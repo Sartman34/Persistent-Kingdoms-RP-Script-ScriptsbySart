@@ -1,0 +1,14 @@
+﻿Server Name  : TR _ RPG
+Discord ID   : aaaaaaaaaa
+Base Hunger  : 0
+Start Hunger : 0
+Start Bank   : 5000
+Start Money  : 2000
+Bank Lost %  : 0
+Ip Adress    : 127.0.0.1
+Base Health  : 35
+Log Location : Mount&Blade Warband Dedicated/Logs
+Whitelist    : 0
+Start Armor  : 142
+Start Foot   : 317
+Idle Income  : 0

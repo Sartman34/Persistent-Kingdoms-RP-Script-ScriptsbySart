@@ -1,0 +1,16 @@
+Admin log pass is: A1N8292UOC
+127.0.0.1
+Got:  load_player ['5', '3214304', '98e_SgtM_Sart'] 80
+Got:  load_admin ['5', '3214304'] 80
+Got:  get_bank_info ['5', '3214304'] 80
+Got:  load_gear ['5', '3214304'] 80
+Got:  save_player ['3214304', '0', '4', '999959999', '100', '0', '0', '142', '317', '0', '-1', '-1', '-1', '-1', '-1', '0', '43641', '26681', '1808'] 80
+Got:  save_inventory ['3214304', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'] 80
+Got:  load_player ['3', '3214304', '98e_SgtM_Sart'] 80
+Got:  load_admin ['3', '3214304'] 80
+Got:  get_bank_info ['3', '3214304'] 80
+Got:  load_gear ['3', '3214304'] 80
+Got:  message_sent ['3', '0', '3214304', '/ardim', '4288217241'] 80
+Got:  message_sent ['3', '0', '3214304', '/yardim', '4288217241'] 80
+Admin log pass is: 979UDNFMAO
+127.0.0.1
