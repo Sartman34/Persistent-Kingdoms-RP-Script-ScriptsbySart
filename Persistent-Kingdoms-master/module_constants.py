@@ -7,7 +7,11 @@
 
 #** Added by us.
 flood_log_limit = 100
+script_ip_address = "@http://127.0.0.1"
+personal_inventory_lenght = 12
 
+admin_queue_command_kick = 1
+admin_queue_command_set_idle_income = 2
 #
 
 ########################################################
@@ -96,6 +100,9 @@ slot_player_first_spawn_occured       = 65
 slot_player_custom_banner_mesh_id     = 66
 
 slot_player_flood_log                 = 67 #**
+slot_player_is_passed_out             = 68
+slot_player_is_not_authenticated      = 69
+slot_player_is_debug_mode             = 70
 
 ########################################################
 ##  AGENT SLOTS            #############################
@@ -248,6 +255,7 @@ slot_scene_prop_store_ammo            = 55
 slot_scene_prop_store_only_ammo       = 56
 
 slot_scene_prop_sitting_agent         = 57
+slot_scene_prop_personal_inventory_player_id = 58
 
 scene_prop_state_active               = 0
 scene_prop_state_destroyed            = 1

@@ -14,20 +14,19 @@ import ntplib
 file = open("basic_settings.txt", "r+")
 database = file.read().split("\n")
 file.close()
-server_name = database[0].split(" : ")[1]
-discord_id = database[1].split(" : ")[1]
-base_hunger = database[2].split(" : ")[1]
-start_hunger = database[3].split(" : ")[1]
-start_bank = database[4].split(" : ")[1]
-start_money = database[5].split(" : ")[1]
-bank_lost_percentage = int(database[6].split(" : ")[1])
-ip_adress = database[7].split(" : ")[1]
-base_health = database[8].split(" : ")[1]
-log_file_location = database[9].split(" : ")[1]
-whitelist_enabled = int(database[10].split(" : ")[1])
-start_armor = database[11].split(" : ")[1]
-start_pants = database[12].split(" : ")[1]
-idle_income = database[13].split(" : ")[1]
+server_name = database.pop(0).split(" : ")[1]
+discord_id = database.pop(0).split(" : ")[1]
+base_hunger = database.pop(0).split(" : ")[1]
+start_hunger = database.pop(0).split(" : ")[1]
+start_bank = database.pop(0).split(" : ")[1]
+start_money = database.pop(0).split(" : ")[1]
+bank_lost_percentage = int(database.pop(0).split(" : ")[1])
+base_health = database.pop(0).split(" : ")[1]
+log_file_location = database.pop(0).split(" : ")[1]
+whitelist_enabled = int(database.pop(0).split(" : ")[1])
+idle_income = database.pop(0).split(" : ")[1]
+license_name = database.pop(0).split(" : ")[1]
+is_high_rpg = database.pop(0).split(" : ")[1]
 
 extension_keys = {"Custom Announcement" : 0,
                   "Door Keys" : 1,
@@ -37,16 +36,16 @@ extension_keys = {"Custom Announcement" : 0,
                   "Inventory" : 5,
                   "Horse Keeper" : 6,
                   "Play Time" : 7,
-                  "Health" : 8
+                  "Health" : 8,
                   }
 
-extensions = [1, 1, 1, 1, 0, 1, 1, 1, 1]
+extensions = [0, 1, 0, 0, 0, 1, 0, 0, 0]
 message_lenght = 80
 class LicenseInfo():
     is_licensed = False
-    date = datetime.datetime(2200, 1, 1)
-    version = "1.8.6"
-    name = "Public Release"
+    date = datetime.datetime(2023, 1, 1)
+    version = "2.0"
+    name = license_name
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, name))
     text[0] = text[0].ljust(message_lenght)
@@ -67,12 +66,17 @@ def logging_print(*string):
     sys.stdout = old_stdout
     file.close()
 
+def clear_spaces(string):
+    for character in [" ", "\t"]:
+        string = string.replace(character, "")
+    return string
+
 ##current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
-current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
-if current_date > LicenseInfo.date:
-    logging_print("License date is over.")
-    input()
-    sys.exit()
+##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
+##if current_date > LicenseInfo.date:
+##    logging_print("License date is over.")
+##    input()
+##    sys.exit()
 
 strings = {
     "/yardim help" : "\
@@ -310,36 +314,36 @@ KapıID guid1 guid2...: Kapı ID'ye guidler eklemenizi sağlar.^\
 KapıID guid1 guid2...: Kapı ID'den guidler çıkarmanızı sağlar.\
 ",
     "/anahtar göster": "\
-Kapı ID: ({}), GUIDs: {}.\
+Kapı (id: {}): {}.\
 ",
     "/anahtar ekle": "\
-{} GUID leri ({}) Kapı ID sine eklendi.\
+{} GUID'leri eklendi.^\
+Kapı (id: {}): {}.\
 ",
     "/anahtar çıkar": "\
-{} GUID leri ({}) Kapı ID sinden çıkarıldı.\
+{} GUID'leri çıkarıldı.^\
+Kapı (id: {}): {}.\
 ",
-    }
-
-colors = {"beyaz" : "4294967295",
-          "koyu mavi shout old": "4282534901",
-          "koyu mavi shout": "4280691865",
-          "koyu mavi": "4284639733",
-          "acik kirmizi": "4293938509",
-          "koyu kirmizi": "4288225055",
-          "acik kahverengi": "4294942763",
-          "koyu kahverengi": "4287714054",
-          "discord pembe": "4292303067",
-          "acik yesil": "4288473929",
-          "koyu yesil": "4283076352",
-          "altin" : "4294434828",
-          "altın" : "4294434828",
-          "gümüş" : "4290822336",
-          "bakır" : "4291589888",
-          "soylenti" : "4284546209",
-          "turuncu" : "4293963842",
-          "mektup" : "4284914073"
-          }
-
+}
+colors = {
+    "beyaz" : 0,
+    "koyu mavi shout": 1,
+    "koyu mavi": 2,
+    "acik kirmizi": 3,
+    "koyu kirmizi": 4,
+    "acik kahverengi": 5,
+    "koyu kahverengi": 6,
+    "discord pembe": 7,
+    "acik yesil": 8,
+    "koyu yesil": 9,
+    "altın" : 10,
+    "gümüş" : 11,
+    "bakır" : 12,
+    "söylenti" : 13,
+    "turuncu" : 14,
+    "mektup" : 15,
+    "yerel sohbet" : 16
+}
 special_strings = {
     "yardim" : [["\
 '/(komut) help' yazarak detaylı açıklamalara ulaşabilirsiniz.^\
@@ -347,26 +351,26 @@ Komutlar:^\
 /yardım", colors["beyaz"]], ["\
 /discord", colors["discord pembe"]], ["\
 /ayrıl", -6750055], ["\
-/dene (mesaj)", colors["soylenti"]], ["\
+/dene (mesaj)", colors["söylenti"]], ["\
 /b (mesaj)", colors["koyu mavi"]], ["\
 /me (mesaj)", colors["acik kahverengi"]], ["\
 /do (mesaj)", colors["acik yesil"]]
-                                ],
+    ],
     "welcome" : [["\
 Merhabalar. {} sunucusuna hoşgeldiniz.".format(server_name), colors["koyu yesil"]], ["\
-Komutlar local-chat'e (Q) yazılarak kullanılır.^\
+Komutlar local-chat'e (Q) yazılarak kullanılır.", colors["yerel sohbet"]], ["\
 /yardım yazarak komutlara ulaşabilirsiniz.", colors["beyaz"]], ["\
-/discord yazarak discord adresimize ulaşabilirsiniz.^\
-Rol yapmaya başlamadan önce uğramanızı tavsiye ederim.", colors["discord pembe"]], ["\
-ScriptsBySart. /license for more info.", colors["koyu yesil"]]
-                                ]
-                   }
+/discord yazarak discord adresimize ulaşabilirsiniz.", colors["discord pembe"]], ["\
+Rol yapmaya başlamadan önce uğramanızı tavsiye ederim.", colors["beyaz"]], ["\
+ScriptsBySart. /license for more info.", colors["söylenti"]]
+    ]
+}
 
 if extensions[extension_keys["Custom Announcement"]]:
     special_strings["yardim"] += [["\
 Roleplay komutları:", colors["beyaz"]], ["\
 /duyuru (mesaj)", colors["beyaz"]], ["\
-/söylenti (mesaj)", colors["soylenti"]]
+/söylenti (mesaj)", colors["söylenti"]]
                                   ]
 if extensions[extension_keys["Letter"]]:
     special_strings["yardim"] += [["\
@@ -376,8 +380,8 @@ Mektup Sistemi:", colors["beyaz"]], ["\
 if extensions[extension_keys["Coin"]]:
     special_strings["yardim"] += [["\
 Madeni Para Sistemi:", colors["beyaz"]], ["\
-/para", colors["altin"]], ["\
-/coin", colors["altin"]]
+/para", colors["altın"]], ["\
+/coin", colors["altın"]]
                                   ]
 if extensions[extension_keys["Door Keys"]]:
     special_strings["yardim"] += [["\
@@ -407,7 +411,6 @@ special_strings["yardim"] += [["\
                                   ]
 admin_client = None
 admin_addr = None
-flood_log = dict()
 admin_q = list()
 players = dict()
 names = dict()
@@ -433,54 +436,70 @@ command_perm = []
 whitelist = []
 t_chat_users = []
 key_checkers = []
-perm_id = {"Duyuru": 0,
-           "Soylenti": 1}
-data_id = {"Faction": 0,
-           "Troop": 1,
-           "Gold": 2,
-           "Health": 3,
-           "Hunger": 4,
-           "Head": 5,
-           "Body": 6,
-           "Foot": 7,
-           "Gloves": 8,
-           "Itm0": 9,
-           "Itm1": 10,
-           "Itm2": 11,
-           "Itm3": 12,
-           "Horse": 13,
-           "HorseHP": 14,
-           "X": 15,
-           "Y": 16,
-           "Z": 17,
-           "Bank": 18,
-           "Pigeon": 19,
-           "Passed-Out" : 20}
-aPerm_id = {"Spectate" : 0,
-            "Tools" : 1,
-            "Panel" : 2,
-            "Gold" : 3,
-            "Kick" : 4,
-            "Temp" : 5,
-            "Perm" : 6,
-            "Fade/Kill" : 7,
-            "Freeze" : 8,
-            "Teleport" : 9,
-            "adminItems" : 10,
-            "Heal" : 11,
-            "Godlike" : 12,
-            "Ship" : 13,
-            "Announce" : 14,
-            "Poll" : 15,
-            "allItems" : 16,
-            "Mute" : 17,
-            "Animal" : 18,
-            "joinFaction" : 19,
-            "Factions" : 20}
-mail_keys = {"Name" : 0,
-             "Message" : 1,
-             "Seal" : 2}
-base_items = ["0", "4", start_money, base_health, base_hunger, "0", start_armor, start_pants, "0", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
+perm_id = {
+    "Duyuru": 0,
+    "Soylenti": 1
+}
+data_id = {
+    "Faction": 0,
+    "Troop": 1,
+    "Gold": 2,
+    "Health": 3,
+    "Hunger": 4,
+    "Head": 5,
+    "Body": 6,
+    "Foot": 7,
+    "Gloves": 8,
+    "Itm0": 9,
+    "Itm1": 10,
+    "Itm2": 11,
+    "Itm3": 12,
+    "Horse": 13,
+    "HorseHP": 14,
+    "X": 15,
+    "Y": 16,
+    "Z": 17,
+    "Bank": 18,
+    "Pigeon": 19,
+    "Passed-Out" : 20
+}
+admin_permissions_ids = {
+    "Spectate" : 0,
+    "Tools" : 1,
+    "Panel" : 2,
+    "Gold" : 3,
+    "Kick" : 4,
+    "Temp" : 5,
+    "Perm" : 6,
+    "Fade/Kill" : 7,
+    "Freeze" : 8,
+    "Teleport" : 9,
+    "adminItems" : 10,
+    "Heal" : 11,
+    "Godlike" : 12,
+    "Ship" : 13,
+    "Announce" : 14,
+    "Poll" : 15,
+    "allItems" : 16,
+    "Mute" : 17,
+    "Animal" : 18,
+    "joinFaction" : 19,
+    "Factions" : 20
+}
+mail_keys = {
+    "Name" : 0,
+    "Message" : 1,
+    "Seal" : 2
+}
+admin_queue_commands = {
+    "Kick": 1,
+    "Settings": 2,
+}
+settings = {
+    "Idle Income" : 0,
+    "High RPG" : 1
+}
+base_items = ["0", "4", start_money, base_health, base_hunger, "0", "0", "0", "0", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
 start_coins = ["0", "0", "0"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
@@ -519,10 +538,10 @@ def import_admin_permissions():
     file = open("admin_permissions.txt", "r+")
     database = file.read().split("\n")
     file.close()
-    for x in database:
-        x = x.replace(" ", "").split("%")
-        guid = x[0]
-        permissions = x[1:]
+    for line in database:
+        guid, *permissions = clear_spaces(line).split("%")
+        if len(permissions) != len(admin_permissions_ids):
+            print("WARNING! Admin with (guid: {}) is cofigured poorly.".format(guid))
         admin_permissions[guid] = permissions
 def import_whitelist():
     global whitelist
@@ -630,6 +649,15 @@ def send_message(client, message, lenght = 128, log = True):
     #if log:
     #    print("Sent: " + message)
 
+def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
+    banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
+    admin_q.append("{}|{}".format(admin_queue_commands["Kick"], unique_id))
+    ban_message = "Player with (unique id: {}) got banned {}. Reason: {}".format(unique_id, "permanently" if permanently else "temporarily", reason)
+    admin_q.append(ban_message)
+    logging_print(ban_message)
+    if admin_client:
+        admin_client.send(ban_message.encode())
+
 def warning(client, message, log, addr, lenght = 128):
     send_message(client, message, lenght)
     while True:
@@ -654,19 +682,14 @@ def refresh_admin():
             finally:
                 admin_client.close()
                 admin_client = None
-                
-def refresh_flood_log():
-    while True:
-        flood_log.clear()
-        time.sleep(10)
 
 def surgery(unique_id):
     t = threading.currentThread()
     time.sleep(20)
     if not getattr(t, "do_run", True):
         return
-    admin_q.append("24|{}|{}".format(unique_id, 75))
-    admin_q.append("38|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["surgery finished"]))
+##    admin_q.append("24|{}|{}".format(unique_id, 75))
+##    admin_q.append("38|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["surgery finished"]))
     patients.pop(unique_id)
 
 def medication(unique_id):
@@ -676,42 +699,42 @@ def medication(unique_id):
         time.sleep(120)
         if not getattr(t, "do_run", True):
             return
-        admin_q.append("35|{}|{}".format(unique_id, 5))
+##        admin_q.append("35|{}|{}".format(unique_id, 5))
         i += 1
     if not getattr(t, "do_run", True):
         return
-    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["medication finished"]))
+##    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["medication finished"]))
     patients.pop(unique_id)
 
 def enpassant(unique_id):
     t = threading.currentThread()
     time.sleep(13)
-    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_info"]))
+##    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_info"]))
     
     time.sleep(20)
     if getattr(t, "do_run", True):
-        admin_q.append("24|{}|{}".format(unique_id, "10"))
-        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage"]))
+##        admin_q.append("24|{}|{}".format(unique_id, "10"))
+##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage"]))
         time.sleep(3)
-        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage_2"]))
+##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage_2"]))
         if int(players[unique_id][data_id["Health"]]) < int("10"):
             players[unique_id][data_id["Health"]] = "10"
 
     time.sleep(180)
     if getattr(t, "do_run", True):
-        admin_q.append("24|{}|{}".format(unique_id, base_health))
-        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["enpassant_second_stage"]))
+##        admin_q.append("24|{}|{}".format(unique_id, base_health))
+##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["enpassant_second_stage"]))
         if int(players[unique_id][data_id["Health"]]) < int(base_health):
             players[unique_id][data_id["Health"]] = base_health
 
-        admin_q.append("26|{}".format(unique_id))
+##        admin_q.append("26|{}".format(unique_id))
         players[unique_id][data_id["Passed-Out"]] = "0"
 
 def authentication_timer(unique_id):
     print("started counting {}".format((authentication_time - play_times[unique_id]) * 60))
     time.sleep((authentication_time - play_times[unique_id]) * 60)
     print("stopped counting")
-    admin_q.append("34|{}".format(unique_id))
+##    admin_q.append("34|{}".format(unique_id))
     
 def main_request_handler(client, addr, port):
     global admin_client, admin_addr, ddos_timer
@@ -753,43 +776,53 @@ def main_request_handler(client, addr, port):
     message = message[1][1:].split("%3C")
     action = message[0].replace("%20", "_")
     message = message[1:]
-    if (not action in ["flood_log", "special_string", "save_to_db", "ping_tcp", "save_chest", "load_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
+    if (not action in ["special_string", "save_to_db", "ping_tcp", "save_chest", "load_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
         logging_print("Got: ", action, message, port)
     try:
         if action == "load_gear":
             #Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z<Bank
             player_id = message[0]
             unique_id = message[1]
+            first_spawn_occured = message[2]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
                 if extensions[extension_keys["Coin"]]:
                     coins[unique_id] = start_coins
-            command_type = "3"
+            kick = "0"
             if unique_id in banned_players:
-                if int(banned_players[unique_id][0]) or (datetime.datetime.now() <= banned_players[unique_id][1]):
-                    command_type = "20"
-            elif not unique_id in whitelist and whitelist_enabled:
-                command_type = "20"
-            send_message(client, "{}|{}".format(command_type, player_id)
-                         + "|{}".format(players[unique_id][data_id["Gold"]])
-                         + "|{}".format(players[unique_id][data_id["Health"]])
-                         + "|{}".format(players[unique_id][data_id["Hunger"]])
-                         + "|{}".format(players[unique_id][data_id["Head"]])
-                         + "|{}".format(players[unique_id][data_id["Body"]])
-                         + "|{}".format(players[unique_id][data_id["Foot"]])
-                         + "|{}".format(players[unique_id][data_id["Gloves"]])
-                         + "|{}".format(players[unique_id][data_id["Itm0"]])
-                         + "|{}".format(players[unique_id][data_id["Itm1"]])
-                         + "|{}".format(players[unique_id][data_id["Itm2"]])
-                         + "|{}".format(players[unique_id][data_id["Itm3"]])
-                         + "|{}".format(players[unique_id][data_id["Horse"]])
-                         + "|{}".format(players[unique_id][data_id["HorseHP"]])
-                         + "|{}".format(players[unique_id][data_id["X"]])
-                         + "|{}".format(players[unique_id][data_id["Y"]])
-                         + "|{}".format(players[unique_id][data_id["Z"]])
-                         + "|{}".format(players[unique_id][data_id["Passed-Out"]])
-                         )
+                permanently = int(banned_players[unique_id][0])
+                hours = banned_players[unique_id][1]
+                reason = banned_players[unique_id][2]
+                if permanently or (datetime.datetime.now() <= hours):
+                    kick = "1"
+                    response = "You have been banned {}!^Reason: {}.^Your GUID: {}".format("permanently" if permanently else "temporarily", reason, unique_id)
+                else:
+                    banned_players.pop(unique_id)
+            if not unique_id in whitelist and whitelist_enabled:
+                kick = "1"
+                response = "You are not whitelisted.^Your GUID: {}".format(unique_id)
+            if kick == "0":
+                response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
+            send_message(client, "{}|{}|{}|{}".format(player_id, first_spawn_occured, kick, response)
+                + "|{}".format(players[unique_id][data_id["Gold"]])
+                + "|{}".format(players[unique_id][data_id["Health"]])
+                + "|{}".format(players[unique_id][data_id["Hunger"]])
+                + "|{}".format(players[unique_id][data_id["Head"]])
+                + "|{}".format(players[unique_id][data_id["Body"]])
+                + "|{}".format(players[unique_id][data_id["Foot"]])
+                + "|{}".format(players[unique_id][data_id["Gloves"]])
+                + "|{}".format(players[unique_id][data_id["Itm0"]])
+                + "|{}".format(players[unique_id][data_id["Itm1"]])
+                + "|{}".format(players[unique_id][data_id["Itm2"]])
+                + "|{}".format(players[unique_id][data_id["Itm3"]])
+                + "|{}".format(players[unique_id][data_id["Horse"]])
+                + "|{}".format(players[unique_id][data_id["HorseHP"]])
+                + "|{}".format(players[unique_id][data_id["X"]])
+                + "|{}".format(players[unique_id][data_id["Y"]])
+                + "|{}".format(players[unique_id][data_id["Z"]])
+                + "|{}".format(players[unique_id][data_id["Passed-Out"]])
+            )
         elif action == "load_player":
             #Faction<Troop
             player_id = message[0]
@@ -808,47 +841,29 @@ def main_request_handler(client, addr, port):
             join_times[unique_id] = datetime.datetime.now()
             if play_times[unique_id] < authentication_time:
                 threading.Thread(target = authentication_timer, args = (unique_id,)).start()
-            send_message(client, "2|{}".format(player_id)
+            send_message(client,
+                         "{}".format(player_id)
                          + "|{}".format(players[unique_id][data_id["Faction"]])
                          + "|{}".format(players[unique_id][data_id["Troop"]])
+                         + "|{}".format("0" if play_times[unique_id] >= authentication_time else "1")
                          + "|{}".format("1" if extensions[extension_keys["Inventory"]] else "0")
                          + ("|{}"*12).format(*inventories[unique_id])
-                         + "|{}".format("0" if play_times[unique_id] >= authentication_time else "1")
                          )
         elif action == "load_admin":
-#player_id|spectate|tools|panel|gold|kick|temp|perm|fade/kill|freeze|teleportsSelf|adminItems|healSelf|godlike|ships|announce|overridePoll|allItems|mute|animals|joinFaction|factions
             player_id = message[0]
             unique_id = message[1]
             if not unique_id in admin_permissions:
                 if admin_client:
                     admin_client.send("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id).encode())
                 logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
-                send_message(client, "16|{}".format(player_id) + "|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1")
+                send_message(client, player_id + "|1" * len(admin_permissions_ids))
             else:
-                send_message(client, "16|{}".format(player_id)
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Spectate"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Tools"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Panel"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Gold"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Kick"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Temp"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Perm"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Fade/Kill"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Freeze"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Teleport"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["adminItems"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Heal"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Godlike"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Ship"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Announce"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Poll"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["allItems"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Mute"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Animal"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["joinFaction"]])
-                             + "|{}".format(admin_permissions[unique_id][aPerm_id["Factions"]])
-                             )
-        elif action == "message_sent" or (action == "chat_message" and extensions[extension_keys["T Chat"]]):
+                send_message(client, player_id
+                    + ("|{}" * len(admin_permissions[unique_id])).format(*admin_permissions[unique_id])
+                    + "|1" * min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0)
+                )
+                
+        elif action == "message_sent":
             player_id = message[0]
             event_type = int(message[1])
             unique_id = message[2]
@@ -858,28 +873,33 @@ def main_request_handler(client, addr, port):
             string0 = string0.replace("%C5%9F", "ş").replace("%C3%A7", "ç").replace("%C4%B1", "ı").replace("%C3%B6", "ö").replace("%C4%9F", "ğ").replace("%C3%BC", "ü")
             string0 = string0.replace("%C5%9E", "Ş").replace("%C3%87", "Ç").replace("%C4%B0", "İ").replace("%C3%96", "Ö").replace("%C4%9E", "Ğ").replace("%C3%9C", "Ü")
             if len(string0) > 256:
-                banned_players[unique_id] = ("1", datetime.datetime.now() + datetime.timedelta(hours = 1))
-                send_message(client, "6|{}".format(unique_id))
-                admin_q.append("{} guidli oyuncu ddos saldirisindan banlandi. (chat overflow)".format(unique_id))
-                logging_print("!!unique id: {} saldırı şüphesi ile banlandı.".format(unique_id))
-                if admin_client:
-                    admin_client.send("!!unique id: {} saldırı şüphesi ile banlandı.".format(unique_id).encode())
+                ban_player(unique_id, permanently = True, reason = "Chat Overflow.")
                 sys.exit()
             command = string0.split(" ")[0][1:]
             text = string0.split(" ")[1:]
             if not any(("%" in text_part) for text_part in string0.split(" ")):
                 if string0[0] == "/":
-                    if command == "register_t_chat":
-                        t_chat_users.append(player_id)
-                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["register_t_chat success"]))
-                    elif command == "yardim" or command == "yardım":
+##                    if command == "register_t_chat":
+##                        t_chat_users.append(player_id)
+##                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["register_t_chat success"]))
+                    if command == "yardim" or command == "yardım":
                         if len(text):
                             if text[0] == "help":
                                 send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/yardim help"]))
                             else:       
-                                send_message(client, "11|{}|0|{}|{}|{}".format(player_id, "yardim", special_strings["yardim"][0][1], special_strings["yardim"][0][0]))
+                                send_message(client, "11|{}|1|{}|{}|{}".format(
+                                    player_id,
+                                    special_strings["yardim"][0][0],
+                                    "yardim",
+                                    special_strings["yardim"][0][1],
+                                ))
                         else:       
-                            send_message(client, "11|{}|0|{}|{}|{}".format(player_id, "yardim", special_strings["yardim"][0][1], special_strings["yardim"][0][0]))
+                            send_message(client, "11|{}|1|{}|{}|{}".format(
+                                player_id,
+                                special_strings["yardim"][0][0],
+                                "yardim",
+                                special_strings["yardim"][0][1],
+                            ))
                     elif command == "license" or command == "lisans":
                         if len(text):
                             if text[0] == "help":
@@ -939,43 +959,43 @@ def main_request_handler(client, addr, port):
                                 send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/dene help"]))
                             else:
                                 basarili = random.randint(0, 1)
-                                colour = colors["soylenti"] if basarili else colors["koyu kirmizi"]
+                                colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
                                 try:
                                     send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)))
                                 except KeyError:
                                     send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
                         else:
                             basarili = random.randint(0, 1)
-                            colour = colors["soylenti"] if basarili else colors["koyu kirmizi"]
+                            colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
                             try:
                                 send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)))
                             except KeyError:
                                 send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-                    elif command == "duyuru" and extensions[extension_keys["Custom Announcement"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/duyuru help"]))
-                            else:
-                                try:
-                                    if unique_id in command_perm[perm_id["Duyuru"]]:
-                                        send_message(client, "10|{}|{}".format(faction_colour, "Duyuru! {}: ".format(names[unique_id]) + " ".join(text)))
-                                    else:
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Duyuru")))
-                                except KeyError:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-                        else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("duyuru")))
-                    elif (command == "soylenti" or command == "söylenti") and extensions[extension_keys["Custom Announcement"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/soylenti help"]))
-                            else:
-                                if unique_id in command_perm[perm_id["Soylenti"]]:
-                                    send_message(client, "10|{}|{}".format(colors["soylenti"], "Soylenti: " + " ".join(text)))
-                                else:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti")))
-                        else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti")))
+##                    elif command == "duyuru" and extensions[extension_keys["Custom Announcement"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/duyuru help"]))
+##                            else:
+##                                try:
+##                                    if unique_id in command_perm[perm_id["Duyuru"]]:
+##                                        send_message(client, "10|{}|{}".format(faction_colour, "Duyuru! {}: ".format(names[unique_id]) + " ".join(text)))
+##                                    else:
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Duyuru")))
+##                                except KeyError:
+##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+##                        else:
+##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("duyuru")))
+##                    elif (command == "söylenti" or command == "söylenti") and extensions[extension_keys["Custom Announcement"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/soylenti help"]))
+##                            else:
+##                                if unique_id in command_perm[perm_id["Soylenti"]]:
+##                                    send_message(client, "10|{}|{}".format(colors["söylenti"], "Soylenti: " + " ".join(text)))
+##                                else:
+##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti")))
+##                        else:
+##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti")))
                     elif command == "discord":
                         if len(text):
                             if text[0] == "help":
@@ -984,14 +1004,14 @@ def main_request_handler(client, addr, port):
                                 send_message(client, "5|{}|{}|{}".format(player_id, colors["discord pembe"], strings["/discord"].format(discord_id)))
                         else:
                             send_message(client, "5|{}|{}|{}".format(player_id, colors["discord pembe"], strings["/discord"].format(discord_id)))
-                    elif command == "ayril" or command == "ayrıl":
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/ayril help"]))
-                            else:
-                                send_message(client, "8|{}".format(player_id))
-                        else:
-                            send_message(client, "8|{}".format(player_id))
+##                    elif command == "ayril" or command == "ayrıl":
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/ayril help"]))
+##                            else:
+##                                send_message(client, "8|{}".format(player_id))
+##                        else:
+##                            send_message(client, "8|{}".format(player_id))
                     elif command == "guid":
                         if len(text):
                             if text[0] == "help":
@@ -1005,78 +1025,78 @@ def main_request_handler(client, addr, port):
                                     send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["kişi bulunamadı"]))
                         else:
                             send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["guidiniz"].format(unique_id)))
-                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"]))
-                            elif text[0] == "yaz":
-                                if len(text) >= 2:
-                                    if text[1] == "help":
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup yaz help"]))
-                                    else:
-                                        while True:
-                                            code = random.randint(10, 100000)
-                                            if str(code) not in mails:
-                                                if unique_id in names:
-                                                    mails[str(code)] = [unique_id, " ".join(text[1:]), "0"]
-                                                    send_message(client, "22|{}|{}".format(player_id, code))
-                                                else:
-                                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-                                                break
-                            elif text[0] == "oku":
-                                if len(text) >= 2:
-                                    if text[1] == "help":
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup oku help"]))
-                                    else:
-                                        send_message(client, "23|{}".format(player_id))
-                                else:
-                                    send_message(client, "23|{}".format(player_id))
-                            elif text[0] == "mühürle" or text[0] == "muhurle":
-                                if len(text) >= 2: #text[1]: guid or "help"
-                                    if text[1] == "help":
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-                                    elif text[1] == "kaldır" or text[1] == "kaldir":
-                                        send_message(client, "25|{}|{}".format(player_id, "0"))
-                                    elif text[1].isnumeric():
-                                        send_message(client, "25|{}|{}".format(player_id, text[1]))
-                                    else:
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-                                else:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-                            else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
-                        else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
-                    elif command in ["para", "coin"] and extensions[extension_keys["Coin"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin help" if command == "coin" else "/para help"]))
-                            elif text[0] in ["bırak", "birak", "drop"]:
-                                if len(text) >= 2:
-                                    if text[1] == "help":
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
-                                    else:
-                                        parameters = {"a" : 0, "g" : 1, "b" : 2} if text[0] != "drop" else {"g" : 0, "s" : 1, "b" : 2}
-                                        transactions = []
-                                        can_continue = True
-                                        for parameter in text[2:]:
-                                            if parameter[-1] in parameters and parameters[:-1].isnumeric():
-                                                transactions.append(parameters[parameter[-1]], int(parameters[:-1]))
-                                            else:
-                                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
-                                                can_continue = False
-                                                break
-                                        if can_continue:
-                                            coin_names = ["Altın", "Gümüş", "Bakır"] if text[0] != "drop" else ["Gold", "Silver", "Bronze"]
-                                            coin_colors = ["altın", "gümüş", "bakır"]
-                                            for transaction in transactions:
-                                                if coins[unique_id][transaction[0]] >= transaction[1]:
-                                                    coins[unique_id][transaction[0]] -= transaction[1]
-                                                    admin_q.append("5|{}|{}|{}".format(player_id, colors[coin_colors[transaction[0]]], strings["bırakma başarılı" if text[0] != "drop" else "drop successful"].format(transaction[1], coin_names[transaction[0]])))
-                            else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
-                        else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
+##                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"]))
+##                            elif text[0] == "yaz":
+##                                if len(text) >= 2:
+##                                    if text[1] == "help":
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup yaz help"]))
+##                                    else:
+##                                        while True:
+##                                            code = random.randint(10, 100000)
+##                                            if str(code) not in mails:
+##                                                if unique_id in names:
+##                                                    mails[str(code)] = [unique_id, " ".join(text[1:]), "0"]
+##                                                    send_message(client, "22|{}|{}".format(player_id, code))
+##                                                else:
+##                                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+##                                                break
+##                            elif text[0] == "oku":
+##                                if len(text) >= 2:
+##                                    if text[1] == "help":
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup oku help"]))
+##                                    else:
+##                                        send_message(client, "23|{}".format(player_id))
+##                                else:
+##                                    send_message(client, "23|{}".format(player_id))
+##                            elif text[0] == "mühürle" or text[0] == "muhurle":
+##                                if len(text) >= 2: #text[1]: guid or "help"
+##                                    if text[1] == "help":
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
+##                                    elif text[1] == "kaldır" or text[1] == "kaldir":
+##                                        send_message(client, "25|{}|{}".format(player_id, "0"))
+##                                    elif text[1].isnumeric():
+##                                        send_message(client, "25|{}|{}".format(player_id, text[1]))
+##                                    else:
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
+##                                else:
+##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
+##                            else:
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
+##                        else:
+##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
+##                    elif command in ["para", "coin"] and extensions[extension_keys["Coin"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin help" if command == "coin" else "/para help"]))
+##                            elif text[0] in ["bırak", "birak", "drop"]:
+##                                if len(text) >= 2:
+##                                    if text[1] == "help":
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
+##                                    else:
+##                                        parameters = {"a" : 0, "g" : 1, "b" : 2} if text[0] != "drop" else {"g" : 0, "s" : 1, "b" : 2}
+##                                        transactions = []
+##                                        can_continue = True
+##                                        for parameter in text[2:]:
+##                                            if parameter[-1] in parameters and parameters[:-1].isnumeric():
+##                                                transactions.append(parameters[parameter[-1]], int(parameters[:-1]))
+##                                            else:
+##                                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
+##                                                can_continue = False
+##                                                break
+##                                        if can_continue:
+##                                            coin_names = ["Altın", "Gümüş", "Bakır"] if text[0] != "drop" else ["Gold", "Silver", "Bronze"]
+##                                            coin_colors = ["altın", "gümüş", "bakır"]
+##                                            for transaction in transactions:
+##                                                if coins[unique_id][transaction[0]] >= transaction[1]:
+##                                                    coins[unique_id][transaction[0]] -= transaction[1]
+##                                                    admin_q.append("5|{}|{}|{}".format(player_id, colors[coin_colors[transaction[0]]], strings["bırakma başarılı" if text[0] != "drop" else "drop successful"].format(transaction[1], coin_names[transaction[0]])))
+##                            else:
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
+##                        else:
+##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
                     elif command in ["envanter", "inventory"] and extensions[extension_keys["Inventory"]]:
                         if len(text):
                             if text[0] == "help":
@@ -1085,8 +1105,6 @@ def main_request_handler(client, addr, port):
                                 send_message(client, "31|{}".format(player_id))
                         else:
                             send_message(client, "31|{}".format(player_id))
-                    elif command in ["debug"]:
-                        send_message(client, "39|{}".format(player_id))
                     elif command in ["anahtar", "key"] and extensions[extension_keys["Door Keys"]] and unique_id in key_checkers:
                         if len(text) >= 2:
                             instance = text[1]
@@ -1102,15 +1120,17 @@ def main_request_handler(client, addr, port):
                                     for unique_id in unique_ids:
                                         if not unique_id in doors[instance]:
                                             doors[instance].append(unique_id)
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar ekle"].format(", ".join(unique_ids), instance)))
-                                    admin_q.append("5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar göster"].format(instance, ", ".join(doors[instance]))))
+                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"],
+                                        strings["/anahtar ekle"].format(", ".join(unique_ids), instance, ", ".join(doors[instance]))
+                                    ))
                                 elif text[0] in ["çıkar", "cikar", "remove"]:
                                     unique_ids = text[2:]
                                     for unique_id in unique_ids:
                                         if unique_id in doors[instance]:
                                             doors[instance].remove(unique_id)
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar çıkar"].format(", ".join(unique_ids), instance)))
-                                    admin_q.append("5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar göster"].format(instance, ", ".join(doors[instance]))))
+                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"],
+                                        strings["/anahtar çıkar"].format(", ".join(unique_ids), instance, ", ".join(doors[instance]))
+                                    ))
                                 else:
                                     send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
                                 if doors[instance] == []:
@@ -1119,44 +1139,42 @@ def main_request_handler(client, addr, port):
                                 send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
                         else:
                             send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
-                    elif command in ["bağla", "bagla", "tie"] and extensions[extension_keys["Horse Keeper"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/bağla help"]))
-                            else:
-                                send_message(client, "32|{}".format(player_id))
-                        else:
-                            send_message(client, "32|{}".format(player_id))
-                    elif command in ["can", "health"] and extensions[extension_keys["Health"]]:
-                        if len(text):
-                            if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
-                            elif text[0] in ["ilaç", "ilac", "medication"]:
-                                if len(text) >= 2:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ilac help"]))
-                                else:
-                                    if unique_id in patients and patients[unique_id].is_alive():
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
-                                    else:
-                                        send_message(client, "36|{}|{}".format(player_id, 1))
-                            elif text[0] in ["ameliyat", "surgery"]:
-                                if len(text) >= 2:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ameliyat help"]))
-                                else:
-                                    if unique_id in patients and patients[unique_id].is_alive():
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
-                                    else:
-                                        send_message(client, "36|{}|{}".format(player_id, 0))
-                            else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
-                        else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
+##                    elif command in ["bağla", "bagla", "tie"] and extensions[extension_keys["Horse Keeper"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/bağla help"]))
+##                            else:
+##                                send_message(client, "32|{}".format(player_id))
+##                        else:
+##                            send_message(client, "32|{}".format(player_id))
+##                    elif command in ["can", "health"] and extensions[extension_keys["Health"]]:
+##                        if len(text):
+##                            if text[0] == "help":
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
+##                            elif text[0] in ["ilaç", "ilac", "medication"]:
+##                                if len(text) >= 2:
+##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ilac help"]))
+##                                else:
+##                                    if unique_id in patients and patients[unique_id].is_alive():
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
+##                                    else:
+##                                        send_message(client, "36|{}|{}".format(player_id, 1))
+##                            elif text[0] in ["ameliyat", "surgery"]:
+##                                if len(text) >= 2:
+##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ameliyat help"]))
+##                                else:
+##                                    if unique_id in patients and patients[unique_id].is_alive():
+##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
+##                                    else:
+##                                        send_message(client, "36|{}|{}".format(player_id, 0))
+##                            else:
+##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
+##                        else:
+##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
                     else:
                         send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["hatali komut"]))
-                elif action == "message_sent": 
-                    send_message(client, "4|{}|{}|{}".format(player_id, event_type, string0))
-                elif unique_id in t_chat_users and extensions[extension_keys["T Chat"]]:
-                    send_message(client, "18|{}|{}|{}".format(player_id, event_type, string0))
+                else: 
+                    send_message(client, "1|{}|{}|{}".format(player_id, event_type, string0))
             else:
                 send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["desteklenmeyen karakter"]))
         elif action == "special_string":
@@ -1164,7 +1182,13 @@ def main_request_handler(client, addr, port):
             string0 = message[1]
             counter = int(message[2])
             if counter < len(special_strings[string0]):
-                send_message(client, "11|{}|{}|{}|{}|{}".format(player_id, counter, string0, special_strings[string0][counter][1], special_strings[string0][counter][0]), log = False)
+                send_message(client, "1|{}|{}|{}|{}|{}".format(
+                    player_id,
+                    counter + 1,
+                    special_strings[string0][counter][0],
+                    string0,
+                    special_strings[string0][counter][1],
+                ), log = False)
             else:
                 send_message(client, "0", lenght = 1, log = False)
         elif action == "heal_buy_success":
@@ -1226,12 +1250,6 @@ def main_request_handler(client, addr, port):
                 send_message(client, "5|{}|{}|{}".format(player_id, colors["acik yesil"], strings["muhur basarili"].format(names[target_guid])))
             else:
                 send_message(client, "5|{}|{}|{}".format(player_id, colors["acik yesil"], strings["muhur kaldirildi"]))
-        elif action == "get_bank_info":
-            player_id = message[0]
-            unique_id = message[1]
-            if not unique_id in players:
-                players[unique_id] = base_items.copy()
-            send_message(client, "5|{}|{}|{}".format(player_id, colors["altin"], strings["banka hesabiniz {}"].format(players[unique_id][data_id["Bank"]])))
         elif action == "ping_tcp":
             if len(admin_q):
                 response = admin_q.pop()
@@ -1250,7 +1268,7 @@ def main_request_handler(client, addr, port):
                 is_private = 1
                 if unique_id in doors[instance_id]:
                     has_keys = 1
-            send_message(client, "14|{}|{}|{}|{}|{}|{}".format(agent_id, instance_id, left, player_id, is_private, has_keys))
+            send_message(client, "{}|{}|{}|{}|{}|{}".format(agent_id, instance_id, left, player_id, is_private, has_keys))
             if unique_id in key_checkers and admin_client:
                 admin_client.send("Door: {}".format(instance_id).encode())
         elif action == "check_door_key_teleport":
@@ -1285,15 +1303,15 @@ def main_request_handler(client, addr, port):
             hunger_count = hunger_count_copy.copy()
             hunger_count_copy = dict()
             send_message(client, "0", lenght = 1)
-        elif action == "sts":
-            text = " ".join(message)
-            if (text == "13" and not text in admin_q) or not text == "13": 
-                admin_q.append(text)
-                client.send(text.encode())
-                logging_print("Sent: {}".format(text))
-            else:
-                client.send(b"Failed to register hunger")
-                logging_print("Sent: {}".format("Failed to register hunger"))
+##        elif action == "sts":
+##            text = " ".join(message)
+##            if (text == "13" and not text in admin_q) or not text == "13": 
+##                admin_q.append(text)
+##                client.send(text.encode())
+##                logging_print("Sent: {}".format(text))
+##            else:
+##                client.send(b"Failed to register hunger")
+##                logging_print("Sent: {}".format("Failed to register hunger"))
         elif action == "save_player": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
             unique_id = message[0]
             data = message[1:]
@@ -1332,7 +1350,7 @@ def main_request_handler(client, addr, port):
             if int(index) < len(chests[variation_id_tuple]):
                 send_message(client, "1|{}|{}|{}|{}|{}".format(scene_prop, variation_id, index, instance_id, chests[variation_id_tuple][int(index)]))
             else:
-                send_message(client, "0", lenght = 1, log = False)
+                send_message(client, "2|{}".format(scene_prop, variation_id, index))
         elif action == "save_inventory":
             unique_id = message[0]
             data = message[1:]
@@ -1374,22 +1392,20 @@ def main_request_handler(client, addr, port):
             death_time_counter[unique_id] = time.time()
         elif action == "ban_player":
             unique_id = message[0]
-            perma = message[1]
-            lenght_hours = message[2]
-            banned_players[unique_id] = (perma, datetime.datetime.now() + datetime.timedelta(hours = int(lenght_hours)))
-            send_message(client, "6|{}".format(unique_id))
+            permanently = message[1]
+            hours = message[2]
+            ban_player(unique_id, permanently = True if permanently == "1" else False, hours = int(hours), reason = "Admin Decision.")
         elif action == "player_ban":
             sended_admin_pass = message[0]
             unique_id = message[1]
-            perma = message[2]
-            lenght_hours = message[3]
+            permanently = message[2]
+            hours = message[3]
             if sended_admin_pass == admin_pass:
-                banned_players[unique_id] = (perma, datetime.datetime.now() + datetime.timedelta(hours = int(lenght_hours)))
-                admin_q.append("6|{}".format(unique_id))
+                ban_player(unique_id, permanently = True if permanently == "1" else False, hours = int(hours), reason = "Panel Order.")
                 client.send("message%Banned player {}".format(unique_id).encode())
             else:
                 client.send(b"message%Hatali sifre.")
-                log = "Hatali admin pass ile banladi."
+                log = "Hatali admin pass ile banlamaya calisti."
                 while True:
                     code = get_random_string(5)
                     if code not in bad_ips:
@@ -1442,7 +1458,12 @@ def main_request_handler(client, addr, port):
                 file = open("banned_players.txt", "w")
                 text = ""
                 for unique_id in banned_players:
-                    text += "{}%{}%{}\n".format(unique_id, banned_players[unique_id][0], banned_players[unique_id][1].strftime('%Y:%m:%d:%H:%M:%S'))
+                    text += "{}%{}%{}%{}\n".format(
+                        unique_id,
+                        banned_players[unique_id][0],
+                        banned_players[unique_id][1].strftime('%Y:%m:%d:%H:%M:%S'),
+                        banned_players[unique_id][2].replace("%", "").replace("\n", "")
+                    )
                 file.write(text[:-1])
                 file.close()
             except:
@@ -1601,12 +1622,12 @@ def main_request_handler(client, addr, port):
             if 0 <= int(players[unique_id][data_id["Bank"]]) - amount:
                 players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
                 players[unique_id][data_id["Gold"]] = str(gold + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altin"], strings["para cekme basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para cekme basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
             elif int(players[unique_id][data_id["Bank"]]) > 0:
                 amount = int(players[unique_id][data_id["Bank"]])
                 players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
                 players[unique_id][data_id["Gold"]] = str(gold + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altin"], strings["tum paraniz cekildi"].format(amount), players[unique_id][data_id["Gold"]]))
+                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz cekildi"].format(amount), players[unique_id][data_id["Gold"]]))
             else:
                 send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["yetersiz bakiye"]))
         elif action == "para_yatir":
@@ -1619,12 +1640,12 @@ def main_request_handler(client, addr, port):
             if 0 <= gold - amount and not gold == 0:
                 players[unique_id][data_id["Gold"]] = str(gold - amount)
                 players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altin"], strings["para yatirma basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para yatirma basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
             elif 0 < gold:
                 amount = gold
                 players[unique_id][data_id["Gold"]] = str(gold - amount)
                 players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altin"], strings["tum paraniz yatirildi"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz yatirildi"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
             else:
                 send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["paraniz yok"]))
         elif action == "refund":
@@ -1752,11 +1773,12 @@ try:
     database = file.read().split("\n")
     file.close()
     for player in database:
-        player = player.split("%")
-        unique_id = player[0]
-        perma = player[1]
-        ban_time = datetime.datetime.strptime(player[2], "%Y:%m:%d:%H:%M:%S")
-        banned_players[unique_id] = (perma, ban_time)
+        parameters = player.split("%")
+        unique_id = parameters.pop(0)
+        permanently = parameters.pop(0)
+        hours = datetime.datetime.strptime(parameters.pop(0), "%Y:%m:%d:%H:%M:%S")
+        reason = parameters.pop(0)
+        banned_players[unique_id] = (permanently, hours, reason)
 
     file = open("banned_ips.txt", "r+")
     database = file.read().split("#")
@@ -1776,19 +1798,17 @@ try:
     import_play_times()
 
     if not idle_income in ["0", ""]:
-        try:
-            int(idle_income)
-            admin_q.append("28|{}".format(idle_income))
-        except:
-            logging_print(traceback.format_exc())
+        int(idle_income)
+        admin_q.append("{}|{}|{}".format(admin_queue_commands["Settings"], settings["Idle Income"], idle_income))
+
+    if is_high_rpg in ["True", "true", "1"]:
+        admin_q.append("{}|{}|1".format(admin_queue_commands["Settings"], settings["High RPG"]))
 
     admin_pass = get_random_string(10)
     logging_print("Admin log pass is: {}".format(admin_pass))
 
     threading.Thread(target = refresh_admin).start()
-    threading.Thread(target = refresh_flood_log).start()
     threading.Thread(target = warband_listener, args = (80, "127.0.0.1")).start()
-##    threading.Thread(target = warband_listener, args = (22161, ip_adress)).start()
 except:
     logging_print(traceback.format_exc())
     input()

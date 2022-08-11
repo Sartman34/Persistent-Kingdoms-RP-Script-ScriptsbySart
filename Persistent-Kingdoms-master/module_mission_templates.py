@@ -77,52 +77,179 @@ before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic 
     (try_end),
     ])
 
-after_mission_start_setup = (ti_after_mission_start, 0, 0, [], # spawn and move certain things after most other set up is done
-   [(set_spawn_effector_scene_prop_kind, 0, -1),
-    (set_spawn_effector_scene_prop_kind, 1, -1),
-    (assign, "$g_preset_message_display_enabled", 0),
+after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and move certain things after most other set up is done
+  (set_spawn_effector_scene_prop_kind, 0, -1),
+  (set_spawn_effector_scene_prop_kind, 1, -1),
+  (assign, "$g_preset_message_display_enabled", 0),
+  (multiplayer_is_server),
+  (assign, "$g_next_scene", -1),
+  (call_script, "script_setup_ship_collision_props"),
+  (call_script, "script_setup_scene_props_after_mission_start"),
+  (init_position, pos1),
+  (set_spawn_position, pos1), # spawn a respawn position marker scene prop for each possible player
+  (server_get_max_num_players, "$g_spawn_marker_count"),
+  (val_add, "$g_spawn_marker_count", 1),
+  (try_for_range, ":unused", 0, "$g_spawn_marker_count"),
+    (spawn_scene_prop, "spr_code_spawn_marker"),
+  (try_end),
+  (assign, "$g_spawned_bot_count", 0),
+  (try_for_range, ":faction_id", castle_factions_begin, factions_end),
+     (try_for_range, ":target_faction_id", castle_factions_begin, factions_end),
+        (neq, ":faction_id", ":target_faction_id"),
+        (call_script, "script_cf_faction_change_relation", ":faction_id", ":target_faction_id", 1),
+     (try_end),
+  (try_end),
+  #Spawn SRP Skyboxes if wanted
+  (try_begin),
+    (eq, "$g_day_night_cycle_enabled", 1),
     (multiplayer_is_server),
-    (assign, "$g_next_scene", -1),
-    (call_script, "script_setup_ship_collision_props"),
-    (call_script, "script_setup_scene_props_after_mission_start"),
-    (init_position, pos1),
-    (set_spawn_position, pos1), # spawn a respawn position marker scene prop for each possible player
-    (server_get_max_num_players, "$g_spawn_marker_count"),
-    (val_add, "$g_spawn_marker_count", 1),
-    (try_for_range, ":unused", 0, "$g_spawn_marker_count"),
-      (spawn_scene_prop, "spr_code_spawn_marker"),
-    (try_end),
-    (assign, "$g_spawned_bot_count", 0),
-    (try_for_range, ":faction_id", castle_factions_begin, factions_end),
-       (try_for_range, ":target_faction_id", castle_factions_begin, factions_end),
-          (neq, ":faction_id", ":target_faction_id"),
-          (call_script, "script_cf_faction_change_relation", ":faction_id", ":target_faction_id", 1),
-       (try_end),
-    (try_end),
-    #Spawn SRP Skyboxes if wanted
-    (try_begin),
-      (eq, "$g_day_night_cycle_enabled", 1),
-      (multiplayer_is_server),
-      (call_script, "script_skybox_spawn_all"),
-    (try_end),
-    ])
+    (call_script, "script_skybox_spawn_all"),
+  (try_end),
 
-player_joined = (ti_server_player_joined, 0, 0, [], # server: handle connecting players
-   [(store_trigger_param_1, ":player_id"),
-    (call_script, "script_setup_player_joined", ":player_id"),
-    (call_script, "script_update_ghost_mode_rule", ":player_id"),
-    (call_script, "script_apply_mute", ":player_id", "$g_mute_all_players"),
-    ])
+  (send_message_to_url_advanced, script_ip_address + "/ping_tcp", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
+
+  ] + [elem for sublist in [[
+    (call_script, "script_load_chests", "spr_" + scene_prop),
+  ] for scene_prop in [
+    "pw_item_chest_a",
+    "pw_item_chest_b",
+    "pw_cart_a",
+    "pw_cart_b",
+    "pw_wheelbarrow",
+    "pw_hand_cart",
+    "pw_back_basket",
+    "pw_back_box",
+    "pw_horse_pack",
+    "cm_civ_cart",
+    "cm_war_cart",
+  ]] for elem in sublist] + [
+])
+
+player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connecting players
+  (store_trigger_param_1, ":player_id"),
+  (call_script, "script_setup_player_joined", ":player_id"),
+  (call_script, "script_update_ghost_mode_rule", ":player_id"),
+  (call_script, "script_apply_mute", ":player_id", "$g_mute_all_players"),
+
+  (assign, reg0, ":player_id"),
+  (player_get_unique_id, reg1, reg0),
+  (str_store_player_username, s0, ":player_id"),
+  (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{reg1}<{s0}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
+])
 
 player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
    [(store_trigger_param_1, ":player_id"),
     (call_script, "script_cf_save_player_exit", ":player_id"),
 
-    (str_store_player_username, s1, ":player_id"),
-    (player_get_unique_id, reg0, ":player_id"),
-    (server_add_message_to_log, "str_s1_has_left_the_game_with_id_reg0"),
+    (player_get_agent_id, ":agent_id", ":player_id"),
+    (try_begin),
+      (agent_is_active, ":agent_id"),
+      (agent_is_alive, ":agent_id"),
 
-    (call_script, "script_log_equipment", ":player_id"),
+      (player_get_unique_id, reg0, ":player_id"),
+      (player_get_slot, reg1, ":player_id", slot_player_faction_id),
+      (player_get_troop_id, reg2, ":player_id"),
+      (player_get_gold, reg3, ":player_id"),
+
+      (store_agent_hit_points, reg4, ":agent_id", 0),
+      (try_begin),
+        (agent_is_alive, ":agent_id"),
+        (agent_get_slot, reg5, ":agent_id", slot_agent_food_amount),
+      (try_end),
+
+      (player_get_slot, reg6, ":player_id", slot_player_equip_head),
+      (player_get_slot, reg7, ":player_id", slot_player_equip_body),
+      (player_get_slot, reg8, ":player_id", slot_player_equip_foot),
+      (player_get_slot, reg9, ":player_id", slot_player_equip_gloves),
+
+      (agent_get_item_slot, reg10, ":agent_id", 0),
+      (agent_get_item_slot, reg11, ":agent_id", 1),
+      (agent_get_item_slot, reg12, ":agent_id", 2),
+      (agent_get_item_slot, reg13, ":agent_id", 3),
+    
+      (try_begin),
+        (agent_get_horse, ":horse_agent_id", ":agent_id"),
+        (agent_is_active, ":horse_agent_id"),
+        (agent_is_alive, ":horse_agent_id"),
+        (agent_get_item_id, reg14, ":horse_agent_id"),
+        (store_agent_hit_points, reg15, ":horse_agent_id", 0),
+        (agent_fade_out, ":horse_agent_id"),
+      (else_try),
+        (assign, reg14, -1),
+        (assign, reg15, 0),
+      (try_end),
+
+      (set_fixed_point_multiplier, 100),
+      (agent_get_position, pos1, ":agent_id"),
+      (position_get_x, reg16, pos1),
+      (position_get_y, reg17, pos1),
+      (position_get_z, reg18, pos1),
+
+      (send_message_to_url_advanced,
+        script_ip_address
+        + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}",
+        "@WSE2", "script_default_return", "script_default_fail"
+      ),
+    
+      (troop_get_slot, ":instance_id", "trp_personal_inventories", ":player_id"),
+      (try_begin),
+        (prop_instance_is_valid, ":instance_id"),
+] + [elem for sublist in [[
+        (scene_prop_get_slot, reg19 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
+        (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
+] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
+  
+        (send_message_to_url_advanced,
+          script_ip_address
+          + "/save_inventory<{reg0}<{reg19}<{reg20}<{reg21}<{reg22}<{reg23}<{reg24}<{reg25}<{reg26}<{reg27}<{reg28}<{reg29}<{reg30}",
+          "@WSE2", "script_default_return", "script_default_fail"
+        ),
+      (try_end),
+        
+##      (try_begin),
+####        (player_get_troop_id, reg2, ":player_id"),
+##        
+####        (player_get_slot, reg6, ":player_id", slot_player_equip_head),
+####        (player_get_slot, reg7, ":player_id", slot_player_equip_body),
+####        (player_get_slot, reg8, ":player_id", slot_player_equip_foot),
+####        (player_get_slot, reg9, ":player_id", slot_player_equip_gloves),
+####
+####        (agent_get_item_slot, reg10, ":agent_id", 0),
+####        (agent_get_item_slot, reg11, ":agent_id", 1),
+####        (agent_get_item_slot, reg12, ":agent_id", 2),
+####        (agent_get_item_slot, reg13, ":agent_id", 3),
+##
+####        (agent_get_position, pos1, ":agent_id"),
+##        
+##        (agent_fade_out, ":agent_id"),
+##        (set_spawn_position, pos1),
+##        (spawn_agent, "trp_multiplayer_profile_troop_female"),
+##        (assign, ":agent_id", reg0),
+##        (agent_set_team, ":agent_id", team_spawn_invulnerable),
+##        (agent_set_crouch_mode, ":agent_id", 1),
+##        (agent_set_animation, ":agent_id", "anim_sleeping", 0),
+##        (call_script, "script_change_armor", ":agent_id", reg6),
+##        (call_script, "script_change_armor", ":agent_id", reg7),
+##        (call_script, "script_change_armor", ":agent_id", reg8),
+##        (call_script, "script_change_armor", ":agent_id", reg9),
+##        (try_begin),
+##          (gt, reg10, -1),
+##          (agent_equip_item, ":agent_id", reg10),
+##        (try_end),
+##        (try_begin),
+##          (gt, reg11, -1),
+##          (agent_equip_item, ":agent_id", reg11),
+##        (try_end),
+##        (try_begin),
+##          (gt, reg12, -1),
+##          (agent_equip_item, ":agent_id", reg12),
+##        (try_end),
+##        (try_begin),
+##          (gt, reg13, -1),
+##          (agent_equip_item, ":agent_id", reg13),
+##        (try_end),
+##      (try_end),
+    (try_end),
   ])
 
 
@@ -130,6 +257,23 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [], # server and clients: set up new age
    [(store_trigger_param_1, ":agent_id"),
     (call_script, "script_on_agent_spawned", ":agent_id"),
     (call_script, "script_death_cam_off", ":agent_id"),
+
+    (try_begin),
+      (multiplayer_is_server),
+      (agent_is_human, ":agent_id"),
+      (neg|agent_is_non_player, ":agent_id"),
+      (agent_get_player_id, ":player_id", ":agent_id"),
+      (player_get_slot, ":first_spawn_occured", ":player_id", slot_player_first_spawn_occured),
+      (try_begin),
+        (player_get_slot, ":spawn_state", ":player_id", slot_player_spawn_state),
+        (eq, ":spawn_state", 1),
+        (player_get_unique_id, ":unique_id", ":player_id"),
+        (assign, reg0, ":player_id"),
+        (assign, reg1, ":unique_id"),
+        (assign, reg2, ":first_spawn_occured"),
+        (send_message_to_url_advanced, script_ip_address + "/load_gear<{reg0}<{reg1}<{reg2}", "@WSE2", "script_load_gear_return", "script_load_gear_fail"),
+      (try_end),
+    (try_end),
 
     (try_begin),
       (multiplayer_is_server),
@@ -179,10 +323,25 @@ agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: h
     (call_script, "script_client_check_show_respawn_time_counter", ":dead_agent_id"),
     (call_script, "script_death_cam", ":dead_agent_id"),
     (call_script, "script_apply_consequences_for_agent_death", ":dead_agent_id", ":killer_agent_id"),
+    
     (multiplayer_is_server),
-    (call_script, "script_setup_agent_for_respawn", ":dead_agent_id"),
+    (try_begin),
+      (neq, ":killer_agent_id", -1),  # if -1 then the player disconnected. Otherwise they died for another reason.
+      (agent_is_human, ":dead_agent_id"),
+      (agent_get_player_id, ":player_id", ":dead_agent_id"),
+      (player_is_active, ":player_id"),
+      (player_get_unique_id, reg0, ":player_id"),
+      (player_get_gold, reg1, ":player_id"),
+      (agent_get_position, pos1, ":dead_agent_id"),
+      (position_get_x, reg2, pos1),
+      (position_get_y, reg3, pos1),
+      (position_get_z, reg4, pos1),
+      (send_message_to_url_advanced, script_ip_address + "/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}", "@WSE2", "script_default_return", "script_default_fail"),
+    (try_end),
+
+    (call_script, "script_setup_agent_for_respawn", ":dead_agent_id", ":killer_agent_id"),
     (call_script, "script_check_animal_killed", ":dead_agent_id", ":killer_agent_id"),
-    (call_script, "script_check_spawn_bots", ":dead_agent_id"),
+##    (call_script, "script_check_spawn_bots", ":dead_agent_id"),
     ])
 
 agent_hit = (ti_on_agent_hit, 0, 0, [], # server: apply extra scripted effects for special weapons, hitting animals, and when overloaded by armor
@@ -1025,6 +1184,40 @@ flood_log_refresh = (5, 0, 0, [
     (player_set_slot, ":player_id", slot_player_flood_log, 0),
   (try_end),
 ], [])
+
+#ScriptsBySartman
+idle_income = (0, 0, 900, [
+  (multiplayer_is_server),
+  (neq, "$g_idle_income", 0),
+  (try_for_players, ":player_id"),
+    (player_is_active, ":player_id"),
+    (call_script, "script_player_adjust_gold", ":player_id", "$g_idle_income", 1),
+  (try_end),
+], [])
+
+ping_tcp_server = (0, 0, 10, [
+  (multiplayer_is_server),
+  (send_message_to_url_advanced, script_ip_address + "/ping_tcp", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
+], [])
+
+save_chests = (900, 0, 0, [
+  (multiplayer_is_server),
+] + [elem for sublist in [[
+  (call_script, "script_save_chests", "spr_" + scene_prop),
+] for scene_prop in [
+    "pw_item_chest_a",
+    "pw_item_chest_b",
+    "pw_cart_a",
+    "pw_cart_b",
+    "pw_wheelbarrow",
+    "pw_hand_cart",
+    "pw_back_basket",
+    "pw_back_box",
+    "pw_horse_pack",
+    "cm_civ_cart",
+    "cm_war_cart",
+]] for elem in sublist] + [
+], [])
 #
 
 def common_triggers(mission_template):
@@ -1068,7 +1261,10 @@ def common_triggers(mission_template):
         herd_animal_count_check,#34
         herd_animal_spawn_check,#35
         weather_situation_check,#36
-        flood_log_refresh#37
+        flood_log_refresh,#37
+        idle_income,#38
+        ping_tcp_server,#39
+        save_chests,#40
     ]
 ##    escape_pressed, #** Client side scripts.
 ##    tab_pressed,
