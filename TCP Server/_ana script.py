@@ -1303,15 +1303,15 @@ def main_request_handler(client, addr, port):
             hunger_count = hunger_count_copy.copy()
             hunger_count_copy = dict()
             send_message(client, "0", lenght = 1)
-##        elif action == "sts":
-##            text = " ".join(message)
-##            if (text == "13" and not text in admin_q) or not text == "13": 
-##                admin_q.append(text)
-##                client.send(text.encode())
-##                logging_print("Sent: {}".format(text))
-##            else:
-##                client.send(b"Failed to register hunger")
-##                logging_print("Sent: {}".format("Failed to register hunger"))
+        elif action == "sts":
+            text = " ".join(message)
+            if (text == "13" and not text in admin_q) or not text == "13": 
+                admin_q.append(text)
+                client.send(text.encode())
+                logging_print("Sent: {}".format(text))
+            else:
+                client.send(b"Failed to register hunger")
+                logging_print("Sent: {}".format("Failed to register hunger"))
         elif action == "save_player": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
             unique_id = message[0]
             data = message[1:]
