@@ -132,7 +132,7 @@ def spr_buy_item_triggers(item_id, pos_offset=(8,0,8), rotate=(0,0,0), use_strin
   if len(resources) > 0:
     buy_trigger[1].append((call_script, "script_cf_buy_sell_item_stockpile", ":agent_id", ":instance_id"))
   else:
-    buy_trigger[1].append((call_script, "script_cf_buy_item", ":agent_id", ":instance_id"))
+    buy_trigger[1].append((call_script, "script_cf_buy_item", ":agent_id", ":instance_id", 0))
   craft_trigger = (ti_on_scene_prop_use, [])
   init_trigger = spr_item_init_trigger(item_id, use_string=use_string, tableau=tableau, stockpile=(len(resources) > 0), price_multiplier=price_multiplier)
   if len(resources) > 0:
@@ -190,7 +190,7 @@ def spr_import_item_triggers(item_id, pos_offset=(10,0,4), rotate=(0,0,0), use_s
       (store_trigger_param_2, ":instance_id"),
       (prop_instance_get_position, pos1, ":instance_id")])
   spr_apply_pos_offset(buy_trigger[1], pos_offset, rotate)
-  buy_trigger[1].append((call_script, "script_cf_buy_item", ":agent_id", ":instance_id"))
+  buy_trigger[1].append((call_script, "script_cf_buy_item", ":agent_id", ":instance_id", 0))
   triggers = [spr_item_init_trigger(item_id, use_string=use_string, price_multiplier=price_multiplier), buy_trigger]
   if check_script is not None:
     triggers.append(spr_call_script_start_use_trigger(check_script))

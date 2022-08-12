@@ -1,0 +1,13 @@
+﻿Server Name  : TR Porterà MRPG
+Discord ID   : p7vQJ6zejQ
+Base Hunger  : 0
+Start Hunger : 100
+Start Bank   : 25000
+Start Money  : 10000
+Bank Lost %  : 0
+Base Health  : 35
+Log Location : ../Logs
+Whitelisted  : 1
+Idle Income  : 0
+Owner Name   : Thror
+Is HRPG      : 0
