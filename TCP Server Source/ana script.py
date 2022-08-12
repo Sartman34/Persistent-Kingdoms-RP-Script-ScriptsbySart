@@ -11,7 +11,7 @@ import sys
 import traceback
 import ntplib
 
-file = open("basic_settings.txt", "r+")
+file = open("Data\\basic_settings.txt", "r+")
 database = file.read().split("\n")
 file.close()
 server_name = database.pop(0).split(" : ")[1]
@@ -42,8 +42,8 @@ extension_keys = {"Custom Announcement" : 0,
 extensions = [0, 1, 0, 0, 0, 1, 0, 0, 0]
 message_lenght = 80
 class LicenseInfo():
-    is_licensed = False
-    date = datetime.datetime(2023, 1, 1)
+    is_licensed = True
+    date = datetime.datetime(2022, 9, 1)
     version = "2.0"
     name = license_name
     text = []
@@ -59,7 +59,7 @@ class LicenseInfo():
 def logging_print(*string):
     print(*string)
 
-    file = open("logs.txt", "a")
+    file = open("Data\\logs.txt", "a")
     old_stdout = sys.stdout
     sys.stdout = file
     print(*string)
@@ -71,12 +71,12 @@ def clear_spaces(string):
         string = string.replace(character, "")
     return string
 
-##current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
+current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
 ##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
-##if current_date > LicenseInfo.date:
-##    logging_print("License date is over.")
-##    input()
-##    sys.exit()
+if current_date > LicenseInfo.date:
+    logging_print("License date is over.")
+    input()
+    sys.exit()
 
 strings = {
     "/yardim help" : "\
@@ -509,7 +509,7 @@ def import_custom_announcement():
     if not extensions[extension_keys["Custom Announcement"]]:
         return
     command_perm = []
-    file = open("permissions.txt", "r+")
+    file = open("Data\\permissions.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -521,7 +521,7 @@ def import_door_keys():
     if not extensions[extension_keys["Door Keys"]]:
         return
     doors = dict()
-    file = open("door_keys.txt", "r+")
+    file = open("Data\\door_keys.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -535,7 +535,7 @@ def import_door_keys():
 def import_admin_permissions():
     global admin_permissions
     admin_permissions = dict()
-    file = open("admin_permissions.txt", "r+")
+    file = open("Data\\admin_permissions.txt", "r+")
     database = file.read().split("\n")
     file.close()
     for line in database:
@@ -547,7 +547,7 @@ def import_whitelist():
     global whitelist
     if not whitelist_enabled:
         return
-    file = open("whitelist.txt", "r+")
+    file = open("Data\\whitelist.txt", "r+")
     database = file.read().split("\n")
     file.close()
     for unique_id in database:
@@ -556,7 +556,7 @@ def import_mails():
     global mails
     if not extensions[extension_keys["Letter"]]:
         return
-    file = open("mails.txt", "r+", encoding='utf-8')
+    file = open("Data\\mails.txt", "r+", encoding='utf-8')
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -570,7 +570,7 @@ def import_mails():
         mails[code] = [name, post, seal]
 def import_names():
     global names
-    file = open("names.txt", "r+")
+    file = open("Data\\names.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -584,7 +584,7 @@ def import_coins():
     global coins, start_coins
     if not extensions[extension_keys["Coin"]]:
         return
-    file = open("coins.txt", "r+")
+    file = open("Data\\coins.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -601,7 +601,7 @@ def import_inventories():
     global inventories, base_inventory
     if not extensions[extension_keys["Inventory"]]:
         return
-    file = open("inventories.txt", "r+")
+    file = open("Data\\inventories.txt", "r+")
     database = file.read().split("\n")
     file.close()
     base_inventory = database[0].split("%")[1:]
@@ -612,7 +612,7 @@ def import_inventories():
         inventories[unique_id] = inventory
 def import_chests():
     global chests
-    file = open("chests.txt", "r+")
+    file = open("Data\\chests.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -627,7 +627,7 @@ def import_play_times():
     global play_times, authentication_time
     if not extensions[extension_keys["Play Time"]]:
         return
-    file = open("play_times.txt", "r+")
+    file = open("Data\\play_times.txt", "r+")
     database = file.read().split("\n")
     file.close()
     authentication_time = int(database[0].split(" : ")[1])
@@ -1449,13 +1449,13 @@ def main_request_handler(client, addr, port):
                     except:
                         logging_print(traceback.format_exc(), "\n", players[unique_id])
                     text += "{}%".format(unique_id) + "%".join(players[unique_id]) + "\n"
-                file = open("database.txt", "w")
+                file = open("Data\\database.txt", "w")
                 file.write(text[:-1])
                 file.close()
             except:
                 logging_print(traceback.format_exc())
             try:
-                file = open("banned_players.txt", "w")
+                file = open("Data\\banned_players.txt", "w")
                 text = ""
                 for unique_id in banned_players:
                     text += "{}%{}%{}%{}\n".format(
@@ -1470,7 +1470,7 @@ def main_request_handler(client, addr, port):
                 logging_print(traceback.format_exc())
             try:
                 if extensions[extension_keys["Letter"]]:
-                    file = open("mails.txt", "w", encoding = 'utf8')
+                    file = open("Data\\mails.txt", "w", encoding = 'utf8')
                     text = ""
                     for code in mails:
                         mail = mails[code]
@@ -1483,7 +1483,7 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                file = open("names.txt", "w", encoding = 'utf8')
+                file = open("Data\\names.txt", "w", encoding = 'utf8')
                 text = ""
                 for unique_id in names.keys():
                     text += unique_id + " : "
@@ -1494,7 +1494,7 @@ def main_request_handler(client, addr, port):
                 logging_print(traceback.format_exc())
             try:
                 if extensions[extension_keys["Door Keys"]]:
-                    with open("door_keys.txt", "w", encoding = 'utf8') as file:
+                    with open("Data\\door_keys.txt", "w", encoding = 'utf8') as file:
                         text = ["%".join(key_checkers)]
                         for door, keys in doors.items():
                             text.append("%".join([door, *keys]))
@@ -1503,7 +1503,7 @@ def main_request_handler(client, addr, port):
                 logging_print(traceback.format_exc())
             try:
                 if extensions[extension_keys["Inventory"]]:
-                    file = open("inventories.txt", "w", encoding = 'utf8')
+                    file = open("Data\\inventories.txt", "w", encoding = 'utf8')
                     text = ""
                     text += "Base Inventory%" + "%".join(base_inventory) + "\n"
                     for unique_id in inventories.keys():
@@ -1514,7 +1514,7 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                file = open("chests.txt", "w", encoding = 'utf8')
+                file = open("Data\\chests.txt", "w", encoding = 'utf8')
                 text = ""
                 for variation_id, items in chests.items():
                     if not items:
@@ -1527,7 +1527,7 @@ def main_request_handler(client, addr, port):
                 logging_print(traceback.format_exc())
             try:
                 if extensions[extension_keys["Play Time"]]:
-                    file = open("play_times.txt", "w", encoding = 'utf8')
+                    file = open("Data\\play_times.txt", "w", encoding = 'utf8')
                     text = ""
                     text += "Authentication Time Minutes" + " : " + str(authentication_time) + "\n"
                     for unique_id in play_times.keys():
@@ -1607,7 +1607,7 @@ def main_request_handler(client, addr, port):
                         addr
                         )
         elif action == "save_bans":
-            file = open("banned_ips.txt", "w")
+            file = open("Data\\banned_ips.txt", "w")
             text = "#".join(banned_ips)
             file.write(text)
             file.close()
@@ -1683,7 +1683,7 @@ def main_request_handler(client, addr, port):
             requested_file = message[1]
             if sent_admin_pass == admin_pass:
                 try:
-                    file = open(requested_file, 'rb')
+                    file = open("Data\\" + requested_file, 'rb')
                     client.send(b"recv_file")
                     l = file.read(1024)
                     while (l):
@@ -1708,7 +1708,7 @@ def main_request_handler(client, addr, port):
             sent_file = message[1]
             if sent_admin_pass == admin_pass:
                 client.send(b"send_file")
-                with open(sent_file, 'wb') as file:
+                with open("Data\\" + sent_file, 'wb') as file:
                     while True:
                         data = client.recv(1024)
                         if not data:
@@ -1760,7 +1760,7 @@ def warband_listener(port, ip_adress):
         threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
 
 try:
-    file = open("database.txt", "r+")
+    file = open("Data\\database.txt", "r+")
     database = file.read().split("\n")
     file.close()
     for player in database:
@@ -1769,7 +1769,7 @@ try:
         player_data = player[1:]
         players[unique_id] = player_data
 
-    file = open("banned_players.txt", "r+")
+    file = open("Data\\banned_players.txt", "r+")
     database = file.read().split("\n")
     file.close()
     for player in database:
@@ -1780,7 +1780,7 @@ try:
         reason = parameters.pop(0)
         banned_players[unique_id] = (permanently, hours, reason)
 
-    file = open("banned_ips.txt", "r+")
+    file = open("Data\\banned_ips.txt", "r+")
     database = file.read().split("#")
     file.close()
     for ip in database:
