@@ -259,6 +259,7 @@ g_dbg_presentation_overlays_end
 g_dbg_presentation_registers_end
 g_idle_income
 g_is_hrpg
+g_player_id_dict
 g_spawn_item_prune_time
 g_actual_ghost_mode
 g_mute_all_players

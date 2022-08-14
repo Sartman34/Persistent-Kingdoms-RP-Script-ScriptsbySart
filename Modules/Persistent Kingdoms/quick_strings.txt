@@ -1,6 +1,7 @@
-63
+69
 qstr_close_server close_server
 qstr_/debug /debug
+qstr_/t_ /t_
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
 qstr_WSE2 WSE2
 qstr_{reg0}<{reg1} {reg0}<{reg1}
@@ -27,11 +28,13 @@ qstr_load_admin_request_f load_admin_request_failed.
 qstr_{s0} {s0}
 qstr_http://127.0.0.1/spe http://127.0.0.1/special_string<{reg0}<welcome<0
 qstr_load_gear_request_fa load_gear_request_failed.
-qstr_http://127.0.0.1/spec http://127.0.0.1/special_string<{reg1}<{s1}<{reg2}
+qstr_http://127.0.0.1/spec http://127.0.0.1/special_string<{reg1}<{s0}<{reg2}
 qstr_special_string_reque special_string_request_failed.
 qstr_Cok_Aciktin! Cok_Aciktin!
 qstr_http://127.0.0.1/pin http://127.0.0.1/ping_tcp
 qstr_ping_tcp_request_fai ping_tcp_request_failed.
+qstr_{reg1} {reg1}
+qstr_{reg2} {reg2}
 qstr_message_sent_request message_sent_request_failed.
 qstr_Bu_kapi_sana_ait. Bu_kapi_sana_ait.
 qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.
@@ -56,9 +59,12 @@ qstr_{s0}^Tailoring:_{reg {s0}^Tailoring:_{reg10}
 qstr_{s0}^Herding:_{reg10 {s0}^Herding:_{reg10}
 qstr_{s0}^Musician:_{reg1 {s0}^Musician:_{reg10}
 qstr_http://127.0.0.1/che http://127.0.0.1/check_door_key<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}
+qstr_http://127.0.0.1/ban http://127.0.0.1/ban_player<{reg0}<0<1
+qstr_http://127.0.0.1/ban_ http://127.0.0.1/ban_player<{reg0}<1<1
 qstr_[E]_Could_not_get_on [E]_Could_not_get_one_or_more_skybox_prop_instances!
 qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{reg1}<{s0}
 qstr_http://127.0.0.1/save http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_inventory<{reg0}<{reg19}<{reg20}<{reg21}<{reg22}<{reg23}<{reg24}<{reg25}<{reg26}<{reg27}<{reg28}<{reg29}<{reg30}
+qstr_{reg0} {reg0}
 qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}<{reg1}<{reg2}
 qstr_http://127.0.0.1/str http://127.0.0.1/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}

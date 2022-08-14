@@ -135,6 +135,7 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
   (player_get_unique_id, reg1, reg0),
   (str_store_player_username, s0, ":player_id"),
   (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{reg1}<{s0}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
+  (dict_set_int, "$g_player_id_dict", "@{reg1}", ":player_id"),
 ])
 
 player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
@@ -205,6 +206,7 @@ player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
           "@WSE2", "script_default_return", "script_default_fail"
         ),
       (try_end),
+      (dict_erase, "$g_player_id_dict", "@{reg0}"),
         
 ##      (try_begin),
 ####        (player_get_troop_id, reg2, ":player_id"),

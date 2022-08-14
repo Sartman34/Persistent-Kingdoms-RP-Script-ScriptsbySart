@@ -39,7 +39,7 @@ extension_keys = {"Custom Announcement" : 0,
                   "Health" : 8,
                   }
 
-extensions = [0, 1, 0, 0, 0, 1, 0, 0, 0]
+extensions = [1, 1, 0, 0, 0, 1, 0, 0, 0]
 message_lenght = 80
 class LicenseInfo():
     is_licensed = True
@@ -342,8 +342,27 @@ colors = {
     "söylenti" : 13,
     "turuncu" : 14,
     "mektup" : 15,
-    "yerel sohbet" : 16
+    "local chat" : 16,
+    "local chat shout" : 17,
 }
+##    4294967295,
+##    4280691865,
+##    4284639733,
+##    4293938509,
+##    4288225055,
+##    4294942763,
+##    4287714054,
+##    4292303067,
+##    4288473929,
+##    4283076352,
+##    4294434828,
+##    4290822336,
+##    4291589888,
+##    4284546209,
+##    4293963842,
+##    4284914073,
+##    local_chat_color,
+##    local_chat_shout_color
 special_strings = {
     "yardim" : [["\
 '/(komut) help' yazarak detaylı açıklamalara ulaşabilirsiniz.^\
@@ -358,7 +377,7 @@ Komutlar:^\
     ],
     "welcome" : [["\
 Merhabalar. {} sunucusuna hoşgeldiniz.".format(server_name), colors["koyu yesil"]], ["\
-Komutlar local-chat'e (Q) yazılarak kullanılır.", colors["yerel sohbet"]], ["\
+Komutlar local-chat'e (Q) yazılarak kullanılır.", colors["local chat"]], ["\
 /yardım yazarak komutlara ulaşabilirsiniz.", colors["beyaz"]], ["\
 /discord yazarak discord adresimize ulaşabilirsiniz.", colors["discord pembe"]], ["\
 Rol yapmaya başlamadan önce uğramanızı tavsiye ederim.", colors["beyaz"]], ["\
@@ -498,6 +517,17 @@ admin_queue_commands = {
 settings = {
     "Idle Income" : 0,
     "High RPG" : 1
+}
+message_type = {
+    "Local Chat": 1,
+    "Message": 2,
+    "Special Message": 3,
+    "Announce": 4,
+    "Command": 5
+}
+event_type = {
+    "Open Personal Inventory": 1,
+    "Leave Faction": 2,
 }
 base_items = ["0", "4", start_money, base_health, base_hunger, "0", "0", "0", "0", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
@@ -648,6 +678,17 @@ def send_message(client, message, lenght = 128, log = True):
     client.send(text.encode())
     #if log:
     #    print("Sent: " + message)
+
+def send_message_warband(client, *message):
+    message = ("{}|" * len(message)).format(*message)[:-1]
+    text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(len(message), message)
+    client.send(text.encode())
+
+def send_message_special(client, unique_id, message_id):
+    send_message_warband(client,
+        message_type["Special Message"], unique_id, 1,
+        message_id, special_strings[message_id][0][0], special_strings[message_id][0][1]
+    )
 
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
     banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
@@ -804,24 +845,15 @@ def main_request_handler(client, addr, port):
                 response = "You are not whitelisted.^Your GUID: {}".format(unique_id)
             if kick == "0":
                 response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
-            send_message(client, "{}|{}|{}|{}".format(player_id, first_spawn_occured, kick, response)
-                + "|{}".format(players[unique_id][data_id["Gold"]])
-                + "|{}".format(players[unique_id][data_id["Health"]])
-                + "|{}".format(players[unique_id][data_id["Hunger"]])
-                + "|{}".format(players[unique_id][data_id["Head"]])
-                + "|{}".format(players[unique_id][data_id["Body"]])
-                + "|{}".format(players[unique_id][data_id["Foot"]])
-                + "|{}".format(players[unique_id][data_id["Gloves"]])
-                + "|{}".format(players[unique_id][data_id["Itm0"]])
-                + "|{}".format(players[unique_id][data_id["Itm1"]])
-                + "|{}".format(players[unique_id][data_id["Itm2"]])
-                + "|{}".format(players[unique_id][data_id["Itm3"]])
-                + "|{}".format(players[unique_id][data_id["Horse"]])
-                + "|{}".format(players[unique_id][data_id["HorseHP"]])
-                + "|{}".format(players[unique_id][data_id["X"]])
-                + "|{}".format(players[unique_id][data_id["Y"]])
-                + "|{}".format(players[unique_id][data_id["Z"]])
-                + "|{}".format(players[unique_id][data_id["Passed-Out"]])
+            send_message_warband(client, player_id, first_spawn_occured, kick, response,
+                players[unique_id][data_id["Gold"]],
+                players[unique_id][data_id["Health"]],
+                players[unique_id][data_id["Hunger"]],
+                *players[unique_id][data_id["Head"] : data_id["Gloves"]],
+                *players[unique_id][data_id["Itm0"] : data_id["Itm3"]],
+                *players[unique_id][data_id["Horse"] : data_id["HorseHP"]],
+                *players[unique_id][data_id["X"] : data_id["Z"]],
+                players[unique_id][data_id["Passed-Out"]],
             )
         elif action == "load_player":
             #Faction<Troop
@@ -841,13 +873,13 @@ def main_request_handler(client, addr, port):
             join_times[unique_id] = datetime.datetime.now()
             if play_times[unique_id] < authentication_time:
                 threading.Thread(target = authentication_timer, args = (unique_id,)).start()
-            send_message(client,
-                         "{}".format(player_id)
-                         + "|{}".format(players[unique_id][data_id["Faction"]])
-                         + "|{}".format(players[unique_id][data_id["Troop"]])
-                         + "|{}".format("0" if play_times[unique_id] >= authentication_time else "1")
-                         + "|{}".format("1" if extensions[extension_keys["Inventory"]] else "0")
-                         + ("|{}"*12).format(*inventories[unique_id])
+            send_message_warband(client,
+                         player_id,
+                         players[unique_id][data_id["Faction"]],
+                         players[unique_id][data_id["Troop"]],
+                         "0" if play_times[unique_id] >= authentication_time else "1",
+                         "1" if extensions[extension_keys["Inventory"]] else "0",
+                         *inventories[unique_id]
                          )
         elif action == "load_admin":
             player_id = message[0]
@@ -858,9 +890,10 @@ def main_request_handler(client, addr, port):
                 logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
                 send_message(client, player_id + "|1" * len(admin_permissions_ids))
             else:
-                send_message(client, player_id
-                    + ("|{}" * len(admin_permissions[unique_id])).format(*admin_permissions[unique_id])
-                    + "|1" * min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0)
+                send_message_warband(client,
+                    player_id,
+                    *admin_permissions[unique_id],
+                    *["1" for x in range(min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0))]
                 )
                 
         elif action == "message_sent":
@@ -879,152 +912,120 @@ def main_request_handler(client, addr, port):
             text = string0.split(" ")[1:]
             if not any(("%" in text_part) for text_part in string0.split(" ")):
                 if string0[0] == "/":
-##                    if command == "register_t_chat":
-##                        t_chat_users.append(player_id)
-##                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["register_t_chat success"]))
-                    if command == "yardim" or command == "yardım":
+                    if command in ["yardim", "yardım", "help"]:
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/yardim help"]))
-                            else:       
-                                send_message(client, "11|{}|1|{}|{}|{}".format(
-                                    player_id,
-                                    special_strings["yardim"][0][0],
-                                    "yardim",
-                                    special_strings["yardim"][0][1],
-                                ))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/yardim help"])
+                            else:
+                                send_message_special(client, unique_id, "yardim")
                         else:       
-                            send_message(client, "11|{}|1|{}|{}|{}".format(
-                                player_id,
-                                special_strings["yardim"][0][0],
-                                "yardim",
-                                special_strings["yardim"][0][1],
-                            ))
+                            send_message_special(client, unique_id, "yardim")
                     elif command == "license" or command == "lisans":
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/license help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/license help"])
                             else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["koyu yesil"], strings["/license"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["söylenti"], strings["/license"])
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["koyu yesil"], strings["/license"]))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["söylenti"], strings["/license"])
                     elif command in ["b", "B", "ooc"]:
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/ooc help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ooc help"])
                             else:
-                                if event_type:
-                                    colour = colors["koyu kirmizi"]
-                                else:
-                                    colour = colors["acik kirmizi"]
-                                try:
-                                    send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, "[OOC][{}] ".format(names[unique_id]) + " ".join(text)))
-                                except KeyError:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+                                colour = (colors["acik kirmizi"], colors["koyu kirmizi"])
+                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                                    "[OOC][{}] ".format(names[unique_id]) + " ".join(text)
+                                )
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("b")))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("b"))
                     elif command == "me":
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/me help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/me help"])
                             else:
-                                if event_type:
-                                    colour = colors["koyu kahverengi"]
-                                else:
-                                    colour = colors["acik kahverengi"]
-                                try:
-                                    send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, '"{} '.format(names[unique_id]) + " ".join(text) + '"'))
-                                except KeyError:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+                                colour = (colors["acik kahverengi"], colors["koyu kahverengi"])
+                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                                    "\"{} ".format(names[unique_id]) + " ".join(text) + "\""
+                                )
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("me")))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("me"))
                     elif command == "do":
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/do help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/do help"])
                             else:
-                                if event_type:
-                                    colour = colors["koyu yesil"]
-                                else:
-                                    colour = colors["acik yesil"]
-                                try:
-                                    send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, '({}) "'.format(names[unique_id]) + " ".join(text) + '"'))
-                                except KeyError:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+                                colour = (colors["acik yesil"], colors["koyu yesil"])
+                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                                    "({}) \"".format(names[unique_id]) + " ".join(text) + "\""
+                                )
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("do")))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("do"))
                     elif command == "roll" or command == "dene":
+                        basarili = random.randint(0, 1)
+                        colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/dene help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/dene help"])
                             else:
-                                basarili = random.randint(0, 1)
-                                colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
-                                try:
-                                    send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)))
-                                except KeyError:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
+                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                                    "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)
+                                )
                         else:
-                            basarili = random.randint(0, 1)
-                            colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
-                            try:
-                                send_message(client, "7|{}|{}|{}|{}".format(player_id, event_type, colour, "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)))
-                            except KeyError:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-##                    elif command == "duyuru" and extensions[extension_keys["Custom Announcement"]]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/duyuru help"]))
-##                            else:
-##                                try:
-##                                    if unique_id in command_perm[perm_id["Duyuru"]]:
-##                                        send_message(client, "10|{}|{}".format(faction_colour, "Duyuru! {}: ".format(names[unique_id]) + " ".join(text)))
-##                                    else:
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Duyuru")))
-##                                except KeyError:
-##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-##                        else:
-##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("duyuru")))
-##                    elif (command == "söylenti" or command == "söylenti") and extensions[extension_keys["Custom Announcement"]]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/soylenti help"]))
-##                            else:
-##                                if unique_id in command_perm[perm_id["Soylenti"]]:
-##                                    send_message(client, "10|{}|{}".format(colors["söylenti"], "Soylenti: " + " ".join(text)))
-##                                else:
-##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti")))
-##                        else:
-##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti")))
+                            send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                                "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)
+                            )
+                    elif command == "duyuru" and extensions[extension_keys["Custom Announcement"]]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/duyuru help"])
+                            else:
+                                if unique_id in command_perm[perm_id["Duyuru"]]:
+                                    send_message_warband(client, message_type["Announce"], faction_colour, "Duyuru! {}: ".format(names[unique_id]) + " ".join(text))
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Duyuru"))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("duyuru"))
+                    elif command in ["söylenti", "soylenti"] and extensions[extension_keys["Custom Announcement"]]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/soylenti help"])
+                            else:
+                                if unique_id in command_perm[perm_id["Soylenti"]]:
+                                    send_message_warband(client, message_type["Announce"], colors["söylenti"], "Söylenti: " + " ".join(text))
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti"))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti"))
                     elif command == "discord":
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/discord help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/discord help"])
                             else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["discord pembe"], strings["/discord"].format(discord_id)))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["discord pembe"], strings["/discord"].format(discord_id))
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["discord pembe"], strings["/discord"].format(discord_id)))
-##                    elif command == "ayril" or command == "ayrıl":
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/ayril help"]))
-##                            else:
-##                                send_message(client, "8|{}".format(player_id))
-##                        else:
-##                            send_message(client, "8|{}".format(player_id))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["discord pembe"], strings["/discord"].format(discord_id))
+                    elif command == "ayril" or command == "ayrıl":
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ayril help"])
+                            else:
+                                send_message_warband(client, message_type["Command"], command_type["Leave Faction"], unique_id)
+                        else:
+                            send_message_warband(client, message_type["Command"], command_type["Leave Faction"], unique_id)
                     elif command == "guid":
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/guid help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/guid help"])
                             else:
                                 for guid in names.keys():
                                     if text[0] == names[guid]:
-                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["aranan guid"].format(text[0], guid)))
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["aranan guid"].format(text[0], guid))
                                         break
                                 else:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["kişi bulunamadı"]))
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["acik kirmizi"], strings["kişi bulunamadı"])
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["guidiniz"].format(unique_id)))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["guidiniz"].format(unique_id))
 ##                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
 ##                        if len(text):
 ##                            if text[0] == "help":
@@ -1100,45 +1101,47 @@ def main_request_handler(client, addr, port):
                     elif command in ["envanter", "inventory"] and extensions[extension_keys["Inventory"]]:
                         if len(text):
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/envanter help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
                             else:
-                                send_message(client, "31|{}".format(player_id))
+                                send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
                         else:
-                            send_message(client, "31|{}".format(player_id))
+                            send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
                     elif command in ["anahtar", "key"] and extensions[extension_keys["Door Keys"]] and unique_id in key_checkers:
                         if len(text) >= 2:
                             instance = text[1]
                             if not instance in doors:
                                 doors[instance] = []
                             if text[0] == "help":
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
                             elif len(text) == 2 and text[0] in ["göster", "goster", "show"]:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar göster"].format(instance, ", ".join(doors[instance]))))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"],
+                                    strings["/anahtar göster"].format(instance, ", ".join(doors[instance]))
+                                )
                             elif len(text) >= 3:
                                 if text[0] in ["ekle", "add"]:
                                     unique_ids = text[2:]
                                     for unique_id in unique_ids:
                                         if not unique_id in doors[instance]:
                                             doors[instance].append(unique_id)
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"],
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"],
                                         strings["/anahtar ekle"].format(", ".join(unique_ids), instance, ", ".join(doors[instance]))
-                                    ))
+                                    )
                                 elif text[0] in ["çıkar", "cikar", "remove"]:
                                     unique_ids = text[2:]
                                     for unique_id in unique_ids:
                                         if unique_id in doors[instance]:
                                             doors[instance].remove(unique_id)
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"],
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"],
                                         strings["/anahtar çıkar"].format(", ".join(unique_ids), instance, ", ".join(doors[instance]))
-                                    ))
+                                    )
                                 else:
-                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
                                 if doors[instance] == []:
                                     doors.pop(instance)
                             else:
-                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
                         else:
-                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/anahtar help"]))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
 ##                    elif command in ["bağla", "bagla", "tie"] and extensions[extension_keys["Horse Keeper"]]:
 ##                        if len(text):
 ##                            if text[0] == "help":
@@ -1172,11 +1175,14 @@ def main_request_handler(client, addr, port):
 ##                        else:
 ##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
                     else:
-                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["hatali komut"]))
-                else: 
-                    send_message(client, "1|{}|{}|{}".format(player_id, event_type, string0))
+                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["hatali komut"])
+                else:
+                    colour = (colors["local chat"], colors["local chat shout"])
+                    send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
+                        "[{}] {} ".format(names[unique_id]) + " ".join(text)
+                    )
             else:
-                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["desteklenmeyen karakter"]))
+                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["desteklenmeyen karakter"])
         elif action == "special_string":
             player_id = message[0]
             string0 = message[1]
@@ -1435,10 +1441,10 @@ def main_request_handler(client, addr, port):
                 _logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "save_to_db":
             try:
-                os.remove("database_backup_02.txt")
-                os.rename("database_backup_01.txt", "database_backup_02.txt")
-                os.rename("database_backup_00.txt", "database_backup_01.txt")
-                os.rename("database.txt", "database_backup_00.txt")
+                os.remove("Data\\database_backup_02.txt")
+                os.rename("Data\\database_backup_01.txt", "Data\\database_backup_02.txt")
+                os.rename("Data\\database_backup_00.txt", "Data\\database_backup_01.txt")
+                os.rename("Data\\database.txt", "Data\\database_backup_00.txt")
                 text = ""
                 for unique_id in players.keys():
                     try:

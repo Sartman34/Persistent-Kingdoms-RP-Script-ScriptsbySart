@@ -1166,7 +1166,7 @@ Poisonous herbs can also sometimes be found, which are then applied to the blade
   ("enter", "^"),
   ("invalid_token", "INVALID_TOKEN"),
   ("dspace", "__"),
-  
+  ("space", "_"),
   #
 
 ]

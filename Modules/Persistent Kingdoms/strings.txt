@@ -1,5 +1,5 @@
 stringsfile version 1
-811
+812
 str_no_string NO_STRING!
 str_empty_string _
 str_yes Yes.
@@ -811,3 +811,4 @@ str_time_error [E]_Could_not_get_one_or_more_skybox_prop_instances!
 str_enter ^
 str_invalid_token INVALID_TOKEN
 str_dspace __
+str_space _
