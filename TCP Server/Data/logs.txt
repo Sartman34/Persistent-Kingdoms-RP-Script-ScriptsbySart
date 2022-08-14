@@ -1,2 +1,22 @@
 Admin log pass is: WQ24YU34JT
 127.0.0.1
+Admin log pass is: U9QGUO1D9B
+127.0.0.1
+Got:  load_player ['3', '3214304', 'Sart_Parma'] 80
+HTTP/1.1 200 OK
+Content-Lenght: 33
+
+3|0|4|0|1|0|0|0|0|0|0|0|0|0|0|0|0
+
+Got:  load_admin ['3', '3214304'] 80
+HTTP/1.1 200 OK
+Content-Lenght: 43
+
+3|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+
+Got:  load_gear ['3', '3214304', '0'] 80
+HTTP/1.1 200 OK
+Content-Lenght: 86
+
+3|0|1|You are not whitelisted.^Your GUID: 3214304|10000|100|100|0|0|0|0|0|0|-1|-1|-1|0
+

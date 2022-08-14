@@ -39,7 +39,7 @@ extension_keys = {"Custom Announcement" : 0,
                   "Health" : 8,
                   }
 
-extensions = [1, 1, 0, 0, 0, 1, 0, 0, 0]
+extensions = [1, 1, 0, 1, 0, 1, 0, 0, 0]
 message_lenght = 80
 class LicenseInfo():
     is_licensed = True
@@ -525,7 +525,7 @@ message_type = {
     "Announce": 4,
     "Command": 5
 }
-event_type = {
+command_type = {
     "Open Personal Inventory": 1,
     "Leave Faction": 2,
 }
@@ -682,6 +682,7 @@ def send_message(client, message, lenght = 128, log = True):
 def send_message_warband(client, *message):
     message = ("{}|" * len(message)).format(*message)[:-1]
     text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(len(message), message)
+    logging_print(text)
     client.send(text.encode())
 
 def send_message_special(client, unique_id, message_id):
@@ -874,13 +875,13 @@ def main_request_handler(client, addr, port):
             if play_times[unique_id] < authentication_time:
                 threading.Thread(target = authentication_timer, args = (unique_id,)).start()
             send_message_warband(client,
-                         player_id,
-                         players[unique_id][data_id["Faction"]],
-                         players[unique_id][data_id["Troop"]],
-                         "0" if play_times[unique_id] >= authentication_time else "1",
-                         "1" if extensions[extension_keys["Inventory"]] else "0",
-                         *inventories[unique_id]
-                         )
+                 player_id,
+                 players[unique_id][data_id["Faction"]],
+                 players[unique_id][data_id["Troop"]],
+                 "0" if play_times[unique_id] >= authentication_time else "1",
+                 "1" if extensions[extension_keys["Inventory"]] else "0",
+                 *inventories[unique_id]
+            )
         elif action == "load_admin":
             player_id = message[0]
             unique_id = message[1]
@@ -1184,15 +1185,15 @@ def main_request_handler(client, addr, port):
             else:
                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["desteklenmeyen karakter"])
         elif action == "special_string":
-            player_id = message[0]
+            unique_id = message[0]
             string0 = message[1]
             counter = int(message[2])
             if counter < len(special_strings[string0]):
                 send_message(client, "1|{}|{}|{}|{}|{}".format(
-                    player_id,
+                    unique_id,
                     counter + 1,
-                    special_strings[string0][counter][0],
                     string0,
+                    special_strings[string0][counter][0],
                     special_strings[string0][counter][1],
                 ), log = False)
             else:
@@ -1384,14 +1385,12 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["Y"]] = cord_y
                 players[unique_id][data_id["Z"]] = cord_z
                 players[unique_id][data_id["Passed-Out"]] = "1"
-                players[unique_id][data_id["Body"]] = "0"
-                players[unique_id][data_id["Foot"]] = "0"
-                players[unique_id][data_id["Health"]] = "0"
-                if unique_id in enpassants and enpassants[unique_id].is_alive():
-                    enpassants[unique_id].do_run = False
-                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
-                enpassant_thread.start()
-                enpassants[unique_id] = enpassant_thread
+##                players[unique_id][data_id["Health"]] = "0"
+##                if unique_id in enpassants and enpassants[unique_id].is_alive():
+##                    enpassants[unique_id].do_run = False
+##                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
+##                enpassant_thread.start()
+##                enpassants[unique_id] = enpassant_thread
             if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
                 patients.pop(unique_id).do_run = False
             send_message(client, "0", lenght = 1)

@@ -140,8 +140,10 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
 
 player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
    [(store_trigger_param_1, ":player_id"),
-    (call_script, "script_cf_save_player_exit", ":player_id"),
+##    (call_script, "script_cf_save_player_exit", ":player_id"),
 
+    (player_get_unique_id, reg0, ":player_id"),
+    (dict_erase, "$g_player_id_dict", "@{reg0}"),
     (player_get_agent_id, ":agent_id", ":player_id"),
     (try_begin),
       (agent_is_active, ":agent_id"),
@@ -206,7 +208,6 @@ player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
           "@WSE2", "script_default_return", "script_default_fail"
         ),
       (try_end),
-      (dict_erase, "$g_player_id_dict", "@{reg0}"),
         
 ##      (try_begin),
 ####        (player_get_troop_id, reg2, ":player_id"),

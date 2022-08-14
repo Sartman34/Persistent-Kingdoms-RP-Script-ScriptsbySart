@@ -392,12 +392,14 @@ scripts.extend([
     (assign, ":action", reg0),
     (try_begin),
       (eq, ":action", 1),
-      (assign, ":player_id", reg1),
+##      (assign, ":unique_id", reg1),
 ##      (assign, ":count", reg2),
       (assign, ":colour_id", reg3),
       #s0: string id
       #s1: string part
 
+      (dict_has_key, "$g_player_id_dict", "@{reg1}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
       (call_script, "script_send_coloured_message", ":player_id", s1, ":colour_id"),
       (send_message_to_url_advanced, script_ip_address + "/special_string<{reg1}<{s0}<{reg2}", "@WSE2", "script_special_string_return", "script_special_string_fail"),
     (try_end),
