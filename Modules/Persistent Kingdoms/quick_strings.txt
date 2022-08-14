@@ -29,7 +29,7 @@ qstr_{s0} {s0}
 qstr_http://127.0.0.1/spe http://127.0.0.1/special_string<{reg0}<welcome<0
 qstr_load_gear_request_fa load_gear_request_failed.
 qstr_{reg1} {reg1}
-qstr_http://127.0.0.1/spec http://127.0.0.1/special_string<{reg1}<{s0}<{reg2}
+qstr_http://127.0.0.1/spec http://127.0.0.1/special_string<{reg1}<{s1}<{reg2}
 qstr_special_string_reque special_string_request_failed.
 qstr_Cok_Aciktin! Cok_Aciktin!
 qstr_http://127.0.0.1/pin http://127.0.0.1/ping_tcp

@@ -378,10 +378,11 @@ scripts.extend([
 
     (try_begin),
       (eq, ":kick", 1),
+      (player_set_is_admin, ":player_id", 0),
       (kick_player, ":player_id"),
     (else_try),
       (eq, ":first_spawn_occured", 0),
-      (assign, reg0, ":player_id"),
+      (player_get_unique_id, reg0, ":player_id"),
       (send_message_to_url_advanced, script_ip_address + "/special_string<{reg0}<welcome<0", "@WSE2", "script_special_string_return", "script_special_string_fail"),
     (try_end),
   ]),
@@ -395,13 +396,13 @@ scripts.extend([
 ##      (assign, ":unique_id", reg1),
 ##      (assign, ":count", reg2),
       (assign, ":colour_id", reg3),
-      #s0: string id
-      #s1: string part
+      #s0: string part
+      #s1: string id
 
       (dict_has_key, "$g_player_id_dict", "@{reg1}"),
       (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
-      (call_script, "script_send_coloured_message", ":player_id", s1, ":colour_id"),
-      (send_message_to_url_advanced, script_ip_address + "/special_string<{reg1}<{s0}<{reg2}", "@WSE2", "script_special_string_return", "script_special_string_fail"),
+      (call_script, "script_send_coloured_message", ":player_id", ":colour_id"),
+      (send_message_to_url_advanced, script_ip_address + "/special_string<{reg1}<{s1}<{reg2}", "@WSE2", "script_special_string_return", "script_special_string_fail"),
     (try_end),
   ]),
   
@@ -535,14 +536,16 @@ scripts.extend([
         (le, ":sq_distance", ":max_sq_distance"),
         (this_or_next|le, ":sq_distance", ":ambient_sq_distance"),
         (position_has_line_of_sight_to_position, pos1, pos2),
-        (call_script, "script_send_coloured_message", ":other_player_id", s0, ":colour_id"),
+        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id"),
       (try_end),
     (else_try),
       (eq, ":action", 2),
-      (assign, ":player_id", reg1),
+##      (assign, ":unique_id", reg1),
       (assign, ":colour_id", reg2),
       #s0: message
-      (call_script, "script_send_coloured_message", ":player_id", s0, ":colour_id"),
+      (dict_has_key, "$g_player_id_dict", "@{reg1}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
+      (call_script, "script_send_coloured_message", ":player_id", ":colour_id"),
     (else_try),
       (eq, ":action", 3),
       (assign, reg0, 1),
@@ -556,7 +559,7 @@ scripts.extend([
         (neg|agent_is_non_player, ":other_agent_id"),
         (agent_get_player_id, ":other_player_id", ":other_agent_id"),
         (player_is_active, ":other_player_id"),
-        (call_script, "script_send_coloured_message", ":other_player_id", s0, ":colour_id"),
+        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id"),
       (try_end),
     (else_try),
       (eq, ":action", 5),
@@ -675,13 +678,12 @@ scripts.extend([
 
   ("send_coloured_message", [
     (store_script_param, ":player_id", 1),
-    (store_script_param, ":string_id", 2),
-    (store_script_param, ":colour_id", 3),
+    (store_script_param, ":colour_id", 2),
     (try_begin),
   ] + [elem for sublist in [[
       (eq, ":colour_id", i),
       (multiplayer_send_2_int_to_player, ":player_id", server_event_script_message_set_color, colour),
-      (multiplayer_send_string_to_player, ":player_id", server_event_script_message, ":string_id"),
+      (multiplayer_send_string_to_player, ":player_id", server_event_script_message, s0),
     (else_try),
   ] for i, colour in enumerate([
     4294967295,

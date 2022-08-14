@@ -681,14 +681,13 @@ def send_message(client, message, lenght = 128, log = True):
 
 def send_message_warband(client, *message):
     message = ("{}|" * len(message)).format(*message)[:-1]
-    text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(len(message), message)
-    logging_print(text)
+    text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(128, message)
     client.send(text.encode())
 
 def send_message_special(client, unique_id, message_id):
     send_message_warband(client,
         message_type["Special Message"], unique_id, 1,
-        message_id, special_strings[message_id][0][0], special_strings[message_id][0][1]
+        special_strings[message_id][0][0], message_id, special_strings[message_id][0][1]
     )
 
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
@@ -850,10 +849,10 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Health"]],
                 players[unique_id][data_id["Hunger"]],
-                *players[unique_id][data_id["Head"] : data_id["Gloves"]],
-                *players[unique_id][data_id["Itm0"] : data_id["Itm3"]],
-                *players[unique_id][data_id["Horse"] : data_id["HorseHP"]],
-                *players[unique_id][data_id["X"] : data_id["Z"]],
+                *players[unique_id][data_id["Head"] : data_id["Gloves"] + 1],
+                *players[unique_id][data_id["Itm0"] : data_id["Itm3"] + 1],
+                *players[unique_id][data_id["Horse"] : data_id["HorseHP"] + 1],
+                *players[unique_id][data_id["X"] : data_id["Z"] + 1],
                 players[unique_id][data_id["Passed-Out"]],
             )
         elif action == "load_player":
@@ -896,7 +895,6 @@ def main_request_handler(client, addr, port):
                     *admin_permissions[unique_id],
                     *["1" for x in range(min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0))]
                 )
-                
         elif action == "message_sent":
             player_id = message[0]
             event_type = int(message[1])
@@ -1180,7 +1178,7 @@ def main_request_handler(client, addr, port):
                 else:
                     colour = (colors["local chat"], colors["local chat shout"])
                     send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
-                        "[{}] {} ".format(names[unique_id]) + " ".join(text)
+                        "[{}] ".format(names[unique_id]) + string0
                     )
             else:
                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["desteklenmeyen karakter"])
@@ -1192,8 +1190,8 @@ def main_request_handler(client, addr, port):
                 send_message(client, "1|{}|{}|{}|{}|{}".format(
                     unique_id,
                     counter + 1,
-                    string0,
                     special_strings[string0][counter][0],
+                    string0,
                     special_strings[string0][counter][1],
                 ), log = False)
             else:
