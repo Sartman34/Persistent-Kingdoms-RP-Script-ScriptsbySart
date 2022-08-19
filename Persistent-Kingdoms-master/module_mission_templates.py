@@ -105,8 +105,9 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
     (multiplayer_is_server),
     (call_script, "script_skybox_spawn_all"),
   (try_end),
-
-  (send_message_to_url_advanced, script_ip_address + "/ping_tcp", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
+  (display_message, "@Updating Settings"),
+  
+  (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
 
   ] + [elem for sublist in [[
     (call_script, "script_load_chests", "spr_" + scene_prop),

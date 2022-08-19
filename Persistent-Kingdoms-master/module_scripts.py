@@ -1612,6 +1612,9 @@ scripts.extend([
       (store_script_param, ":attacker_agent_id", 2),
       (store_script_param, ":damage", 3),
 
+      (agent_is_active, ":defender_agent_id"),
+      (agent_is_active, ":attacker_agent_id"),
+
       (agent_is_human, ":defender_agent_id"),
       (agent_is_human, ":attacker_agent_id"),
 	
@@ -6231,11 +6234,17 @@ scripts.extend([
     (try_begin),
       (neq, ":current_troop_id", ":troop_id"),
       (eq, ":cancel", 0),
+      (assign, ":fail", 0),
       (try_begin),
         (eq, "$g_is_hrpg", 0),
-        (scene_prop_get_slot, ":gold_cost", ":instance_id", slot_scene_prop_gold_value),
-        (call_script, "script_cf_check_enough_gold", ":player_id", ":gold_cost"),
+        (try_begin),
+          (scene_prop_get_slot, ":gold_cost", ":instance_id", slot_scene_prop_gold_value),
+          (call_script, "script_cf_check_enough_gold", ":player_id", ":gold_cost"),
+        (else_try),
+          (assign, ":fail", 1),
+        (try_end),
       (try_end),
+      (eq, ":fail", 0),
       (call_script, "script_cf_change_faction", ":agent_id", ":instance_id", change_faction_type_respawn),
       (try_begin),
         (call_script, "script_player_adjust_gold", ":player_id", ":gold_cost", -1),
@@ -6944,9 +6953,8 @@ scripts.extend([
 	(try_end),
 	#End
     (try_begin),
-      (eq, ":item_id", "itm_money_bag"), # since the item instance will be removed immediately aftewards, transfer the contents to an agent slot
-      (neq, "$g_game_type", "mt_no_money"),
       (scene_prop_get_slot, ":value", ":instance_id", slot_scene_prop_gold_value),
+      (gt, ":value", 0),
       (scene_prop_set_slot, ":instance_id", slot_scene_prop_gold_value, 0),
       (try_for_range, ":value_slot", slot_agent_money_bag_1_value, slot_agent_money_bag_4_value + 1),
         (agent_get_slot, ":next_value", ":agent_id", ":value_slot"),

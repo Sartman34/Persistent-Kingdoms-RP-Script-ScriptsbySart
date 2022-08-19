@@ -7,12 +7,14 @@ setup(
         "açlık scripti.py",
         "autosave.py",
         "script attack viewer.py",
-        "send command.py"
+        "send command.py",
     ],
     windows = [
         "Server Owner Panel v1.3.3 x64.pyw"
     ],
-    options = {"py2exe" : {
-        "dist_dir": "../TCP Server",
-    }}
+    options = {
+        "py2exe" : {
+            "dist_dir": "../TCP Server",
+        }
+    }
 )

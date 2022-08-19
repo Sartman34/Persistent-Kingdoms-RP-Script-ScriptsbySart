@@ -59,7 +59,7 @@ class LicenseInfo():
 def logging_print(*string):
     print(*string)
 
-    file = open("Data\\logs.txt", "a")
+    file = open("Data\\logs.txt", "a", encoding = "utf8")
     old_stdout = sys.stdout
     sys.stdout = file
     print(*string)
@@ -449,12 +449,12 @@ join_times = dict()
 chests = dict()
 death_idle_time = 7
 authentication_time = 0
-counter_x = 0
-banned_ips = []
-command_perm = []
-whitelist = []
-t_chat_users = []
-key_checkers = []
+banned_ips = list()
+command_perm = list()
+whitelist = list()
+t_chat_users = list()
+key_checkers = list()
+settings = list()
 perm_id = {
     "Duyuru": 0,
     "Soylenti": 1
@@ -514,7 +514,7 @@ admin_queue_commands = {
     "Kick": 1,
     "Settings": 2,
 }
-settings = {
+settings_type = {
     "Idle Income" : 0,
     "High RPG" : 1
 }
@@ -1261,6 +1261,14 @@ def main_request_handler(client, addr, port):
             else:
                 response = "0"
             send_message(client, response)
+        elif action == "update_settings":
+            for setting in settings:
+                admin_q.append(setting)
+            if len(admin_q):
+                response = admin_q.pop()
+            else:
+                response = "0"
+            send_message(client, response)
         elif action == "check_door_key":
             agent_id = message[0]
             instance_id = message[1]
@@ -1334,7 +1342,6 @@ def main_request_handler(client, addr, port):
             if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
                 patients.pop(unique_id).do_run = False
         elif action == "save_chest":
-            global counter_x
             scene_prop = message[0]
             variation_id = message[1]
             data = message[2:]
@@ -1343,7 +1350,6 @@ def main_request_handler(client, addr, port):
             for item in data:
                 chests[variation_id].append(item)
             send_message(client, "0")
-            counter_x += 1
         elif action == "load_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1802,10 +1808,10 @@ try:
 
     if not idle_income in ["0", ""]:
         int(idle_income)
-        admin_q.append("{}|{}|{}".format(admin_queue_commands["Settings"], settings["Idle Income"], idle_income))
+        settings.append("{}|{}|{}".format(admin_queue_commands["Settings"], settings_type["Idle Income"], idle_income))
 
     if is_high_rpg in ["True", "true", "1"]:
-        admin_q.append("{}|{}|1".format(admin_queue_commands["Settings"], settings["High RPG"]))
+        settings.append("{}|{}|1".format(admin_queue_commands["Settings"], settings_type["High RPG"]))
 
     admin_pass = get_random_string(10)
     logging_print("Admin log pass is: {}".format(admin_pass))
