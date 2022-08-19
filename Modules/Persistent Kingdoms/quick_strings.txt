@@ -1,12 +1,15 @@
-71
+74
 qstr_close_server close_server
 qstr_/debug /debug
 qstr_/t_ /t_
+qstr_[{s0}]_{s1} [{s0}]_{s1}
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
 qstr_WSE2 WSE2
 qstr_{reg0}<{reg1} {reg0}<{reg1}
 qstr_{s0}<{reg2} {s0}<{reg2}
 qstr_http://127.0.0.1/sav http://127.0.0.1/save_chest<{s0}
+qstr_http://127.0.0.1/rea http://127.0.0.1/read_letter<{reg0}<{reg1}
+qstr_read_letter_request_ read_letter_request_failed.
 qstr_http://127.0.0.1/loa http://127.0.0.1/load_chest<{reg0}<{reg1}<0<{reg2}
 qstr_http://127.0.0.1/load http://127.0.0.1/load_chest<{reg1}<{reg2}<{reg3}<{reg4}
 qstr_pw_item_chest_a pw_item_chest_a

@@ -11,51 +11,6 @@ import sys
 import traceback
 import ntplib
 
-file = open("Data\\basic_settings.txt", "r+")
-database = file.read().split("\n")
-file.close()
-server_name = database.pop(0).split(" : ")[1]
-discord_id = database.pop(0).split(" : ")[1]
-base_hunger = database.pop(0).split(" : ")[1]
-start_hunger = database.pop(0).split(" : ")[1]
-start_bank = database.pop(0).split(" : ")[1]
-start_money = database.pop(0).split(" : ")[1]
-bank_lost_percentage = int(database.pop(0).split(" : ")[1])
-base_health = database.pop(0).split(" : ")[1]
-log_file_location = database.pop(0).split(" : ")[1]
-whitelist_enabled = int(database.pop(0).split(" : ")[1])
-idle_income = database.pop(0).split(" : ")[1]
-license_name = database.pop(0).split(" : ")[1]
-is_high_rpg = database.pop(0).split(" : ")[1]
-
-extension_keys = {"Custom Announcement" : 0,
-                  "Door Keys" : 1,
-                  "Letter" : 2,
-                  "Pass-Out" : 3,
-                  "Coin" : 4,#bozuk
-                  "Inventory" : 5,
-                  "Horse Keeper" : 6,
-                  "Play Time" : 7,
-                  "Health" : 8,
-                  }
-
-extensions = [1, 1, 0, 1, 0, 1, 0, 0, 0]
-message_lenght = 80
-class LicenseInfo():
-    is_licensed = True
-    date = datetime.datetime(2022, 9, 1)
-    version = "2.0"
-    name = license_name
-    text = []
-    text.append("Scripts by Sart. Version: {}, License: {}".format(version, name))
-    text[0] = text[0].ljust(message_lenght)
-    if is_licensed:
-        text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
-    else:
-        text.append("Sunucunun lisansı 1 aylık deneme sürümüdür.")
-    text[1] = text[1].ljust(message_lenght)
-    text = "".join(text)
-
 def logging_print(*string):
     print(*string)
 
@@ -65,6 +20,55 @@ def logging_print(*string):
     print(*string)
     sys.stdout = old_stdout
     file.close()
+
+try:
+    file = open("Data\\basic_settings.txt", "r+")
+    database = file.read().split("\n")
+    file.close()
+    server_name = database.pop(0).split(" : ")[1]
+    discord_id = database.pop(0).split(" : ")[1]
+    base_hunger = database.pop(0).split(" : ")[1]
+    start_hunger = database.pop(0).split(" : ")[1]
+    start_bank = database.pop(0).split(" : ")[1]
+    start_money = database.pop(0).split(" : ")[1]
+    bank_lost_percentage = int(database.pop(0).split(" : ")[1])
+    base_health = database.pop(0).split(" : ")[1]
+    log_file_location = database.pop(0).split(" : ")[1]
+    whitelist_enabled = int(database.pop(0).split(" : ")[1])
+    idle_income = database.pop(0).split(" : ")[1]
+    license_name = database.pop(0).split(" : ")[1]
+    is_high_rpg = database.pop(0).split(" : ")[1]
+
+    extension_keys = {"Custom Announcement" : 0,
+                      "Door Keys" : 1,
+                      "Letter" : 2,
+                      "Pass-Out" : 3,
+                      "Coin" : 4,#bozuk
+                      "Inventory" : 5,
+                      "Horse Keeper" : 6,
+                      "Play Time" : 7,
+                      "Health" : 8,
+                      }
+
+    extensions = [1, 1, 0, 1, 0, 1, 0, 0, 0]
+except:
+    logging_print(traceback.format_exc())
+
+message_lenght = 80
+
+class LicenseInfo():
+    is_licensed = True
+    date = datetime.datetime(2022, 9, 5)
+    version = "2.1"
+    text = []
+    text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if licensed else "Free Trial"))
+    text[0] = text[0].ljust(message_lenght)
+    if is_licensed:
+        text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
+    else:
+        text.append("Sunucunun lisansı 1 aylık deneme sürümüdür.")
+    text[1] = text[1].ljust(message_lenght)
+    text = "".join(text)
 
 def clear_spaces(string):
     for character in [" ", "\t"]:
@@ -159,7 +163,6 @@ Lisans hakkında bilgi verir.\
 Kuzgun sayınız : {}\
 ",
     "/mektup help" : "\
-Discord sunucumuzdaki '-mektup-sistemi' odasını okuyabilirsiniz.^\
 /mektup yaz help^\
 /mektup oku help^\
 /mektup mühürle help\
@@ -1025,48 +1028,44 @@ def main_request_handler(client, addr, port):
                                     send_message_warband(client, message_type["Message"], unique_id, colors["acik kirmizi"], strings["kişi bulunamadı"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["guidiniz"].format(unique_id))
-##                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"]))
-##                            elif text[0] == "yaz":
-##                                if len(text) >= 2:
-##                                    if text[1] == "help":
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup yaz help"]))
-##                                    else:
-##                                        while True:
-##                                            code = random.randint(10, 100000)
-##                                            if str(code) not in mails:
-##                                                if unique_id in names:
-##                                                    mails[str(code)] = [unique_id, " ".join(text[1:]), "0"]
-##                                                    send_message(client, "22|{}|{}".format(player_id, code))
-##                                                else:
-##                                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["acik kirmizi"], strings["problem with script"]))
-##                                                break
-##                            elif text[0] == "oku":
-##                                if len(text) >= 2:
-##                                    if text[1] == "help":
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup oku help"]))
-##                                    else:
-##                                        send_message(client, "23|{}".format(player_id))
-##                                else:
-##                                    send_message(client, "23|{}".format(player_id))
-##                            elif text[0] == "mühürle" or text[0] == "muhurle":
-##                                if len(text) >= 2: #text[1]: guid or "help"
-##                                    if text[1] == "help":
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-##                                    elif text[1] == "kaldır" or text[1] == "kaldir":
-##                                        send_message(client, "25|{}|{}".format(player_id, "0"))
-##                                    elif text[1].isnumeric():
-##                                        send_message(client, "25|{}|{}".format(player_id, text[1]))
-##                                    else:
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-##                                else:
-##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup mühürle help"]))
-##                            else:
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
-##                        else:
-##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/mektup help"].format(players[unique_id][data_id["Pigeon"]])))
+                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
+                            elif text[0] == "yaz":
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup yaz help"])
+                                    else:
+                                        while True:
+                                            code = random.randint(10, 100000)
+                                            if str(code) not in mails:
+                                                mails[str(code)] = [unique_id, " ".join(text[1:]), "0"]
+                                                send_message(client, "22|{}|{}".format(player_id, code))
+                            elif text[0] == "oku":
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup oku help"])
+                                    else:
+                                        send_message(client, "23|{}".format(player_id))
+                                else:
+                                    send_message(client, "23|{}".format(player_id))
+                            elif text[0] == "mühürle" or text[0] == "muhurle":
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup mühürle help"])
+                                    elif text[1] == "kaldır" or text[1] == "kaldir":
+                                        send_message(client, "25|{}|{}".format(player_id, "0"))
+                                    elif text[1].isnumeric():
+                                        send_message(client, "25|{}|{}".format(player_id, text[1]))
+                                    else:
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup mühürle help"])
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup mühürle help"])
+                            else:
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
 ##                    elif command in ["para", "coin"] and extensions[extension_keys["Coin"]]:
 ##                        if len(text):
 ##                            if text[0] == "help":

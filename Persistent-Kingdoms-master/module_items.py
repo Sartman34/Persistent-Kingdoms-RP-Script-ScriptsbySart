@@ -1508,7 +1508,7 @@ items = [
  13000 , weight(0.01)|head_armor(0)|body_armor(0)|leg_armor(0)|difficulty(7) ,imodbits_none|imodbit_female],
  
 ["letter", "Letter", [("letter_carry",0),("letter",ixmesh_carry),("letter",ixmesh_inventory)], itp_type_one_handed_wpn|itp_primary|itp_no_parry, itcf_carry_dagger_front_left,
- 550, weight(1.75)|weapon_length(13), imodbits_none],
+ 550, weight(1.75)|weapon_length(13), imodbits_none, [(ti_on_weapon_attack, [(store_trigger_param_1, ":agent_id"), (call_script, "script_cf_use_letter_item", ":agent_id")])]],
 
 
 itm_faction_banner("a01"),

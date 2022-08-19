@@ -77,9 +77,12 @@ scripts.extend([
       (str_split, ":lenght", s0, s0, "str_space", 1),
       (ge, ":lenght", 2),
       (val_sub, ":lenght", 1),
-      (str_store_join, s0, s1, ":lenght", "str_space"),
-      (assign, ":trigger", 0),
-      (set_result_string, s0),
+      (str_store_join, s1, s1, ":lenght", "str_space"),
+      (str_store_player_username, s0, ":player_id"),
+      (try_for_players, ":other_player_id", 1),
+        (multiplayer_send_2_int_to_player, ":other_player_id", server_event_script_message_set_color, admin_chat_color),
+        (multiplayer_send_string_to_player, ":other_player_id", server_event_script_message, "@[{s0}] {s1}"),
+      (try_end),
     (else_try),
       (neg|str_is_empty, s0),#** Chat Bug Fix
       (neg|str_contains, s0, "str_enter"),
@@ -120,6 +123,25 @@ scripts.extend([
       (send_message_to_url_advanced, script_ip_address + "/save_chest<{s0}", "@WSE2", "script_default_return", "script_default_fail"),
     (try_end),
   ]),
+
+  ("cf_use_letter_item", [
+    (store_script_param, ":agent_id", 1),
+
+    (agent_get_player_id, ":player_id", ":agent_id"),
+    (player_is_active, ":player_id"),
+    (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
+    (val_add, ":slot_id", slot_agent_item_1_value),
+    (agent_get_slot, ":value", ":agent_id", ":slot_id"),
+    (player_get_unique_id, reg0, ":player_id"),
+    (assign, reg1, ":value"),
+    (send_message_to_url_advanced, script_ip_address + "/read_letter<{reg0}<{reg1}", "@WSE2", "script_read_letter_return", "script_read_letter_fail"),
+  ]),
+
+  ("read_letter_return", [
+    
+  ]),
+
+  ("read_letter_fail", [ (display_message, "@read_letter request failed."), ]),
 
   ("load_chests", [
     (store_script_param, ":scene_prop_id", 1),
