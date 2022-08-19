@@ -119,10 +119,10 @@ slot_agent_food_amount                = 7
 slot_agent_fishing_last_school        = 8 # last school fished from, to speed up repetitive check
 slot_agent_last_horse_ridden          = 9
 
-slot_agent_money_bag_1_value          = 10 # the values of the money bags picked up, in order
-slot_agent_money_bag_2_value          = 11
-slot_agent_money_bag_3_value          = 12
-slot_agent_money_bag_4_value          = 13
+slot_agent_item_1_value          = 10 # the values of the money bags picked up, in order
+slot_agent_item_2_value          = 11
+slot_agent_item_3_value          = 12
+slot_agent_item_4_value          = 13
 
 slot_agent_hunting_last_carcass       = 14 # last animal carcass processed, to speed up repetitive checks
 slot_agent_died_normally              = 15
@@ -256,6 +256,7 @@ slot_scene_prop_store_only_ammo       = 56
 
 slot_scene_prop_sitting_agent         = 57
 slot_scene_prop_personal_inventory_player_id = 58
+slot_scene_prop_value                 = 59
 
 scene_prop_state_active               = 0
 scene_prop_state_destroyed            = 1

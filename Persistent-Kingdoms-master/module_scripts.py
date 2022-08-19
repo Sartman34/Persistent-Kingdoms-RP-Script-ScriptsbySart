@@ -4955,7 +4955,7 @@ scripts.extend([
       (agent_get_position, pos1, ":agent_id"),
       (call_script, "script_set_random_spawn_position", 50),
       (spawn_item, "itm_money_bag", 0, "$g_spawn_item_prune_time"),
-      (scene_prop_set_slot, reg0, slot_scene_prop_gold_value, ":gold_loot"),
+      (scene_prop_set_slot, reg0, slot_scene_prop_value, ":gold_loot"),
     (try_end),
     ]),
 
@@ -6725,10 +6725,19 @@ scripts.extend([
         (assign, ":item_id", -1),
       (try_end),
       (neq, ":item_id", -1),
-      (call_script, "script_cf_agent_consume_item", ":agent_id", ":item_id", 1),
       (try_begin),
-        (eq, ":item_id", "itm_money_bag"),
-        (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"),
+        (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
+        (store_add, ":agent_slot_id", slot_agent_item_1_value),
+        (agent_slot_gt, ":agent_id", ":agent_slot_id", 0),
+        (agent_set_slot, ":agent_id", ":agent_slot_id", 0),
+        (val_add, ":slot_id", 1),
+        (agent_unequip_item, ":agent_id", ":item_id", ":slot_id"),
+      (else_try),
+        (call_script, "script_cf_agent_consume_item", ":agent_id", ":item_id", 1),
+##        (try_begin),
+##          (eq, ":item_id", "itm_money_bag"),
+##          (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"),
+##        (try_end),
       (try_end),
       (assign, ":fail", 0),
     (try_end),
@@ -6899,7 +6908,7 @@ scripts.extend([
     (position_move_y, pos1, 50),
     (set_spawn_position, pos1),
     (spawn_item, "itm_money_bag", 0, "$g_spawn_item_prune_time"),
-    (scene_prop_set_slot, reg0, slot_scene_prop_gold_value, ":gold_amount"),
+    (scene_prop_set_slot, reg0, slot_scene_prop_value, ":gold_amount"),
 	
     #Log spawn money bag
     (str_store_player_username, s11, ":player_id"),
@@ -6908,33 +6917,39 @@ scripts.extend([
     #End
     ]),
 
-  ("cf_pop_agent_money_bag_value", # remove the last added money bag amount from the agent's slots
-   [(store_script_param, ":agent_id", 1), # must be valid
-
-    (assign, ":last_value", 0),
-    (try_for_range_backwards, ":value_slot", slot_agent_money_bag_1_value, slot_agent_money_bag_4_value + 1),
-      (agent_get_slot, ":value", ":agent_id", ":value_slot"),
-      (agent_set_slot, ":agent_id", ":value_slot", ":last_value"),
-      (assign, ":last_value", ":value"),
-    (try_end),
-    (assign, reg0, ":last_value"),
-    (gt, ":last_value", 0),
-    ]),
+##  ("cf_pop_agent_money_bag_value", # remove the last added money bag amount from the agent's slots
+##   [(store_script_param, ":agent_id", 1), # must be valid
+##
+##    (assign, ":last_value", 0),
+##    (try_for_range_backwards, ":value_slot", slot_agent_item_1_value, slot_agent_item_4_value + 1),
+##      (agent_get_slot, ":value", ":agent_id", ":value_slot"),
+##      (agent_set_slot, ":agent_id", ":value_slot", ":last_value"),
+##      (assign, ":last_value", ":value"),
+##    (try_end),
+##    (assign, reg0, ":last_value"),
+##    (gt, ":last_value", 0),
+##    ]),
 
   ("cf_use_money_bag_item", # server: handle players retrieving the contents of equipped money bags
    [(store_script_param, ":agent_id", 1), # must be valid
 
-    (neq, "$g_game_type", "mt_no_money"),
-    (call_script, "script_cf_agent_consume_item", ":agent_id", "itm_money_bag", 1),
-    (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"),
-    (assign, ":gold_value", reg0),
+##    (neq, "$g_game_type", "mt_no_money"),
+##    (call_script, "script_cf_agent_consume_item", ":agent_id", "itm_money_bag", 1),
+##    (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"),
+##    (assign, ":gold_value", reg0),
+    (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
+    (val_add, ":slot_id", 1),
+    (agent_unequip_item, ":agent_id", "itm_money_bag", ":slot_id"),
+    (val_add, ":slot_id", slot_agent_item_1_value - 1),
+    (agent_get_slot, ":value", ":agent_id", ":slot_id"),
+    (agent_set_slot, ":agent_id", ":slot_id", 0),
     (agent_get_player_id, ":player_id", ":agent_id"),
     (player_is_active, ":player_id"),
-    (call_script, "script_player_adjust_gold", ":player_id", ":gold_value", 1),
-	
+    (call_script, "script_player_adjust_gold", ":player_id", ":value", 1),
+    
     #Log money bag use
     (str_store_player_username, s11, ":player_id"),
-    (assign, reg31, ":gold_value"),
+    (assign, reg31, ":value"),
     (server_add_message_to_log, "str_log_use_money_bag"),
     #End
     ]),
@@ -6944,23 +6959,21 @@ scripts.extend([
     (store_script_param, ":item_id", 2),
     (store_script_param, ":instance_id", 3), # must be the item instance's id
     #Log item pick ups
-	(try_begin),
-	  (agent_get_player_id, ":player_id", ":agent_id"),
-	  (str_store_player_username, s11, ":player_id"),
-	  (str_store_item_name, s12, ":item_id"),
-	  (assign, reg31, ":instance_id"),
-	  (server_add_message_to_log, "str_log_pick_up_item"),
-	(try_end),
-	#End
     (try_begin),
-      (scene_prop_get_slot, ":value", ":instance_id", slot_scene_prop_gold_value),
+      (agent_get_player_id, ":player_id", ":agent_id"),
+      (str_store_player_username, s11, ":player_id"),
+      (str_store_item_name, s12, ":item_id"),
+      (assign, reg31, ":instance_id"),
+      (server_add_message_to_log, "str_log_pick_up_item"),
+    (try_end),
+    #End
+    (try_begin),
+      (scene_prop_get_slot, ":value", ":instance_id", slot_scene_prop_value),
       (gt, ":value", 0),
-      (scene_prop_set_slot, ":instance_id", slot_scene_prop_gold_value, 0),
-      (try_for_range, ":value_slot", slot_agent_money_bag_1_value, slot_agent_money_bag_4_value + 1),
-        (agent_get_slot, ":next_value", ":agent_id", ":value_slot"),
-        (agent_set_slot, ":agent_id", ":value_slot", ":value"),
-        (assign, ":value", ":next_value"),
-      (try_end),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_value, 0),
+      (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
+      (val_add, ":slot_id", slot_agent_item_1_value),
+      (agent_set_slot, ":agent_id", ":slot_id", ":value"),
     (else_try),
       (this_or_next|eq, ":item_id", "itm_invisible_sword"),
       (this_or_next|eq, ":item_id", "itm_riotshield"),
@@ -6979,34 +6992,39 @@ scripts.extend([
     (store_script_param, ":instance_id", 3), # must be the dropped item instance's id
     (store_script_param, ":agent_died", 4), # set to 1 for dropping when the agent dies
     #Log item drops
-	(try_begin),
-	  (neq, ":agent_died", 1),
-	  (agent_get_player_id, ":player_id", ":agent_id"),
-	  (str_store_player_username, s11, ":player_id"),
-	  (str_store_item_name, s12, ":item_id"),
-	  (assign, reg31, ":instance_id"),
-	  (server_add_message_to_log, "str_log_drop_item"),
-	(try_end),
-	#End
+    (try_begin),
+      (neq, ":agent_died", 1),
+      (agent_get_player_id, ":player_id", ":agent_id"),
+      (str_store_player_username, s11, ":player_id"),
+      (str_store_item_name, s12, ":item_id"),
+      (assign, reg31, ":instance_id"),
+      (server_add_message_to_log, "str_log_drop_item"),
+    (try_end),
+    #End
     (set_fixed_point_multiplier, 100),
     (try_begin), # only check for items over a certain id, near the end of the list
       (le, ":item_id", "itm_lock_pick"),
     (else_try),
-      (eq, ":item_id", "itm_money_bag"),
-      (try_begin),
-        (neq, "$g_game_type", "mt_no_money"),
-        (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"), # transfer from the agent slot into the new dropped item instance
-        (scene_prop_set_slot, ":instance_id", slot_scene_prop_gold_value, reg0),
-      (try_end),
-    (else_try),
-      (is_between, ":item_id", "itm_pw_banner_pole_a01", "itm_pw_banner_castle_fac_1a"),
-      (neq, ":agent_died", 1), # if not dropped because the agent died, plant the flag pole upright
-      (prop_instance_get_position, pos1, ":instance_id"),
-      (position_rotate_x, pos1, 90),
-      (prop_instance_set_position, ":instance_id", pos1),
-      (assign, ":flag_prune_time", "$g_spawn_item_prune_time"),
-      (val_max, ":flag_prune_time", 3600), # prevent it disappearing for at least an hour
-      (scene_prop_set_prune_time, ":instance_id", ":flag_prune_time"),
+      (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
+      (val_add, ":slot_id", slot_agent_item_1_value),
+      (agent_get_slot, ":value", ":agent_id", slot_agent_item_1_value),
+      (gt, ":value", 0),
+      (agent_set_slot, ":agent_id", slot_agent_item_1_value, 0),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_value, ":value"),
+##      (eq, ":item_id", "itm_money_bag"),
+##      (try_begin),
+##        (call_script, "script_cf_pop_agent_money_bag_value", ":agent_id"), # transfer from the agent slot into the new dropped item instance
+##        (scene_prop_set_slot, ":instance_id", slot_scene_prop_value, reg0),
+##      (try_end),
+##    (else_try),
+##      (is_between, ":item_id", "itm_pw_banner_pole_a01", "itm_pw_banner_castle_fac_1a"),
+##      (neq, ":agent_died", 1), # if not dropped because the agent died, plant the flag pole upright
+##      (prop_instance_get_position, pos1, ":instance_id"),
+##      (position_rotate_x, pos1, 90),
+##      (prop_instance_set_position, ":instance_id", pos1),
+##      (assign, ":flag_prune_time", "$g_spawn_item_prune_time"),
+##      (val_max, ":flag_prune_time", 3600), # prevent it disappearing for at least an hour
+##      (scene_prop_set_prune_time, ":instance_id", ":flag_prune_time"),
     (else_try),
       (eq, ":item_id", "itm_fishing_net"),
       (prop_instance_get_position, pos1, ":instance_id"),
@@ -7062,16 +7080,16 @@ scripts.extend([
         (position_rotate_x, pos1, 180),
       (try_end),
       (prop_instance_set_position, ":instance_id", pos1),
-    (else_try), # remove admin items dropped on the ground
-      (this_or_next|eq, ":item_id", "itm_invisible_sword"),
-      (this_or_next|eq, ":item_id", "itm_admin_lock_pick"),
-      (this_or_next|eq, ":item_id", "itm_riotshield"),
-      (this_or_next|eq, ":item_id", "itm_baton"),
-      (eq, ":item_id", "itm_admin_scalpel"),
-      (init_position, pos1),
-      (position_set_z, pos1, z_position_to_hide_object),
-      (prop_instance_set_position, ":instance_id", pos1),
-      (scene_prop_set_prune_time, ":instance_id", 1),
+##    (else_try), # remove admin items dropped on the ground
+##      (this_or_next|eq, ":item_id", "itm_invisible_sword"),
+##      (this_or_next|eq, ":item_id", "itm_admin_lock_pick"),
+##      (this_or_next|eq, ":item_id", "itm_riotshield"),
+##      (this_or_next|eq, ":item_id", "itm_baton"),
+##      (eq, ":item_id", "itm_admin_scalpel"),
+##      (init_position, pos1),
+##      (position_set_z, pos1, z_position_to_hide_object),
+##      (prop_instance_set_position, ":instance_id", pos1),
+##      (scene_prop_set_prune_time, ":instance_id", 1),
     (try_end),
     ]),
 
