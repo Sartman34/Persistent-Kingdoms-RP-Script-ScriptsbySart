@@ -141,7 +141,6 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
 
 player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
    [(store_trigger_param_1, ":player_id"),
-##    (call_script, "script_cf_save_player_exit", ":player_id"),
 
     (player_get_unique_id, reg0, ":player_id"),
     (dict_erase, "$g_player_id_dict", "@{reg0}"),
@@ -350,50 +349,80 @@ agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: h
 ##    (call_script, "script_check_spawn_bots", ":dead_agent_id"),
     ])
 
-agent_hit = (ti_on_agent_hit, 0, 0, [], # server: apply extra scripted effects for special weapons, hitting animals, and when overloaded by armor
-   [(store_trigger_param_1, ":attacked_agent_id"),
-    (store_trigger_param_2, ":attacker_agent_id"),
-    (store_trigger_param_3, ":damage_dealt"),
-    (try_begin), # check if damage should bleed through the armor due to unmet requirements
-      (agent_slot_ge, ":attacked_agent_id", slot_agent_armor_damage_through, 5),
-      (agent_get_slot, ":damage_through_multiplier", ":attacked_agent_id", slot_agent_armor_damage_through),
-      (gt, reg0, -1),
-      (item_get_slot, ":damage_through", reg0, slot_item_max_raw_damage),
-      (val_mul, ":damage_through", ":damage_through_multiplier"),
-      (val_div, ":damage_through", 100),
-      (gt, ":damage_through", ":damage_dealt"),
-      (store_random_in_range, ":damage_through", ":damage_dealt", ":damage_through"),
-      (set_trigger_result, ":damage_through"),
-    (try_end),
+agent_hit = (ti_on_agent_hit, 0, 0, [], [ # server: apply extra scripted effects for special weapons, hitting animals, and when overloaded by armor
+  (store_trigger_param_1, ":attacked_agent_id"),
+  (store_trigger_param_2, ":attacker_agent_id"),
+  (store_trigger_param_3, ":damage_dealt"),
+  (try_begin), # check if damage should bleed through the armor due to unmet requirements
+    (agent_slot_ge, ":attacked_agent_id", slot_agent_armor_damage_through, 5),
+    (agent_get_slot, ":damage_through_multiplier", ":attacked_agent_id", slot_agent_armor_damage_through),
+    (gt, reg0, -1),
+    (item_get_slot, ":damage_through", reg0, slot_item_max_raw_damage),
+    (val_mul, ":damage_through", ":damage_through_multiplier"),
+    (val_div, ":damage_through", 100),
+    (gt, ":damage_through", ":damage_dealt"),
+    (store_random_in_range, ":damage_dealt", ":damage_dealt", ":damage_through"),
+  (try_end),
+  (try_begin),
+    (agent_slot_ge, ":attacked_agent_id", slot_agent_animal_birth_time, 1),
+    (call_script, "script_animal_hit", ":attacked_agent_id", ":attacker_agent_id", ":damage_dealt", reg0),
+    (assign, ":damage_dealt", reg0),
+  (try_end),
+  (try_begin),
+    (is_between, reg0, scripted_items_begin, scripted_items_end),
+    (call_script, "script_agent_hit_with_scripted_item", ":attacked_agent_id", ":attacker_agent_id", ":damage_dealt", reg0),
+    (assign, ":damage_dealt", reg0),
+  (try_end),
+  (try_begin),
+    (eq, reg0, "itm_baton"),
+    (assign, ":damage_dealt", 0),
+    (neg|agent_is_non_player, ":attacked_agent_id"),
+    (agent_set_animation, ":attacked_agent_id", "anim_strike_fall_back_rise", 0),
+    (agent_get_player_id, ":player_id", ":attacked_agent_id"),
+    (player_get_gender, ":gender", ":player_id"),
     (try_begin),
-      (agent_slot_ge, ":attacked_agent_id", slot_agent_animal_birth_time, 1),
-      (call_script, "script_animal_hit", ":attacked_agent_id", ":attacker_agent_id", ":damage_dealt", reg0),
+      (gt, ":gender", 0),#woman
+      (agent_play_sound, ":attacked_agent_id", "snd_woman_hit"),
+    (else_try),
+      (agent_play_sound, ":attacked_agent_id", "snd_man_hit"),
     (try_end),
+  (try_end),
+  (try_begin),
+    (neg|agent_is_non_player, ":attacked_agent_id"),
+    (agent_get_player_id, ":player_id", ":attacked_agent_id"),
+    (call_script, "script_toggle_walk", ":player_id", 1, 0),
+  (try_end),
+  (try_begin),
+    (eq, "$g_is_hit_disabled", 1),
+    (neq, ":attacked_agent_id", ":attacker_agent_id"),
+    (assign, ":fail", 0),
     (try_begin),
-      (is_between, reg0, scripted_items_begin, scripted_items_end),
-      (call_script, "script_agent_hit_with_scripted_item", ":attacked_agent_id", ":attacker_agent_id", ":damage_dealt", reg0),
+      (agent_is_human, ":attacker_agent_id"),
+    (else_try),
+      (agent_get_rider, ":attacker_agent_id", ":attacker_agent_id"),
+      (agent_is_active, ":attacker_agent_id"),
+    (else_try),
+      (assign, ":fail", 1),
     (try_end),
+    (eq, ":fail", 0),
+    (agent_get_player_id, ":player_id", ":attacker_agent_id"),
+    (player_is_active, ":player_id"),
+    (neg|player_is_admin, ":player_id"),
+    (assign, ":damage_dealt", 0),
+    (store_mission_timer_a, ":time"),
+    (agent_get_slot, ":last_action_time", ":attacker_agent_id", slot_agent_last_hit_time),
+    (store_sub, ":interval", ":time", ":last_action_time"),
+    (ge, ":interval", 10),
+    (agent_set_slot, ":attacker_agent_id", slot_agent_last_hit_time, ":time"),
     (try_begin),
-      (eq, reg0, "itm_baton"),
-      (set_trigger_result, 0),
-      (neg|agent_is_non_player, ":attacked_agent_id"),
-      (agent_set_animation, ":attacked_agent_id", "anim_strike_fall_back_rise", 0),
-      (agent_get_player_id, ":player_id", ":attacked_agent_id"),
-      (player_get_gender, ":gender", ":player_id"),
-      (try_begin),
-        (gt, ":gender", 0),#woman
-        (agent_play_sound, ":attacked_agent_id", "snd_woman_hit"),
-      (else_try),
-        (agent_play_sound, ":attacked_agent_id", "snd_man_hit"),
-      (try_end),
+      (multiplayer_send_2_int_to_player, ":player_id", server_event_script_message_set_color, 4293938509),
+      (multiplayer_send_string_to_player, ":player_id", server_event_script_message_announce, "@Hitler kapatildi."),
     (try_end),
-    (try_begin),
-        (neg|agent_is_non_player, ":attacked_agent_id"),
-        (agent_get_player_id, ":player_id", ":attacked_agent_id"),
-        (call_script, "script_toggle_walk", ":player_id", 1, 0),
-    (try_end),
+  (else_try),
     (call_script, "script_log_hit", ":attacked_agent_id", ":attacker_agent_id", ":damage_dealt", reg0, 0),
-    ])
+  (try_end),
+  (set_trigger_result, ":damage_dealt"),
+])
 
 item_picked_up = (ti_on_item_picked_up, 0, 0, [], # handle agents picking up an item
    [(store_trigger_param_1, ":agent_id"),
@@ -581,61 +610,6 @@ player_check_loop = (0, 0, 0.5, # server: check all players to see if any need a
       (assign, "$g_loop_player_check_outlaw", 0),
     (try_end),
     ], [])
-
-##agent_check_loop = (0, 0, 0.5, # server: loop over all agents, doing all common repetitive checks together for each agent, to minimize the penalty of using try_for_agents
-##   [(multiplayer_is_server),
-##    (try_begin), # if the loop was not restarted
-##      (gt, "$g_loop_agent_last_checked", -2),
-##      (assign, ":agent_id", -1),
-##      (try_for_agents, ":loop_agent_id"), # find the next agent id greater than the previous checked
-##        (eq, ":agent_id", -1),
-##        (gt, ":loop_agent_id", "$g_loop_agent_last_checked"),
-##        (assign, ":agent_id", ":loop_agent_id"),
-##      (try_end),
-##      (try_begin),
-##        (gt, ":agent_id", -1), # if a next agent id was found
-##        (assign, "$g_loop_agent_last_checked", ":agent_id"),
-##        (call_script, "script_check_agent_drowning", ":agent_id"),
-##        (try_begin),
-##          (eq, "$g_loop_horse_check", 1),
-##          (try_begin),
-##            (neg|agent_is_human, ":agent_id"),
-##            (call_script, "script_check_remove_lost_horse", ":agent_id"),
-##          (else_try),
-##            (call_script, "script_agent_remove_empty_ammo_stacks", ":agent_id"),
-##          (try_end),
-##        (try_end),
-##        (try_begin),
-##          (eq, "$g_loop_health_check", 1),
-##          (call_script, "script_check_agent_health", ":agent_id"),
-##        (try_end),
-##      (else_try),
-##        (assign, "$g_loop_agent_last_checked", -2),
-##      (try_end),
-##    (else_try), # setting up to restart the loop
-##      (store_mission_timer_a, ":time"),
-##      (try_begin),
-##        (ge, ":time", "$g_loop_agent_check_time"),
-##        (val_add, "$g_loop_agent_check_time", loop_agent_check_interval),
-##        (assign, "$g_loop_agent_last_checked", -1), # set to an invalid low agent id to start
-##        (try_begin),
-##          (ge, ":time", "$g_loop_horse_check_time"),
-##          (val_add, "$g_loop_horse_check_time", loop_horse_check_interval),
-##          (assign, "$g_loop_horse_check", 1),
-##        (else_try),
-##          (assign, "$g_loop_horse_check", 0),
-##        (try_end),
-##        (try_begin),
-##          (ge, ":time", "$g_loop_health_check_time"),
-##          (val_add, "$g_loop_health_check_time", loop_health_check_interval),
-##          (assign, "$g_loop_health_check", 1),
-##        (else_try),
-##          (assign, "$g_loop_health_check", 0),
-##        (try_end),
-##      (try_end),
-##    (try_end),
-##    (eq, "$g_loop_agent_last_checked", -2), # at the end of the loop, the trigger succeeds to wait the rearm interval before restarting
-##    ], [])
 
 agent_check_attack_loop = (0, 0, 0.2, [], # server: repeatedly check all agents for attacking with a weapon they can't use - should be kept as simple as possible
    [(multiplayer_is_server),
@@ -1249,7 +1223,6 @@ def common_triggers(mission_template):
         instrument_with_sheild_wield,#18
         instrument_with_sheild_pickup,#19
         player_check_loop,#20
-##      agent_check_loop,
         agent_check_attack_loop,#21
         agent_check_drowning_loop,#22 #** agent_check_loop split to 3 loops
         agent_check_health_loop,#23
@@ -1259,7 +1232,6 @@ def common_triggers(mission_template):
         polls_check,#27
         game_ended_check,#28
         draw_initial_banners,#29
-##      fill_chests_starting_inventory,
         fire_place_check,#30
         fish_school_loop,#31
         herd_leader_movement_loop,#32
@@ -1272,42 +1244,18 @@ def common_triggers(mission_template):
         ping_tcp_server,#39
         save_chests,#40
     ]
-##    escape_pressed, #** Client side scripts.
-##    tab_pressed,
-##    static_presentations_setup,
-##    action_menu_pressed,
-##    target_agent_pressed,
-##    chat_overlay_toggled,
-##    chat_resend_check,
-##    local_chat_pressed,
-##    faction_chat_pressed,
-##    admin_chat_pressed,
-##    ship_control_pressed,
-##    animation_menu_pressed,
-##    commit_suicide_loop,
-##    welcome_message,
-##    turn_windmill_fans,
-##    ambient_sounds_check,
-##    music_situation_check,
-##    shadow_recalculation,
-##    adjust_weather_effects,
-##    render_weather_effects,
-##    skybox_update_interval,
 
 mission_templates = [
   ("conquest", mtf_battle_mode, -1, "Conquest.", spawn_points_0_99,
     common_triggers("conquest") + [
-##    money_bag_pressed,
     ]),
     
   ("multiplayer_dm", mtf_battle_mode, -1, "Deathmatch.", spawn_points_0_99,
     common_triggers("multiplayer_dm") + [
-##    money_bag_pressed,
     ]),
 
   ("quick_battle", mtf_battle_mode, -1, "Quick battle.", spawn_points_0_99,
     common_triggers("quick_battle") + [
-##    money_bag_pressed,
     ]),
 
   ("no_money", mtf_battle_mode, -1, "No money.", spawn_points_0_99,
@@ -1316,12 +1264,10 @@ mission_templates = [
 
   ("feudalism", mtf_battle_mode, -1, "Feudalism.", spawn_points_0_99,
     common_triggers("feudalism") + [
-##    money_bag_pressed,
     ]),
 
   ("permanent_death", mtf_battle_mode, -1, "Permanent death.", spawn_points_0_99,
     common_triggers("permanent_death") + [
-##    money_bag_pressed,
     ]),
 
   ("edit_scene", 0, -1, "edit_scene", [(0,mtef_visitor_source,0,aif_start_alarmed,1,[])],

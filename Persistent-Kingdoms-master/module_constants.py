@@ -195,6 +195,7 @@ slot_agent_playing_music              = 67
 slot_agent_rest_use_start_time        = 68
 
 slot_agent_walk_mode                  = 73
+slot_agent_last_hit_time              = 74 #**
 
 
 ########################################################

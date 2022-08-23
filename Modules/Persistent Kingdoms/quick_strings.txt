@@ -1,6 +1,9 @@
-78
+81
 qstr_close_server close_server
 qstr_/debug /debug
+qstr_/hit /hit
+qstr_Hitler_tekrardan_akt Hitler_tekrardan_aktif!
+qstr_Hitler_kapatildi. Hitler_kapatildi.
 qstr_/t_ /t_
 qstr_[{s0}]_{s1} [{s0}]_{s1}
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
