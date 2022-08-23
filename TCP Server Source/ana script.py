@@ -39,18 +39,18 @@ try:
     license_name = database.pop(0).split(" : ")[1]
     is_high_rpg = database.pop(0).split(" : ")[1]
 
-    extension_keys = {"Custom Announcement" : 0,
-                      "Door Keys" : 1,
-                      "Letter" : 2,
-                      "Pass-Out" : 3,
-                      "Coin" : 4,#bozuk
-                      "Inventory" : 5,
-                      "Horse Keeper" : 6,
-                      "Play Time" : 7,
-                      "Health" : 8,
-                      }
-
-    extensions = [1, 1, 0, 1, 0, 1, 0, 0, 0]
+    extension_keys = {
+        "Custom Announcement" : 0,
+        "Door Keys" : 1,
+        "Letter" : 2,
+        "Pass-Out" : 3,
+        "Coin" : 4,#bozuk
+        "Inventory" : 5,
+        "Horse Keeper" : 6,
+        "Play Time" : 7,
+        "Health" : 8,
+    }
+    extensions = [1, 1, 0, 0, 0, 1, 0, 0, 0]
 except:
     logging_print(traceback.format_exc())
 
@@ -58,10 +58,10 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2022, 9, 5)
-    version = "2.1"
+    date = datetime.datetime(2022, 10, 5)
+    version = "2.2"
     text = []
-    text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if licensed else "Free Trial"))
+    text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
     text[0] = text[0].ljust(message_lenght)
     if is_licensed:
         text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
@@ -105,24 +105,6 @@ Sadece {0} yazarakta ekleyebilirsiniz.\
 ",
     "/ayril help" : "\
 /ayril: commoners'a katılırsınız.\
-",
-    "para cekme basarili" : "\
-Hesabınızdan {} dinar çekildi. Hesabınız: {} dinar.\
-",
-    "para yatirma basarili" : "\
-Hesabınıza {} dinar aktarıldı. Hesabınız: {} dinar.\
-",
-    "tum paraniz cekildi" : "\
-Hesabınızda artta kalan para ({}) çekildi.\
-",
-    "tum paraniz yatirildi" : "\
-Tüm paranız ({}) hesaba aktarıldı. Hesabınız: {} dinar.\
-",
-    "yetersiz bakiye" : "\
-Hesabınız boş.\
-",
-    "paraniz yok" : "\
-Hesaba aktarıcak paranız kalmadı.\
 ",
     "/me help" : "\
 /me (mesaj): local chate eyleminizi bildirirsiniz. \
@@ -348,24 +330,6 @@ colors = {
     "local chat" : 16,
     "local chat shout" : 17,
 }
-##    4294967295,
-##    4280691865,
-##    4284639733,
-##    4293938509,
-##    4288225055,
-##    4294942763,
-##    4287714054,
-##    4292303067,
-##    4288473929,
-##    4283076352,
-##    4294434828,
-##    4290822336,
-##    4291589888,
-##    4284546209,
-##    4293963842,
-##    4284914073,
-##    local_chat_color,
-##    local_chat_shout_color
 special_strings = {
     "yardim" : [["\
 '/(komut) help' yazarak detaylı açıklamalara ulaşabilirsiniz.^\
@@ -450,6 +414,8 @@ inventories = dict()
 play_times = dict()
 join_times = dict()
 chests = dict()
+doors = dict()
+admin_permissions = dict()
 death_idle_time = 7
 authentication_time = 0
 banned_ips = list()
@@ -458,6 +424,7 @@ whitelist = list()
 t_chat_users = list()
 key_checkers = list()
 settings = list()
+command_perm = list()
 perm_id = {
     "Duyuru": 0,
     "Soylenti": 1
@@ -482,8 +449,6 @@ data_id = {
     "Y": 16,
     "Z": 17,
     "Bank": 18,
-    "Pigeon": 19,
-    "Passed-Out" : 20
 }
 admin_permissions_ids = {
     "Spectate" : 0,
@@ -538,10 +503,9 @@ start_coins = ["0", "0", "0"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
         
 def import_custom_announcement():
-    global command_perm
     if not extensions[extension_keys["Custom Announcement"]]:
         return
-    command_perm = []
+    command_perm.clear()
     file = open("Data\\permissions.txt", "r+")
     database = file.read().split("\n")
     file.close()
@@ -550,24 +514,23 @@ def import_custom_announcement():
     for permission in database:
         command_perm.append(permission.split("%"))
 def import_door_keys():
-    global doors, key_checkers
     if not extensions[extension_keys["Door Keys"]]:
         return
-    doors = dict()
+    doors.clear()
     file = open("Data\\door_keys.txt", "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
         return
-    key_checkers = database.pop(0).split("%")
+    key_checkers.clear()
+    key_checkers.extend(database.pop(0).split("%"))
     for x in database:
         x = x.split("%")
         door = x[0]
         keys = x[1:]
         doors[door] = keys
 def import_admin_permissions():
-    global admin_permissions
-    admin_permissions = dict()
+    admin_permissions.clear()
     file = open("Data\\admin_permissions.txt", "r+")
     database = file.read().split("\n")
     file.close()
@@ -577,18 +540,18 @@ def import_admin_permissions():
             print("WARNING! Admin with (guid: {}) is cofigured poorly.".format(guid))
         admin_permissions[guid] = permissions
 def import_whitelist():
-    global whitelist
     if not whitelist_enabled:
         return
+    whitelist.clear()
     file = open("Data\\whitelist.txt", "r+")
     database = file.read().split("\n")
     file.close()
     for unique_id in database:
         whitelist.append(unique_id)
 def import_mails():
-    global mails
     if not extensions[extension_keys["Letter"]]:
         return
+    mails.clear()
     file = open("Data\\mails.txt", "r+", encoding='utf-8')
     database = file.read().split("\n")
     file.close()
@@ -602,7 +565,7 @@ def import_mails():
         seal = x[3]
         mails[code] = [name, post, seal]
 def import_names():
-    global names
+    names.clear()
     file = open("Data\\names.txt", "r+")
     database = file.read().split("\n")
     file.close()
@@ -631,23 +594,24 @@ def import_coins():
         bronze = x[3]
         coins[unique_id] = [gold, silver, bronze]
 def import_inventories():
-    global inventories, base_inventory
     if not extensions[extension_keys["Inventory"]]:
         return
     file = open("Data\\inventories.txt", "r+")
     database = file.read().split("\n")
     file.close()
-    base_inventory = database[0].split("%")[1:]
+    base_inventory.clear()
+    base_inventory.extend(database[0].split("%")[1:])
+    inventories.clear()
     for x in database[1:]:
         x = x.split("%")
         unique_id = x[0]
         inventory = x[1:]
         inventories[unique_id] = inventory
 def import_chests():
-    global chests
     file = open("Data\\chests.txt", "r+")
     database = file.read().split("\n")
     file.close()
+    chests.clear()
     if not database[0]:
         return
     for x in database:
@@ -855,8 +819,7 @@ def main_request_handler(client, addr, port):
                 *players[unique_id][data_id["Head"] : data_id["Gloves"] + 1],
                 *players[unique_id][data_id["Itm0"] : data_id["Itm3"] + 1],
                 *players[unique_id][data_id["Horse"] : data_id["HorseHP"] + 1],
-                *players[unique_id][data_id["X"] : data_id["Z"] + 1],
-                players[unique_id][data_id["Passed-Out"]],
+                *players[unique_id][data_id["X"] : data_id["Z"] + 1]
             )
         elif action == "load_player":
             #Faction<Troop
@@ -871,18 +834,19 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["Hunger"]] = start_hunger
             if not unique_id in inventories:
                 inventories[unique_id] = base_inventory
-            if not unique_id in play_times:
-                play_times[unique_id] = 0
-            join_times[unique_id] = datetime.datetime.now()
-            if play_times[unique_id] < authentication_time:
-                threading.Thread(target = authentication_timer, args = (unique_id,)).start()
+##            if not unique_id in play_times:
+##                play_times[unique_id] = 0
+##            join_times[unique_id] = datetime.datetime.now()
+##            if play_times[unique_id] < authentication_time:
+##                threading.Thread(target = authentication_timer, args = (unique_id,)).start()
             send_message_warband(client,
-                 player_id,
-                 players[unique_id][data_id["Faction"]],
-                 players[unique_id][data_id["Troop"]],
-                 "0" if play_times[unique_id] >= authentication_time else "1",
-                 "1" if extensions[extension_keys["Inventory"]] else "0",
-                 *inventories[unique_id]
+                player_id,
+                players[unique_id][data_id["Faction"]],
+                players[unique_id][data_id["Troop"]],
+                players[unique_id][data_id["Bank"]],
+##                 "0" if play_times[unique_id] >= authentication_time else "1",
+                "1" if extensions[extension_keys["Inventory"]] else "0",
+                *inventories[unique_id]
             )
         elif action == "load_admin":
             player_id = message[0]
@@ -1329,17 +1293,17 @@ def main_request_handler(client, addr, port):
             data = message[1:]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
-            for x in range(data_id["Faction"], data_id["Z"] + 1):
+            for x in range(data_id["Faction"], data_id["Bank"] + 1):
                 players[unique_id][x] = data[x]
             send_message(client, "0")
             if unique_id in death_time_counter:
                 if not death_time_counter[unique_id] + death_idle_time < time.time():
                     for x in range(data_id["Itm0"], data_id["Itm3"] + 1):
                         players[unique_id][x] = "0"
-            if unique_id in play_times:
-                play_times[unique_id] += int((datetime.datetime.now() - join_times[unique_id]).total_seconds() / 60)
-            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
-                patients.pop(unique_id).do_run = False
+##            if unique_id in play_times:
+##                play_times[unique_id] += int((datetime.datetime.now() - join_times[unique_id]).total_seconds() / 60)
+##            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
+##                patients.pop(unique_id).do_run = False
         elif action == "save_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1383,19 +1347,19 @@ def main_request_handler(client, addr, port):
             players[unique_id][data_id["Troop"]] = Troop
             players[unique_id][data_id["Gold"]] = Gold
             players[unique_id][data_id["Bank"]] = Bank
-            if extensions[extension_keys["Pass-Out"]]:
-                players[unique_id][data_id["X"]] = cord_x
-                players[unique_id][data_id["Y"]] = cord_y
-                players[unique_id][data_id["Z"]] = cord_z
-                players[unique_id][data_id["Passed-Out"]] = "1"
+##            if extensions[extension_keys["Pass-Out"]]:
+##                players[unique_id][data_id["X"]] = cord_x
+##                players[unique_id][data_id["Y"]] = cord_y
+##                players[unique_id][data_id["Z"]] = cord_z
+##                players[unique_id][data_id["Passed-Out"]] = "1"
 ##                players[unique_id][data_id["Health"]] = "0"
 ##                if unique_id in enpassants and enpassants[unique_id].is_alive():
 ##                    enpassants[unique_id].do_run = False
 ##                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
 ##                enpassant_thread.start()
 ##                enpassants[unique_id] = enpassant_thread
-            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
-                patients.pop(unique_id).do_run = False
+##            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
+##                patients.pop(unique_id).do_run = False
             send_message(client, "0", lenght = 1)
             death_time_counter[unique_id] = time.time()
         elif action == "ban_player":
@@ -1620,60 +1584,61 @@ def main_request_handler(client, addr, port):
             file.write(text)
             file.close()
             client.send(b"Banned IP's saved")
-        elif action == "para_cek":
-            unique_id = message[0]
-            amount = int(message[1])
-            player_id = message[2]
-            gold = int(message[3])
-            if not unique_id in players:
-                players[unique_id] = base_items.copy()
-            if 0 <= int(players[unique_id][data_id["Bank"]]) - amount:
-                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
-                players[unique_id][data_id["Gold"]] = str(gold + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para cekme basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-            elif int(players[unique_id][data_id["Bank"]]) > 0:
-                amount = int(players[unique_id][data_id["Bank"]])
-                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
-                players[unique_id][data_id["Gold"]] = str(gold + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz cekildi"].format(amount), players[unique_id][data_id["Gold"]]))
-            else:
-                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["yetersiz bakiye"]))
-        elif action == "para_yatir":
-            unique_id = message[0]
-            amount = int(message[1])
-            player_id = message[2]
-            gold = int(message[3])
-            if not unique_id in players:
-                players[unique_id] = base_items.copy()
-            if 0 <= gold - amount and not gold == 0:
-                players[unique_id][data_id["Gold"]] = str(gold - amount)
-                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para yatirma basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-            elif 0 < gold:
-                amount = gold
-                players[unique_id][data_id["Gold"]] = str(gold - amount)
-                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz yatirildi"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-            else:
-                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["paraniz yok"]))
-        elif action == "refund":
-            sended_admin_pass = message[0]
-            unique_id = message[1]
-            take_give = message[2]
-            bank_gold = message[3]
-            amount = message[4]
-            if sended_admin_pass == admin_pass:
-                pass
-            else:
-                client.send(b"message%Hatali sifre.")
-                log = "Hatali admin pass ile refund istedi."
-                while True:
-                    code = get_random_string(5)
-                    if code not in bad_ips:
-                        bad_ips[code] = addr[0]
-                        break
-                if admin_client:
-                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
+##        elif action == "para_cek":
+##            unique_id = message[0]
+##            amount = int(message[1])
+##            player_id = message[2]
+##            gold = int(message[3])
+##            if not unique_id in players:
+##                players[unique_id] = base_items.copy()
+##            if 0 <= int(players[unique_id][data_id["Bank"]]) - amount:
+##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
+##                players[unique_id][data_id["Gold"]] = str(gold + amount)
+##                send_message_warband(client, message_type["Command"], command_type["Update Gold"], unique_id, players[unique_id][data_id["Gold"]])
+##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para cekme basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+##            elif int(players[unique_id][data_id["Bank"]]) > 0:
+##                amount = int(players[unique_id][data_id["Bank"]])
+##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
+##                players[unique_id][data_id["Gold"]] = str(gold + amount)
+##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz cekildi"].format(amount), players[unique_id][data_id["Gold"]]))
+##            else:
+##                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["yetersiz bakiye"]))
+##        elif action == "para_yatir":
+##            unique_id = message[0]
+##            amount = int(message[1])
+##            player_id = message[2]
+##            gold = int(message[3])
+##            if not unique_id in players:
+##                players[unique_id] = base_items.copy()
+##            if 0 <= gold - amount and not gold == 0:
+##                players[unique_id][data_id["Gold"]] = str(gold - amount)
+##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
+##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para yatirma basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+##            elif 0 < gold:
+##                amount = gold
+##                players[unique_id][data_id["Gold"]] = str(gold - amount)
+##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
+##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz yatirildi"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
+##            else:
+##                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["paraniz yok"]))
+##        elif action == "refund":
+##            sended_admin_pass = message[0]
+##            unique_id = message[1]
+##            take_give = message[2]
+##            bank_gold = message[3]
+##            amount = message[4]
+##            if sended_admin_pass == admin_pass:
+##                pass
+##            else:
+##                client.send(b"message%Hatali sifre.")
+##                log = "Hatali admin pass ile refund istedi."
+##                while True:
+##                    code = get_random_string(5)
+##                    if code not in bad_ips:
+##                        bad_ips[code] = addr[0]
+##                        break
+##                if admin_client:
+##                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
         elif action == "get_log":
             log_file = message[0]
             try:

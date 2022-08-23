@@ -8,7 +8,7 @@ set_pass_admin aaa
 set_pass XQCFGHTY
 
 set_mission conquest # other options: quick_battle, no_money
-set_map scene_1 # this is the map that is started first
+set_map scene_5 # this is the map that is started first
 
 
 

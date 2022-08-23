@@ -189,9 +189,11 @@ player_exit = (ti_on_player_exit, 0, 0, [], # server: save player values on exit
       (position_get_y, reg17, pos1),
       (position_get_z, reg18, pos1),
 
+      (player_get_slot, reg19, ":player_id", slot_player_bank),
+
       (send_message_to_url_advanced,
         script_ip_address
-        + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}",
+        + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}<{reg19}",
         "@WSE2", "script_default_return", "script_default_fail"
       ),
     

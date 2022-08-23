@@ -101,6 +101,57 @@ scripts.extend([
     (set_trigger_result, ":trigger"),
   ]),
 
+  ("cf_bank_withdraw", [
+    (store_script_param, ":player_id", 1),
+    (store_script_param, ":amount", 2),
+
+    (player_get_slot, ":bank", ":player_id", slot_player_bank),
+    (try_begin),
+      (ge, ":bank", ":amount"),
+    (else_try),
+      (eq, ":bank", 0),
+      (assign, ":amount", 0),
+      (str_store_string, s0, "@Hesabiniz bos."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+    (else_try),
+      (assign, ":amount", ":bank"),
+    (try_end),
+    (gt, ":amount", 0),
+    (val_sub, ":bank", ":amount"),
+    (player_set_slot, ":player_id", slot_player_bank, ":bank"),
+    (call_script, "script_player_adjust_gold", ":player_id", ":amount", 1),
+    (assign, reg0, ":amount"),
+    (assign, reg1, ":bank"),
+    (str_store_string, s0, "@Hesabinizdan {reg0} dinar cekildi. Hesabiniz: {reg1} dinar."),
+    (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+  ]),
+
+  ("cf_bank_deposit", [
+    (store_script_param, ":player_id", 1),
+    (store_script_param, ":amount", 2),
+
+    (player_get_slot, ":bank", ":player_id", slot_player_bank),
+    (player_get_gold, ":gold", ":player_id"),
+    (try_begin),
+      (ge, ":gold", ":amount"),
+    (else_try),
+      (eq, ":gold", 0),
+      (assign, ":amount", 0),
+      (str_store_string, s0, "@Hesabiniza aktaracak paraniz kalmadi."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+    (else_try),
+      (assign, ":amount", ":gold"),
+    (try_end),
+    (gt, ":amount", 0),
+    (val_add, ":bank", ":amount"),
+    (player_set_slot, ":player_id", slot_player_bank, ":bank"),
+    (call_script, "script_player_adjust_gold", ":player_id", ":amount", -1),
+    (assign, reg0, ":amount"),
+    (assign, reg1, ":bank"),
+    (str_store_string, s0, "@Hesabiniza {reg0} dinar aktarildi. Hesabiniz: {reg1} dinar."),
+    (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+   ]),
+
   ("autosave", [
   ]),
 
@@ -202,7 +253,7 @@ scripts.extend([
     (assign, ":player_id", reg0),
     (assign, ":faction_id", reg1),
     (assign, ":troop_id", reg2),
-    (assign, ":player_is_not_authenticated", reg3),
+    (assign, ":bank", reg3),
     (assign, ":is_personal_inventory_enabled", reg4),
     #reg5 inventory begin
   
@@ -216,7 +267,7 @@ scripts.extend([
       (player_set_troop_id, ":player_id", ":troop_id"),
     (try_end),
 
-    (player_set_slot, ":player_id", slot_player_is_not_authenticated, ":player_is_not_authenticated"),
+    (player_set_slot, ":player_id", slot_player_bank, ":bank"),
   
     (try_begin),
       (eq, ":is_personal_inventory_enabled", 1),
@@ -872,38 +923,6 @@ scripts.extend([
           (send_message_to_url_advanced, script_ip_address + "/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}",
             "@WSE2", "script_message_sent_return", "script_message_sent_fail"
           ),
-##          (player_get_agent_id, ":agent_id", ":sender_player_id"),
-##          (gt, ":agent_id", -1),
-##          (agent_is_alive, ":agent_id"),
-##          (str_store_player_username, s1, ":sender_player_id"),
-##          (str_store_string, s0, "str_chat_format"),
-##          (server_add_message_to_log, "str_local_chat_log_format"),
-##          (try_begin),
-##            (eq, ":chat_event_type", chat_event_type_local_shout),
-##            (assign, ":max_sq_distance", sq(max_distance_local_chat_shout)),
-##            (assign, ":ambient_sq_distance", sq(ambient_distance_local_chat_shout)),
-##            (assign, ":server_event", server_event_local_chat_shout),
-##          (else_try),
-##            (assign, ":max_sq_distance", sq(max_distance_local_chat)),
-##            (assign, ":ambient_sq_distance", sq(ambient_distance_local_chat)),
-##            (assign, ":server_event", server_event_local_chat),
-##          (try_end),
-##          (set_fixed_point_multiplier, 100),
-##          (agent_get_position, pos1, ":agent_id"),
-##          (position_move_z, pos1, 160),
-##          (try_for_agents, ":other_agent_id"), # send the chat message to other players whoose agents are close enough
-##            (agent_is_alive, ":other_agent_id"),
-##            (neg|agent_is_non_player, ":other_agent_id"),
-##            (agent_get_player_id, ":other_player_id", ":other_agent_id"),
-##            (player_is_active, ":other_player_id"),
-##            (agent_get_position, pos2, ":other_agent_id"),
-##            (position_move_z, pos2, 160),
-##            (get_sq_distance_between_positions, ":sq_distance", pos1, pos2),
-##            (le, ":sq_distance", ":max_sq_distance"),
-##            (this_or_next|le, ":sq_distance", ":ambient_sq_distance"),
-##            (position_has_line_of_sight_to_position, pos1, pos2),
-##            (multiplayer_send_string_to_player, ":other_player_id", ":server_event", s0),
-##          (try_end),
         (else_try), # event type to change a faction's name (not really a chat message, but uses the system for more reliability)
           (eq, ":chat_event_type", chat_event_type_set_faction_name),
           (player_get_slot, ":faction_id", ":sender_player_id", slot_player_faction_id),
@@ -1060,7 +1079,7 @@ scripts.extend([
           (player_set_team_no, ":sender_player_id", team_default),
           (try_begin), # clean up spawn state if the player's agent was faded out without resetting it
             (player_slot_eq, ":sender_player_id", slot_player_spawn_state, player_spawn_state_alive),
-            (player_get_agent_id, ":agent_id", ":player_id"),
+            (player_get_agent_id, ":agent_id", ":sender_player_id"),
             (this_or_next|neg|agent_is_active, ":agent_id"),
             (neg|agent_is_alive, ":agent_id"),
             (player_set_slot, ":sender_player_id", slot_player_spawn_state, player_spawn_state_dead),
@@ -1453,10 +1472,10 @@ scripts.extend([
       (else_try),
         (try_begin),
           (eq, ":withdraw_or_deposit", 0),
-          (call_script, "script_bank_withdraw", ":sender_player_id", ":amount"),
+          (call_script, "script_cf_bank_withdraw", ":sender_player_id", ":amount"),
         (else_try),
           (eq, ":withdraw_or_deposit", 1),
-          (call_script, "script_bank_deposit", ":sender_player_id", ":amount"),
+          (call_script, "script_cf_bank_deposit", ":sender_player_id", ":amount"),
         (try_end),
       (try_end),
     (try_end),
@@ -1633,16 +1652,19 @@ scripts.extend([
       (store_script_param, ":defender_agent_id", 1),
       (store_script_param, ":attacker_agent_id", 2),
       (store_script_param, ":damage", 3),
-
+      
       (agent_is_active, ":defender_agent_id"),
       (agent_is_active, ":attacker_agent_id"),
-
+      
       (agent_is_human, ":defender_agent_id"),
       (agent_is_human, ":attacker_agent_id"),
-	
+      
       (agent_get_player_id, ":defender_player_id", ":defender_agent_id"),
       (agent_get_player_id, ":attacker_player_id", ":attacker_agent_id"),
-    
+      
+      (player_is_active, ":defender_player_id"),
+      (player_is_active, ":attacker_player_id"),
+      
       (str_store_player_username, s11, ":defender_player_id"),
       (str_store_player_username, s12, ":attacker_player_id"),
       (assign, reg31, ":damage"),
@@ -7029,9 +7051,9 @@ scripts.extend([
     (else_try),
       (agent_get_wielded_item_slot_no, ":slot_id", ":agent_id"),
       (val_add, ":slot_id", slot_agent_item_1_value),
-      (agent_get_slot, ":value", ":agent_id", slot_agent_item_1_value),
+      (agent_get_slot, ":value", ":agent_id", ":slot_id"),
       (gt, ":value", 0),
-      (agent_set_slot, ":agent_id", slot_agent_item_1_value, 0),
+      (agent_set_slot, ":agent_id", ":slot_id", 0),
       (scene_prop_set_slot, ":instance_id", slot_scene_prop_value, ":value"),
 ##      (eq, ":item_id", "itm_money_bag"),
 ##      (try_begin),
@@ -15185,17 +15207,6 @@ scripts.extend([
     (agent_get_player_id, ":player_id", ":agent_id"),
     (multiplayer_send_int_to_player, ":player_id", server_event_bank_management, ":instance_id"),
    ]),
-
-  ("bank_withdraw",
-   [
-
-  ]),
-
-  ("bank_deposit",
-   [
-
-   ]),
-
 
   ## CUSTOM SERVER SCRIPTS END ##
 

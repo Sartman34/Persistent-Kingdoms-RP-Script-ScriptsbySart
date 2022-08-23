@@ -108,8 +108,8 @@ try:
   process_factions.export(processor)
   import process_items
   process_items.export(processor)
-  import process_scenes
-  process_scenes.export(processor)
+##  import process_scenes
+##  process_scenes.export(processor)
   import process_troops
   process_troops.export(processor)
   import process_particle_systems

@@ -1,10 +1,14 @@
-74
+78
 qstr_close_server close_server
 qstr_/debug /debug
 qstr_/t_ /t_
 qstr_[{s0}]_{s1} [{s0}]_{s1}
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
 qstr_WSE2 WSE2
+qstr_Hesabiniz_bos. Hesabiniz_bos.
+qstr_Hesabinizdan_{reg0}_ Hesabinizdan_{reg0}_dinar_cekildi._Hesabiniz:_{reg1}_dinar.
+qstr_Hesabiniza_aktaracak Hesabiniza_aktaracak_paraniz_kalmadi.
+qstr_Hesabiniza_{reg0}_di Hesabiniza_{reg0}_dinar_aktarildi._Hesabiniz:_{reg1}_dinar.
 qstr_{reg0}<{reg1} {reg0}<{reg1}
 qstr_{s0}<{reg2} {s0}<{reg2}
 qstr_http://127.0.0.1/sav http://127.0.0.1/save_chest<{s0}
@@ -69,7 +73,7 @@ qstr_Updating_Settings Updating_Settings
 qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
 qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{reg1}<{s0}
 qstr_{reg0} {reg0}
-qstr_http://127.0.0.1/save http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}
+qstr_http://127.0.0.1/save http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}<{reg19}
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_inventory<{reg0}<{reg19}<{reg20}<{reg21}<{reg22}<{reg23}<{reg24}<{reg25}<{reg26}<{reg27}<{reg28}<{reg29}<{reg30}
 qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}<{reg1}<{reg2}
 qstr_http://127.0.0.1/str http://127.0.0.1/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}

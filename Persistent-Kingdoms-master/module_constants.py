@@ -12,6 +12,27 @@ personal_inventory_lenght = 12
 
 admin_queue_command_kick = 1
 admin_queue_command_set_idle_income = 2
+
+colors = {
+    "beyaz" : 0,
+    "koyu mavi shout": 1,
+    "koyu mavi": 2,
+    "acik kirmizi": 3,
+    "koyu kirmizi": 4,
+    "acik kahverengi": 5,
+    "koyu kahverengi": 6,
+    "discord pembe": 7,
+    "acik yesil": 8,
+    "koyu yesil": 9,
+    "gold" : 10,
+    "silver" : 11,
+    "bronze" : 12,
+    "soylenti" : 13,
+    "turuncu" : 14,
+    "mektup" : 15,
+    "local chat" : 16,
+    "local chat shout" : 17,
+}
 #
 
 ########################################################
@@ -101,7 +122,7 @@ slot_player_custom_banner_mesh_id     = 66
 
 slot_player_flood_log                 = 67 #**
 slot_player_is_passed_out             = 68
-slot_player_is_not_authenticated      = 69
+slot_player_bank                      = 69
 slot_player_is_debug_mode             = 70
 
 ########################################################
