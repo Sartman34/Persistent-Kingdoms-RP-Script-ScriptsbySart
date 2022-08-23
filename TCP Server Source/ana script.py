@@ -58,7 +58,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2022, 10, 5)
+    date = datetime.datetime(2022, 9, 5)
     version = "2.2"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
@@ -736,7 +736,7 @@ def enpassant(unique_id):
             players[unique_id][data_id["Health"]] = base_health
 
 ##        admin_q.append("26|{}".format(unique_id))
-        players[unique_id][data_id["Passed-Out"]] = "0"
+##        players[unique_id][data_id["Passed-Out"]] = "0"
 
 def authentication_timer(unique_id):
     print("started counting {}".format((authentication_time - play_times[unique_id]) * 60))
@@ -1417,7 +1417,7 @@ def main_request_handler(client, addr, port):
                         if unique_id != "GUID":
                             if int(players[unique_id][data_id["Health"]]) < int(base_health):
                                 players[unique_id][data_id["Health"]] = base_health
-                            players[unique_id][data_id["Passed-Out"]] = "0"
+##                            players[unique_id][data_id["Passed-Out"]] = "0"
                     except:
                         logging_print(traceback.format_exc(), "\n", players[unique_id])
                     text += "{}%".format(unique_id) + "%".join(players[unique_id]) + "\n"
