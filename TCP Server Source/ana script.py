@@ -39,18 +39,17 @@ try:
     license_name = database.pop(0).split(" : ")[1]
     is_high_rpg = database.pop(0).split(" : ")[1]
 
-    extension_keys = {
-        "Custom Announcement" : 0,
+    extensions = {
+        "Custom Announcement" : 1,
         "Door Keys" : 1,
-        "Letter" : 2,
-        "Pass-Out" : 3,
-        "Coin" : 4,#bozuk
-        "Inventory" : 5,
-        "Horse Keeper" : 6,
-        "Play Time" : 7,
-        "Health" : 8,
+        "Letter" : 0,
+        "Pass-Out" : 0,
+        "Coin" : 0,
+        "Inventory" : 1,
+        "Horse Keeper" : 0,
+        "Play Times" : 1,
+        "Health" : 0,
     }
-    extensions = [1, 1, 0, 0, 0, 1, 0, 0, 0]
 except:
     logging_print(traceback.format_exc())
 
@@ -133,9 +132,6 @@ Local chate desteklenmeyen karakter gönderdiniz.\
 ",
     "banka hesabiniz {}" : "\
 Banka hesabiniz: {} dinar.\
-",
-    "register_t_chat success" : "\
-T ve Y chat kullanımınız aktifleştirildi. İyi roller.\
 ",
     "/license help" : "\
 Lisans hakkında bilgi verir.\
@@ -329,72 +325,73 @@ colors = {
     "mektup" : 15,
     "local chat" : 16,
     "local chat shout" : 17,
+    "commoners" : 18,
 }
 special_strings = {
-    "yardim" : [["\
-'/(komut) help' yazarak detaylı açıklamalara ulaşabilirsiniz.^\
-Komutlar:^\
-/yardım", colors["beyaz"]], ["\
-/discord", colors["discord pembe"]], ["\
-/ayrıl", -6750055], ["\
-/dene (mesaj)", colors["söylenti"]], ["\
-/b (mesaj)", colors["koyu mavi"]], ["\
-/me (mesaj)", colors["acik kahverengi"]], ["\
-/do (mesaj)", colors["acik yesil"]]
+    "welcome" : [
+        ("Merhabalar. {} sunucusuna hoşgeldiniz.".format(server_name), colors["koyu yesil"]),
+        ("Komutlar local-chat'e (Q) yazılarak kullanılır.", colors["local chat"]),
+        ("/yardım yazarak komutlara ulaşabilirsiniz.", colors["beyaz"]),
+        ("/discord yazarak discord adresimize ulaşabilirsiniz.", colors["discord pembe"]),
+        ("Rol yapmaya başlamadan önce uğramanızı tavsiye ederim.", colors["beyaz"]),
+        ("ScriptsBySart. /license for more info.", colors["söylenti"]),
     ],
-    "welcome" : [["\
-Merhabalar. {} sunucusuna hoşgeldiniz.".format(server_name), colors["koyu yesil"]], ["\
-Komutlar local-chat'e (Q) yazılarak kullanılır.", colors["local chat"]], ["\
-/yardım yazarak komutlara ulaşabilirsiniz.", colors["beyaz"]], ["\
-/discord yazarak discord adresimize ulaşabilirsiniz.", colors["discord pembe"]], ["\
-Rol yapmaya başlamadan önce uğramanızı tavsiye ederim.", colors["beyaz"]], ["\
-ScriptsBySart. /license for more info.", colors["söylenti"]]
-    ]
+    "yardim" : [
+        ("\"/(komut) help\" yazarak detaylı açıklamalara ulaşabilirsiniz.", colors["beyaz"]),
+        ("Komutlar:", colors["beyaz"]),
+        ("/yardım", colors["beyaz"]),
+        ("/discord", colors["discord pembe"]),
+        ("/ayrıl", colors["commoners"]),
+        ("/dene (mesaj)", colors["söylenti"]),
+        ("/b (mesaj)", colors["koyu mavi"]),
+        ("/me (mesaj)", colors["acik kahverengi"]),
+        ("/do (mesaj)", colors["acik yesil"]),
+    ],
 }
 
-if extensions[extension_keys["Custom Announcement"]]:
-    special_strings["yardim"] += [["\
-Roleplay komutları:", colors["beyaz"]], ["\
-/duyuru (mesaj)", colors["beyaz"]], ["\
-/söylenti (mesaj)", colors["söylenti"]]
-                                  ]
-if extensions[extension_keys["Letter"]]:
-    special_strings["yardim"] += [["\
-Mektup Sistemi:", colors["beyaz"]], ["\
-/mektup help", colors["mektup"]]
-                                  ]
-if extensions[extension_keys["Coin"]]:
-    special_strings["yardim"] += [["\
-Madeni Para Sistemi:", colors["beyaz"]], ["\
-/para", colors["altın"]], ["\
-/coin", colors["altın"]]
-                                  ]
-if extensions[extension_keys["Door Keys"]]:
-    special_strings["yardim"] += [["\
-Kapı Kilidi Sistemi +", colors["beyaz"]]
-                                  ]
-if extensions[extension_keys["Pass-Out"]]:
-    special_strings["yardim"] += [["\
-Bayılma Sistemi +", colors["beyaz"]]
-                                  ]
-if extensions[extension_keys["Inventory"]]:
-    special_strings["yardim"] += [["\
-Envanter Sistemi:", colors["beyaz"]], ["\
-/envanter help", colors["turuncu"]]
-                                  ]
-if extensions[extension_keys["Horse Keeper"]]:
-    special_strings["yardim"] += [["\
-At Bağlama Sistemi:", colors["beyaz"]], ["\
-/bağla help", colors["koyu kahverengi"]]
-                                  ]
-if extensions[extension_keys["Health"]]:
-    special_strings["yardim"] += [["\
-Can Sistemi:", colors["beyaz"]], ["\
-/can help", colors["acik yesil"]]
-                                  ]
-special_strings["yardim"] += [["\
-Çoban Sistemi +", colors["beyaz"]]
-                                  ]
+if extensions["Custom Announcement"]:
+    special_strings["yardim"].extend([
+        ("Roleplay komutları:", colors["beyaz"]),
+        ("/duyuru (mesaj)", colors["beyaz"]),
+        ("/söylenti (mesaj)", colors["söylenti"]),
+    ])
+if extensions["Letter"]:
+    special_strings["yardim"].extend([
+        ("Mektup Sistemi:", colors["beyaz"]),
+        ("/mektup help", colors["mektup"]),
+    ])
+if extensions["Coin"]:
+    special_strings["yardim"].extend([
+        ("Madeni Para Sistemi:", colors["beyaz"]),
+        ("/para", colors["altın"]),
+        ("/coin", colors["altın"]),
+    ])
+if extensions["Door Keys"]:
+    special_strings["yardim"].extend([
+        ("Kapı Kilidi Sistemi +", colors["beyaz"]),
+    ])
+if extensions["Pass-Out"]:
+    special_strings["yardim"].extend([
+        ("Bayılma Sistemi +", colors["beyaz"]),
+    ])
+if extensions["Inventory"]:
+    special_strings["yardim"].extend([
+        ("Envanter Sistemi:", colors["beyaz"]),
+        ("/envanter help", colors["turuncu"]),
+    ])
+if extensions["Horse Keeper"]:
+    special_strings["yardim"].extend([
+        ("At Bağlama Sistemi:", colors["beyaz"]),
+        ("/bağla help", colors["koyu kahverengi"]),
+    ])
+if extensions["Health"]:
+    special_strings["yardim"].extend([
+        ("Can Sistemi:", colors["beyaz"]),
+        ("/can help", colors["acik yesil"]),
+    ])
+special_strings["yardim"].extend([
+    ("Çoban Sistemi +", colors["beyaz"]),
+])
 admin_client = None
 admin_addr = None
 admin_q = list()
@@ -417,7 +414,7 @@ chests = dict()
 doors = dict()
 admin_permissions = dict()
 death_idle_time = 7
-authentication_time = 0
+authentication_time = "0"
 banned_ips = list()
 command_perm = list()
 whitelist = list()
@@ -482,9 +479,10 @@ admin_queue_commands = {
     "Kick": 1,
     "Settings": 2,
 }
-settings_type = {
+setting_types = {
     "Idle Income" : 0,
-    "High RPG" : 1
+    "High RPG" : 1,
+    "Authentication Time" : 2,
 }
 message_type = {
     "Local Chat": 1,
@@ -503,7 +501,7 @@ start_coins = ["0", "0", "0"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
         
 def import_custom_announcement():
-    if not extensions[extension_keys["Custom Announcement"]]:
+    if not extensions["Custom Announcement"]:
         return
     command_perm.clear()
     file = open("Data\\permissions.txt", "r+")
@@ -514,7 +512,7 @@ def import_custom_announcement():
     for permission in database:
         command_perm.append(permission.split("%"))
 def import_door_keys():
-    if not extensions[extension_keys["Door Keys"]]:
+    if not extensions["Door Keys"]:
         return
     doors.clear()
     file = open("Data\\door_keys.txt", "r+")
@@ -549,7 +547,7 @@ def import_whitelist():
     for unique_id in database:
         whitelist.append(unique_id)
 def import_mails():
-    if not extensions[extension_keys["Letter"]]:
+    if not extensions["Letter"]:
         return
     mails.clear()
     file = open("Data\\mails.txt", "r+", encoding='utf-8')
@@ -578,7 +576,7 @@ def import_names():
         names[unique_id] = name
 def import_coins():
     global coins, start_coins
-    if not extensions[extension_keys["Coin"]]:
+    if not extensions["Coin"]:
         return
     file = open("Data\\coins.txt", "r+")
     database = file.read().split("\n")
@@ -594,7 +592,7 @@ def import_coins():
         bronze = x[3]
         coins[unique_id] = [gold, silver, bronze]
 def import_inventories():
-    if not extensions[extension_keys["Inventory"]]:
+    if not extensions["Inventory"]:
         return
     file = open("Data\\inventories.txt", "r+")
     database = file.read().split("\n")
@@ -621,17 +619,18 @@ def import_chests():
         items = x[2:]
         chests[(scene_prop, variation_id)] = items
 def import_play_times():
-    global play_times, authentication_time
-    if not extensions[extension_keys["Play Time"]]:
+    global authentication_time
+    if not extensions["Play Times"]:
         return
     file = open("Data\\play_times.txt", "r+")
     database = file.read().split("\n")
     file.close()
-    authentication_time = int(database[0].split(" : ")[1])
-    for x in database[1:]:
-        x = x.split(" : ")
-        unique_id = x[0]
-        play_time = int(x[1])
+    play_times.clear()
+    authentication_time = database[0].split(" : ")[1]
+    for data in database[1:]:
+        data = data.split(" : ")
+        unique_id = data.pop(0)
+        play_time = data.pop(0)
         play_times[unique_id] = play_time
 
 def get_random_string(length):
@@ -656,7 +655,9 @@ def send_message_special(client, unique_id, message_id):
         message_type["Special Message"], unique_id, 1,
         special_strings[message_id][0][0], message_id, special_strings[message_id][0][1]
     )
-
+def add_setting(setting_type, *args):
+    settings.append(("{}|" * (2 + len(args)))[:-1].format(admin_queue_commands["Settings"], setting_types[setting_type], *args))
+    
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
     banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
     admin_q.append("{}|{}".format(admin_queue_commands["Kick"], unique_id))
@@ -737,12 +738,6 @@ def enpassant(unique_id):
 
 ##        admin_q.append("26|{}".format(unique_id))
 ##        players[unique_id][data_id["Passed-Out"]] = "0"
-
-def authentication_timer(unique_id):
-    print("started counting {}".format((authentication_time - play_times[unique_id]) * 60))
-    time.sleep((authentication_time - play_times[unique_id]) * 60)
-    print("stopped counting")
-##    admin_q.append("34|{}".format(unique_id))
     
 def main_request_handler(client, addr, port):
     global admin_client, admin_addr, ddos_timer
@@ -795,7 +790,7 @@ def main_request_handler(client, addr, port):
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
-                if extensions[extension_keys["Coin"]]:
+                if extensions["Coin"]:
                     coins[unique_id] = start_coins
             kick = "0"
             if unique_id in banned_players:
@@ -834,19 +829,16 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["Hunger"]] = start_hunger
             if not unique_id in inventories:
                 inventories[unique_id] = base_inventory
-##            if not unique_id in play_times:
-##                play_times[unique_id] = 0
-##            join_times[unique_id] = datetime.datetime.now()
-##            if play_times[unique_id] < authentication_time:
-##                threading.Thread(target = authentication_timer, args = (unique_id,)).start()
+            if not unique_id in play_times:
+                play_times[unique_id] = "0"
             send_message_warband(client,
                 player_id,
                 players[unique_id][data_id["Faction"]],
                 players[unique_id][data_id["Troop"]],
                 players[unique_id][data_id["Bank"]],
-##                 "0" if play_times[unique_id] >= authentication_time else "1",
-                "1" if extensions[extension_keys["Inventory"]] else "0",
-                *inventories[unique_id]
+                play_times[unique_id] if extensions["Play Times"] else "0",
+                "1" if extensions["Inventory"] else "0",
+                *inventories[unique_id],
             )
         elif action == "load_admin":
             player_id = message[0]
@@ -941,7 +933,7 @@ def main_request_handler(client, addr, port):
                             send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
                                 "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)
                             )
-                    elif command == "duyuru" and extensions[extension_keys["Custom Announcement"]]:
+                    elif command == "duyuru" and extensions["Custom Announcement"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/duyuru help"])
@@ -952,7 +944,7 @@ def main_request_handler(client, addr, port):
                                     send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Duyuru"))
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("duyuru"))
-                    elif command in ["söylenti", "soylenti"] and extensions[extension_keys["Custom Announcement"]]:
+                    elif command in ["söylenti", "soylenti"] and extensions["Custom Announcement"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/soylenti help"])
@@ -992,7 +984,7 @@ def main_request_handler(client, addr, port):
                                     send_message_warband(client, message_type["Message"], unique_id, colors["acik kirmizi"], strings["kişi bulunamadı"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["guidiniz"].format(unique_id))
-                    elif command == "mektup" and extensions[extension_keys["Letter"]]:
+                    elif command == "mektup" and extensions["Letter"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
@@ -1030,7 +1022,7 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
-##                    elif command in ["para", "coin"] and extensions[extension_keys["Coin"]]:
+##                    elif command in ["para", "coin"] and extensions["Coin"]:
 ##                        if len(text):
 ##                            if text[0] == "help":
 ##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin help" if command == "coin" else "/para help"]))
@@ -1060,7 +1052,7 @@ def main_request_handler(client, addr, port):
 ##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
 ##                        else:
 ##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
-                    elif command in ["envanter", "inventory"] and extensions[extension_keys["Inventory"]]:
+                    elif command in ["envanter", "inventory"] and extensions["Inventory"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
@@ -1068,7 +1060,7 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
                         else:
                             send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
-                    elif command in ["anahtar", "key"] and extensions[extension_keys["Door Keys"]] and unique_id in key_checkers:
+                    elif command in ["anahtar", "key"] and extensions["Door Keys"] and unique_id in key_checkers:
                         if len(text) >= 2:
                             instance = text[1]
                             if not instance in doors:
@@ -1104,7 +1096,7 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
-##                    elif command in ["bağla", "bagla", "tie"] and extensions[extension_keys["Horse Keeper"]]:
+##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
 ##                        if len(text):
 ##                            if text[0] == "help":
 ##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/bağla help"]))
@@ -1112,7 +1104,7 @@ def main_request_handler(client, addr, port):
 ##                                send_message(client, "32|{}".format(player_id))
 ##                        else:
 ##                            send_message(client, "32|{}".format(player_id))
-##                    elif command in ["can", "health"] and extensions[extension_keys["Health"]]:
+##                    elif command in ["can", "health"] and extensions["Health"]:
 ##                        if len(text):
 ##                            if text[0] == "help":
 ##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
@@ -1290,7 +1282,7 @@ def main_request_handler(client, addr, port):
                 logging_print("Sent: {}".format("Failed to register hunger"))
         elif action == "save_player": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
             unique_id = message[0]
-            data = message[1:]
+            *data, play_time = message[1:]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
             for x in range(data_id["Faction"], data_id["Bank"] + 1):
@@ -1300,9 +1292,9 @@ def main_request_handler(client, addr, port):
                 if not death_time_counter[unique_id] + death_idle_time < time.time():
                     for x in range(data_id["Itm0"], data_id["Itm3"] + 1):
                         players[unique_id][x] = "0"
-##            if unique_id in play_times:
-##                play_times[unique_id] += int((datetime.datetime.now() - join_times[unique_id]).total_seconds() / 60)
-##            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
+            if extensions["Play Times"]:
+                play_times[unique_id] = play_time
+##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
 ##                patients.pop(unique_id).do_run = False
         elif action == "save_chest":
             scene_prop = message[0]
@@ -1347,7 +1339,7 @@ def main_request_handler(client, addr, port):
             players[unique_id][data_id["Troop"]] = Troop
             players[unique_id][data_id["Gold"]] = Gold
             players[unique_id][data_id["Bank"]] = Bank
-##            if extensions[extension_keys["Pass-Out"]]:
+##            if extensions["Pass-Out"]:
 ##                players[unique_id][data_id["X"]] = cord_x
 ##                players[unique_id][data_id["Y"]] = cord_y
 ##                players[unique_id][data_id["Z"]] = cord_z
@@ -1358,7 +1350,7 @@ def main_request_handler(client, addr, port):
 ##                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
 ##                enpassant_thread.start()
 ##                enpassants[unique_id] = enpassant_thread
-##            if extensions[extension_keys["Health"]] and unique_id in patients and patients[unique_id].is_alive():
+##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
 ##                patients.pop(unique_id).do_run = False
             send_message(client, "0", lenght = 1)
             death_time_counter[unique_id] = time.time()
@@ -1441,7 +1433,7 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                if extensions[extension_keys["Letter"]]:
+                if extensions["Letter"]:
                     file = open("Data\\mails.txt", "w", encoding = 'utf8')
                     text = ""
                     for code in mails:
@@ -1465,7 +1457,7 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                if extensions[extension_keys["Door Keys"]]:
+                if extensions["Door Keys"]:
                     with open("Data\\door_keys.txt", "w", encoding = 'utf8') as file:
                         text = ["%".join(key_checkers)]
                         for door, keys in doors.items():
@@ -1474,7 +1466,7 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                if extensions[extension_keys["Inventory"]]:
+                if extensions["Inventory"]:
                     file = open("Data\\inventories.txt", "w", encoding = 'utf8')
                     text = ""
                     text += "Base Inventory%" + "%".join(base_inventory) + "\n"
@@ -1498,12 +1490,12 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
-                if extensions[extension_keys["Play Time"]]:
+                if extensions["Play Times"]:
                     file = open("Data\\play_times.txt", "w", encoding = 'utf8')
                     text = ""
-                    text += "Authentication Time Minutes" + " : " + str(authentication_time) + "\n"
+                    text += "Authentication Time Minutes" + " : " + authentication_time + "\n"
                     for unique_id in play_times.keys():
-                        text += unique_id + " : " + str(play_times[unique_id]) + "\n"
+                        text += unique_id + " : " + play_times[unique_id] + "\n"
                     file.write(text[:-1])
                     file.close()
             except:
@@ -1517,6 +1509,7 @@ def main_request_handler(client, addr, port):
                 import_custom_announcement()
                 import_admin_permissions()
                 import_whitelist()
+                import_play_times()
                 client.send(b"message%Files reimported")
             else:
                 client.send(b"message%Hatali sifre.")
@@ -1772,10 +1765,13 @@ try:
 
     if not idle_income in ["0", ""]:
         int(idle_income)
-        settings.append("{}|{}|{}".format(admin_queue_commands["Settings"], settings_type["Idle Income"], idle_income))
+        add_setting("Idle Income", idle_income)
 
     if is_high_rpg in ["True", "true", "1"]:
-        settings.append("{}|{}|1".format(admin_queue_commands["Settings"], settings_type["High RPG"]))
+        add_setting("High RPG", "1")
+
+    if extensions["Play Times"] and authentication_time != "0":
+        add_setting("Authentication Time", authentication_time)
 
     admin_pass = get_random_string(10)
     logging_print("Admin log pass is: {}".format(admin_pass))

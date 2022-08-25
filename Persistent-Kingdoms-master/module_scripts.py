@@ -127,7 +127,7 @@ scripts.extend([
       (eq, ":bank", 0),
       (assign, ":amount", 0),
       (str_store_string, s0, "@Hesabiniz bos."),
-      (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+      (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
     (else_try),
       (assign, ":amount", ":bank"),
     (try_end),
@@ -138,7 +138,7 @@ scripts.extend([
     (assign, reg0, ":amount"),
     (assign, reg1, ":bank"),
     (str_store_string, s0, "@Hesabinizdan {reg0} dinar cekildi. Hesabiniz: {reg1} dinar."),
-    (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+    (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
   ]),
 
   ("cf_bank_deposit", [
@@ -153,7 +153,7 @@ scripts.extend([
       (eq, ":gold", 0),
       (assign, ":amount", 0),
       (str_store_string, s0, "@Hesabiniza aktaracak paraniz kalmadi."),
-      (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+      (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
     (else_try),
       (assign, ":amount", ":gold"),
     (try_end),
@@ -164,7 +164,7 @@ scripts.extend([
     (assign, reg0, ":amount"),
     (assign, reg1, ":bank"),
     (str_store_string, s0, "@Hesabiniza {reg0} dinar aktarildi. Hesabiniz: {reg1} dinar."),
-    (call_script, "script_send_coloured_message", ":player_id", colors["gold"]),
+    (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
    ]),
 
   ("autosave", [
@@ -269,8 +269,9 @@ scripts.extend([
     (assign, ":faction_id", reg1),
     (assign, ":troop_id", reg2),
     (assign, ":bank", reg3),
-    (assign, ":is_personal_inventory_enabled", reg4),
-    #reg5 inventory begin
+    (assign, ":time", reg4),
+    (assign, ":is_personal_inventory_enabled", reg5),
+    #reg6 inventory begin
   
     (try_begin),
       (is_between, ":faction_id", factions_begin, factions_end),
@@ -283,6 +284,7 @@ scripts.extend([
     (try_end),
 
     (player_set_slot, ":player_id", slot_player_bank, ":bank"),
+    (player_set_slot, ":player_id", slot_player_time, ":time"),
   
     (try_begin),
       (eq, ":is_personal_inventory_enabled", 1),
@@ -299,8 +301,8 @@ scripts.extend([
         (troop_set_slot, "trp_personal_inventories", ":player_id", ":instance_id"),
       (try_end),
   ] + [elem for sublist in [[
-      (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg5 + i),
-      (multiplayer_send_3_int_to_player, ":player_id", server_event_scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg5 + i),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg6 + i),
+      (multiplayer_send_3_int_to_player, ":player_id", server_event_scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg6 + i),
   ] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
     (try_end),
     
@@ -338,7 +340,7 @@ scripts.extend([
     (assign, ":x", reg16),
     (assign, ":y", reg17),
     (assign, ":z", reg18),
-    (assign, ":is_passed_out", reg19),
+##    (assign, ":is_passed_out", reg19),
     #s0: response
     
     (player_get_agent_id, ":agent_id", ":player_id"),
@@ -361,7 +363,7 @@ scripts.extend([
   ] for i in xrange(4)] for elem in sublist] + [
     (try_begin),
       (eq, ":is_naked", 1),
-      (eq, ":is_passed_out", 0),
+##      (eq, ":is_passed_out", 0),
       (player_get_gender, ":gender", ":player_id"),
       (store_random_in_range, ":head_item", 0, 3),
       (store_random_in_range, ":body_item", 0, 3),
@@ -459,10 +461,9 @@ scripts.extend([
       (agent_set_hit_points, ":horse_agent_id", ":horse_health", 0),
     (try_end),
     
-    (player_set_slot, ":player_id", slot_player_is_passed_out, ":is_passed_out"),
+##    (player_set_slot, ":player_id", slot_player_is_passed_out, ":is_passed_out"),
 
-    (multiplayer_send_2_int_to_player, ":player_id", server_event_script_message_set_color, 4294967295),
-    (multiplayer_send_string_to_player, ":player_id", server_event_script_message, "@{s0}"),
+    (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
 
     (try_begin),
       (eq, ":kick", 1),
@@ -489,7 +490,7 @@ scripts.extend([
 
       (dict_has_key, "$g_player_id_dict", "@{reg1}"),
       (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
-      (call_script, "script_send_coloured_message", ":player_id", ":colour_id"),
+      (call_script, "script_send_coloured_message", ":player_id", ":colour_id", 0),
       (send_message_to_url_advanced, script_ip_address + "/special_string<{reg1}<{s1}<{reg2}", "@WSE2", "script_special_string_return", "script_special_string_fail"),
     (try_end),
   ]),
@@ -530,6 +531,7 @@ scripts.extend([
   ] for i, setting in enumerate([
     "$g_idle_income",
     "$g_is_hrpg",
+    "$g_authentication_time",
   ])] for elem in sublist][:-1] + [
       (try_end),
     (else_try),
@@ -624,7 +626,7 @@ scripts.extend([
         (le, ":sq_distance", ":max_sq_distance"),
         (this_or_next|le, ":sq_distance", ":ambient_sq_distance"),
         (position_has_line_of_sight_to_position, pos1, pos2),
-        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id"),
+        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id", 0),
       (try_end),
     (else_try),
       (eq, ":action", 2),
@@ -633,7 +635,7 @@ scripts.extend([
       #s0: message
       (dict_has_key, "$g_player_id_dict", "@{reg1}"),
       (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
-      (call_script, "script_send_coloured_message", ":player_id", ":colour_id"),
+      (call_script, "script_send_coloured_message", ":player_id", ":colour_id", 0),
     (else_try),
       (eq, ":action", 3),
       (assign, reg0, 1),
@@ -647,7 +649,7 @@ scripts.extend([
         (neg|agent_is_non_player, ":other_agent_id"),
         (agent_get_player_id, ":other_player_id", ":other_agent_id"),
         (player_is_active, ":other_player_id"),
-        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id"),
+        (call_script, "script_send_coloured_message", ":other_player_id", ":colour_id", 0),
       (try_end),
     (else_try),
       (eq, ":action", 5),
@@ -767,11 +769,14 @@ scripts.extend([
   ("send_coloured_message", [
     (store_script_param, ":player_id", 1),
     (store_script_param, ":colour_id", 2),
+    (store_script_param, ":announce", 3),
+
+    (store_add, ":event_type", server_event_script_message, ":announce"),
     (try_begin),
   ] + [elem for sublist in [[
       (eq, ":colour_id", i),
       (multiplayer_send_2_int_to_player, ":player_id", server_event_script_message_set_color, colour),
-      (multiplayer_send_string_to_player, ":player_id", server_event_script_message, s0),
+      (multiplayer_send_string_to_player, ":player_id", ":event_type", s0),
     (else_try),
   ] for i, colour in enumerate([
     4294967295,
@@ -791,7 +796,8 @@ scripts.extend([
     4293963842,
     4284914073,
     local_chat_color,
-    local_chat_shout_color
+    local_chat_shout_color,
+    -6750055,
   ])] for elem in sublist][:-1] + [
     (try_end),
   ]),
@@ -1782,6 +1788,7 @@ scripts.extend([
               (server_add_message_to_log, "str_log_hit_phorse"),
             (else_try),#Else, the horse or animal is Rogue (a weeabo)
               (agent_get_item_id, ":animal_item_id", ":attacked_agent_id"),
+              (gt, ":animal_item_id", -1),
               (str_store_item_name, s12, ":animal_item_id"),
               (assign, reg32, ":attacked_agent_id"),
               (server_add_message_to_log, "str_log_hit_animal"),
@@ -1800,6 +1807,7 @@ scripts.extend([
             (player_get_slot, reg10, ":attacker_player_id", slot_player_faction_id),
           (else_try),#Else, the horse or animal is Rogue (a weeabo)
             (agent_get_item_id, ":animal_item_id", ":attacker_agent_id"),
+            (gt, ":animal_item_id", -1),
             (str_store_item_name, s11, ":animal_item_id"),
           (try_end),
           (server_add_message_to_log, "str_log_bump"),

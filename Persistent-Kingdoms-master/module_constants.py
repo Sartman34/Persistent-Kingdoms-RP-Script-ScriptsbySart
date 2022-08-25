@@ -32,6 +32,7 @@ colors = {
     "mektup" : 15,
     "local chat" : 16,
     "local chat shout" : 17,
+    "commoners" : 18,
 }
 #
 
@@ -124,6 +125,7 @@ slot_player_flood_log                 = 67 #**
 slot_player_is_passed_out             = 68
 slot_player_bank                      = 69
 slot_player_is_debug_mode             = 70
+slot_player_time                      = 71
 
 ########################################################
 ##  AGENT SLOTS            #############################
