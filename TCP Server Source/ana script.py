@@ -1338,7 +1338,6 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["X"]] = x
                 players[unique_id][data_id["Y"]] = y
                 players[unique_id][data_id["Z"]] = z
-                players[unique_id][data_id["Health"]] = "0"
                 players[unique_id][data_id["Head"]] = "0"
                 players[unique_id][data_id["Body"]] = "0"
                 players[unique_id][data_id["Foot"]] = "0"
