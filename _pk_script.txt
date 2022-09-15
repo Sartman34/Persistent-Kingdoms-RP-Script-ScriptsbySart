@@ -10,6 +10,7 @@ set_pass XQCFGHTY
 set_mission conquest # other options: quick_battle, no_money
 set_map scene_5 # this is the map that is started first
 
+set_respawn_period 20
 
 
 set_maps_voteable 0
@@ -24,7 +25,6 @@ limit_artillery 400 # scale_for_skyboxes, the default is 400 and you should test
 #COMBAT SETTINGS
 set_control_block_direction 1
 set_combat_speed 2
-set_respawn_period 10
 
 #REQUIRED
 set_factions 0 0 # this is ignored by the mod, but warband needs it to start

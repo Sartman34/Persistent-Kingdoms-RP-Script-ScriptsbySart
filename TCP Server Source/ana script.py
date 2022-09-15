@@ -41,9 +41,10 @@ try:
 
     extensions = {
         "Custom Announcement" : 1,
+        "Hunger" : 0,
         "Door Keys" : 1,
         "Letter" : 0,
-        "Pass-Out" : 0,
+        "Pass-Out" : 1,
         "Coin" : 0,
         "Inventory" : 1,
         "Horse Keeper" : 0,
@@ -398,7 +399,6 @@ admin_q = list()
 players = dict()
 names = dict()
 bad_ips = dict()
-death_time_counter = dict()
 doors = dict()
 hunger_count = dict()
 hunger_count_copy = dict()
@@ -495,7 +495,7 @@ command_type = {
     "Open Personal Inventory": 1,
     "Leave Faction": 2,
 }
-base_items = ["0", "4", start_money, base_health, base_hunger, "0", "0", "0", "0", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
+base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
 start_coins = ["0", "0", "0"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
@@ -1288,10 +1288,6 @@ def main_request_handler(client, addr, port):
             for x in range(data_id["Faction"], data_id["Bank"] + 1):
                 players[unique_id][x] = data[x]
             send_message(client, "0")
-            if unique_id in death_time_counter:
-                if not death_time_counter[unique_id] + death_idle_time < time.time():
-                    for x in range(data_id["Itm0"], data_id["Itm3"] + 1):
-                        players[unique_id][x] = "0"
             if extensions["Play Times"]:
                 play_times[unique_id] = play_time
 ##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
@@ -1324,27 +1320,29 @@ def main_request_handler(client, addr, port):
             send_message(client, "0")
         elif action == "strip_gear":
             unique_id = message[0]
-            player_id = message[1]
-            cord_x = message[2]
-            cord_y = message[3]
-            cord_z = message[4]
+            gold = message[1]
+            x = message[2]
+            y = message[3]
+            z = message[4]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
-            Gold = message[1]
-            Faction = players[unique_id][data_id["Faction"]]
-            Troop = players[unique_id][data_id["Troop"]]
-            Bank = str(int(players[unique_id][data_id["Bank"]]) - int(int(players[unique_id][data_id["Bank"]]) * bank_lost_percentage / 100))
+            faction = players[unique_id][data_id["Faction"]]
+            troop = players[unique_id][data_id["Troop"]]
+            bank = str(int(players[unique_id][data_id["Bank"]]) - int(int(players[unique_id][data_id["Bank"]]) * bank_lost_percentage / 100))
             players[unique_id] = base_items.copy()
-            players[unique_id][data_id["Faction"]] = Faction
-            players[unique_id][data_id["Troop"]] = Troop
-            players[unique_id][data_id["Gold"]] = Gold
-            players[unique_id][data_id["Bank"]] = Bank
-##            if extensions["Pass-Out"]:
-##                players[unique_id][data_id["X"]] = cord_x
-##                players[unique_id][data_id["Y"]] = cord_y
-##                players[unique_id][data_id["Z"]] = cord_z
-##                players[unique_id][data_id["Passed-Out"]] = "1"
-##                players[unique_id][data_id["Health"]] = "0"
+            players[unique_id][data_id["Faction"]] = faction
+            players[unique_id][data_id["Troop"]] = troop
+            players[unique_id][data_id["Gold"]] = gold
+            players[unique_id][data_id["Bank"]] = bank
+            if extensions["Pass-Out"]:
+                players[unique_id][data_id["X"]] = x
+                players[unique_id][data_id["Y"]] = y
+                players[unique_id][data_id["Z"]] = z
+                players[unique_id][data_id["Health"]] = "0"
+                players[unique_id][data_id["Head"]] = "0"
+                players[unique_id][data_id["Body"]] = "0"
+                players[unique_id][data_id["Foot"]] = "0"
+                players[unique_id][data_id["Gloves"]] = "0"
 ##                if unique_id in enpassants and enpassants[unique_id].is_alive():
 ##                    enpassants[unique_id].do_run = False
 ##                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
@@ -1353,7 +1351,6 @@ def main_request_handler(client, addr, port):
 ##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
 ##                patients.pop(unique_id).do_run = False
             send_message(client, "0", lenght = 1)
-            death_time_counter[unique_id] = time.time()
         elif action == "ban_player":
             unique_id = message[0]
             permanently = message[1]

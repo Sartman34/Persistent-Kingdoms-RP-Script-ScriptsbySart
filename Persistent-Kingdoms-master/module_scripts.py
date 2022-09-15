@@ -340,7 +340,6 @@ scripts.extend([
     (assign, ":x", reg16),
     (assign, ":y", reg17),
     (assign, ":z", reg18),
-##    (assign, ":is_passed_out", reg19),
     #s0: response
     
     (player_get_agent_id, ":agent_id", ":player_id"),
@@ -355,7 +354,7 @@ scripts.extend([
     (assign, ":is_naked", 1),
   ] + [elem for sublist in [[
     (try_begin),
-      (ge, reg6 + i, all_items_begin),
+      (neq, reg6 + i, -1),
       (call_script, "script_change_armor", ":agent_id", reg6 + i),
       (player_set_slot, ":player_id", slot_player_equip_head + i, reg6 + i),
       (assign, ":is_naked", 0),
@@ -363,7 +362,6 @@ scripts.extend([
   ] for i in xrange(4)] for elem in sublist] + [
     (try_begin),
       (eq, ":is_naked", 1),
-##      (eq, ":is_passed_out", 0),
       (player_get_gender, ":gender", ":player_id"),
       (store_random_in_range, ":head_item", 0, 3),
       (store_random_in_range, ":body_item", 0, 3),

@@ -155,10 +155,8 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
     (player_get_gold, reg3, ":player_id"),
 
     (store_agent_hit_points, reg4, ":agent_id", 0),
-    (try_begin),
-      (agent_is_alive, ":agent_id"),
-      (agent_get_slot, reg5, ":agent_id", slot_agent_food_amount),
-    (try_end),
+
+    (agent_get_slot, reg5, ":agent_id", slot_agent_food_amount),
 
     (player_get_slot, reg6, ":player_id", slot_player_equip_head),
     (player_get_slot, reg7, ":player_id", slot_player_equip_body),
