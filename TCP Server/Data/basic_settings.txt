@@ -9,5 +9,5 @@ Base Health  : 35
 Log Location : ../Logs
 Whitelisted  : 0
 Idle Income  : 0
-Owner Name   : Advocate
+Owner Name   : mucahidw
 Is HRPG      : 0

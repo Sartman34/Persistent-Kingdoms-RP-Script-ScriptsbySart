@@ -57,7 +57,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2022, 9, 5)
+    date = datetime.datetime(2022, 9, 24)
     version = "2.2"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
