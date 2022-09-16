@@ -533,6 +533,15 @@ scripts.extend([
   ])] for elem in sublist][:-1] + [
       (try_end),
     (else_try),
+      (eq, ":action", 3),
+      (assign, ":unique_id", reg1),
+      #s0: username
+      (try_for_players, ":player_id", 1),
+        (player_get_unique_id, ":other_unique_id", ":player_id"),
+        (eq, ":unique_id", ":other_unique_id"),
+        (player_set_username, ":player_id", s0),
+      (try_end),
+    (else_try),
       (eq, ":action", 13),
       (try_for_agents, ":agent_id"),
         (agent_is_alive, ":agent_id"),

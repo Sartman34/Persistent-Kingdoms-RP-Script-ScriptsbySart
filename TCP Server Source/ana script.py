@@ -59,7 +59,7 @@ message_lenght = 80
 class LicenseInfo():
     is_licensed = True
     date = datetime.datetime(2022, 9, 24)
-    version = "2.2"
+    version = "2.3"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
     text[0] = text[0].ljust(message_lenght)
@@ -413,8 +413,8 @@ join_times = dict()
 chests = dict()
 doors = dict()
 admin_permissions = dict()
-death_idle_time = 7
 authentication_time = "0"
+force_names = False
 banned_ips = list()
 command_perm = list()
 whitelist = list()
@@ -478,6 +478,8 @@ mail_keys = {
 admin_queue_commands = {
     "Kick": 1,
     "Settings": 2,
+    "Change Name": 3,
+    "Hunger": 13,
 }
 setting_types = {
     "Idle Income" : 0,
@@ -550,7 +552,7 @@ def import_mails():
     if not extensions["Letter"]:
         return
     mails.clear()
-    file = open("Data\\mails.txt", "r+", encoding='utf-8')
+    file = open("Data\\mails.txt", "r", encoding = "utf-8")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -563,16 +565,21 @@ def import_mails():
         seal = x[3]
         mails[code] = [name, post, seal]
 def import_names():
+    global force_names
     names.clear()
-    file = open("Data\\names.txt", "r+")
-    database = file.read().split("\n")
-    file.close()
-    if not database[0]:
+    with open("Data\\names.txt", "r", encoding = "utf-8") as file:
+        data = file.read()
+    if not data:
+        with open("Data\\names.txt", "w", encoding = "utf-8") as file:
+            file.write("Force Usernames : 0")
         return
-    for x in database:
-        x = x.split(" : ")
-        unique_id = x[0]
-        name = x[1]
+    force_names, lines = data.split("\n")
+    if force_names in ["True", "true", "+", "1"]:
+        force_names = True
+    else:
+        force_names = False
+    for line in lines:
+        unique_id, name = line.split(" : ")
         names[unique_id] = name
 def import_coins():
     global coins, start_coins
@@ -782,7 +789,48 @@ def main_request_handler(client, addr, port):
     if (not action in ["special_string", "save_to_db", "ping_tcp", "save_chest", "load_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
         logging_print("Got: ", action, message, port)
     try:
-        if action == "load_gear":
+        if action == "load_player":
+            #Faction<Troop
+            player_id = message[0]
+            unique_id = message[1]
+            name = message[2]
+            if force_names and unique_id in names:
+                admin_q.append("{}|{}|{}".format(admin_queue_commands["Change Name"], unique_id, names[unique_id]))
+            else:
+                names[unique_id] = name
+            coins[unique_id] = start_coins
+            if not unique_id in players:
+                players[unique_id] = base_items.copy()
+                players[unique_id][data_id["Health"]] = "100"
+                players[unique_id][data_id["Hunger"]] = start_hunger
+            if not unique_id in inventories:
+                inventories[unique_id] = base_inventory
+            if not unique_id in play_times:
+                play_times[unique_id] = "0"
+            send_message_warband(client,
+                player_id,
+                players[unique_id][data_id["Faction"]],
+                players[unique_id][data_id["Troop"]],
+                players[unique_id][data_id["Bank"]],
+                play_times[unique_id] if extensions["Play Times"] else "0",
+                "1" if extensions["Inventory"] else "0",
+                *inventories[unique_id],
+            )
+        elif action == "load_admin":
+            player_id = message[0]
+            unique_id = message[1]
+            if not unique_id in admin_permissions:
+                if admin_client:
+                    admin_client.send("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id).encode())
+                logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
+                send_message(client, player_id + "|1" * len(admin_permissions_ids))
+            else:
+                send_message_warband(client,
+                    player_id,
+                    *admin_permissions[unique_id],
+                    *["1" for x in range(min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0))]
+                )
+        elif action == "load_gear":
             #Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z<Bank
             player_id = message[0]
             unique_id = message[1]
@@ -816,44 +864,6 @@ def main_request_handler(client, addr, port):
                 *players[unique_id][data_id["Horse"] : data_id["HorseHP"] + 1],
                 *players[unique_id][data_id["X"] : data_id["Z"] + 1]
             )
-        elif action == "load_player":
-            #Faction<Troop
-            player_id = message[0]
-            unique_id = message[1]
-            name = message[2]
-            names[unique_id] = name
-            coins[unique_id] = start_coins
-            if not unique_id in players:
-                players[unique_id] = base_items.copy()
-                players[unique_id][data_id["Health"]] = "100"
-                players[unique_id][data_id["Hunger"]] = start_hunger
-            if not unique_id in inventories:
-                inventories[unique_id] = base_inventory
-            if not unique_id in play_times:
-                play_times[unique_id] = "0"
-            send_message_warband(client,
-                player_id,
-                players[unique_id][data_id["Faction"]],
-                players[unique_id][data_id["Troop"]],
-                players[unique_id][data_id["Bank"]],
-                play_times[unique_id] if extensions["Play Times"] else "0",
-                "1" if extensions["Inventory"] else "0",
-                *inventories[unique_id],
-            )
-        elif action == "load_admin":
-            player_id = message[0]
-            unique_id = message[1]
-            if not unique_id in admin_permissions:
-                if admin_client:
-                    admin_client.send("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id).encode())
-                logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
-                send_message(client, player_id + "|1" * len(admin_permissions_ids))
-            else:
-                send_message_warband(client,
-                    player_id,
-                    *admin_permissions[unique_id],
-                    *["1" for x in range(min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0))]
-                )
         elif action == "message_sent":
             player_id = message[0]
             event_type = int(message[1])
@@ -1506,6 +1516,7 @@ def main_request_handler(client, addr, port):
                 import_admin_permissions()
                 import_whitelist()
                 import_play_times()
+                import_names()
                 client.send(b"message%Files reimported")
             else:
                 client.send(b"message%Hatali sifre.")

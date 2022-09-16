@@ -10,9 +10,6 @@ flood_log_limit = 100
 script_ip_address = "@http://127.0.0.1"
 personal_inventory_lenght = 12
 
-admin_queue_command_kick = 1
-admin_queue_command_set_idle_income = 2
-
 colors = {
     "beyaz" : 0,
     "koyu mavi shout": 1,
