@@ -573,7 +573,7 @@ def import_names():
         with open("Data\\names.txt", "w", encoding = "utf-8") as file:
             file.write("Force Usernames : 0")
         return
-    force_names, lines = data.split("\n")
+    force_names, *lines = data.split("\n")
     if force_names in ["True", "true", "+", "1"]:
         force_names = True
     else:
@@ -1454,7 +1454,7 @@ def main_request_handler(client, addr, port):
                 logging_print(traceback.format_exc())
             try:
                 file = open("Data\\names.txt", "w", encoding = 'utf8')
-                text = ""
+                text = "Force Usernames : {}\n".format("1" if force_names else "0")
                 for unique_id in names.keys():
                     text += unique_id + " : "
                     text += names[unique_id] + "\n"
