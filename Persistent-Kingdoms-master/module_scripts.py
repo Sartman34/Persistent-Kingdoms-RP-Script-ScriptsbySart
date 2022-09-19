@@ -439,6 +439,7 @@ scripts.extend([
   ] for i in xrange(4)] for elem in sublist] + [
 
     (set_fixed_point_multiplier, 100),
+    (init_position, pos0),
     (try_begin),
       (neq, ":x", -1),
       (neq, ":y", -1),
@@ -458,8 +459,6 @@ scripts.extend([
       (agent_set_position, ":horse_agent_id", pos0),
       (agent_set_hit_points, ":horse_agent_id", ":horse_health", 0),
     (try_end),
-    
-##    (player_set_slot, ":player_id", slot_player_is_passed_out, ":is_passed_out"),
 
     (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
 
@@ -541,6 +540,32 @@ scripts.extend([
         (eq, ":unique_id", ":other_unique_id"),
         (player_set_username, ":player_id", s0),
       (try_end),
+    (else_try),
+      (eq, ":action", 4),
+      (assign, ":unique_id", reg1),
+      (assign, ":troop_no", reg2),
+      (assign, ":count", reg3),
+      (assign, ":player_id", -1),
+      (try_for_players, ":other_player_id", 1),
+        (player_get_unique_id, ":other_unique_id", ":other_player_id"),
+        (eq, ":unique_id", ":other_unique_id"),
+        (assign, ":player_id", ":other_player_id"),
+      (try_end),
+      (neq, ":player_id", -1),
+      (try_begin),
+  ] + [elem for sublist in [[
+        (eq, ":troop_no", i),
+        (assign, ":troop_id", troop_id),
+      (else_try),
+  ] for i, troop_id in enumerate([
+    "trp_sergeant",
+    "trp_archer",
+    "trp_man_at_arms",
+  ])] for elem in sublist][:-1] + [
+      (try_end),
+      (store_current_scene, ":scene_id"),
+      (modify_visitors_at_site, ":scene_id"),
+      (add_visitors_to_current_scene, 0, ":troop_id", ":count", team_default, ":player_id"),
     (else_try),
       (eq, ":action", 13),
       (try_for_agents, ":agent_id"),

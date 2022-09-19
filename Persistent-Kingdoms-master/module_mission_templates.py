@@ -305,6 +305,14 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [], [ # server and clients: set up new a
     (call_script, "script_player_set_worse_respawn_troop", ":player_id", "trp_peasant"),
     (multiplayer_send_3_int_to_player, ":player_id", server_event_preset_message, "str_inactive_faction_change", preset_message_chat_log|preset_message_red, ":faction_id"),
   (try_end),
+
+  (try_begin),
+    (multiplayer_is_server),
+    (neg|agent_is_non_player,":agent_id"),
+    (agent_get_player_id, ":group_id", ":agent_id"),
+    (team_give_order, ":group_id", grc_everyone, mordr_follow),
+    (team_give_order, ":group_id", grc_cavalry, mordr_mount), #Mount cavalry...
+  (try_end),
 ])
 
 agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: handle messages, score, loot, and more after agents die

@@ -50,6 +50,7 @@ try:
         "Horse Keeper" : 0,
         "Play Times" : 1,
         "Health" : 0,
+        "Army", 0,
     }
 except:
     logging_print(traceback.format_exc())
@@ -479,6 +480,7 @@ admin_queue_commands = {
     "Kick": 1,
     "Settings": 2,
     "Change Name": 3,
+    "Recruit Soldier": 4,
     "Hunger": 13,
 }
 setting_types = {
@@ -662,12 +664,16 @@ def send_message_special(client, unique_id, message_id):
         message_type["Special Message"], unique_id, 1,
         special_strings[message_id][0][0], message_id, special_strings[message_id][0][1]
     )
-def add_setting(setting_type, *args):
-    settings.append(("{}|" * (2 + len(args)))[:-1].format(admin_queue_commands["Settings"], setting_types[setting_type], *args))
+
+def admin_queue_add_command(command, *args):
+    admin_q.append(("{}|" * (len(args) + 1))[:-1].format(admin_queue_commands[command], *args))
+    
+def admin_queue_add_setting(setting_type, *args):
+    admin_queue_add_command("Settings", setting_types[setting_type], *args)
     
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
     banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
-    admin_q.append("{}|{}".format(admin_queue_commands["Kick"], unique_id))
+    admin_queue_add_command("Kick", unique_id)
     ban_message = "Player with (unique id: {}) got banned {}. Reason: {}".format(unique_id, "permanently" if permanently else "temporarily", reason)
     admin_q.append(ban_message)
     logging_print(ban_message)
@@ -795,7 +801,7 @@ def main_request_handler(client, addr, port):
             unique_id = message[1]
             name = message[2]
             if force_names and unique_id in names:
-                admin_q.append("{}|{}|{}".format(admin_queue_commands["Change Name"], unique_id, names[unique_id]))
+                admin_queue_add_command("Change Name", unique_id, names[unique_id])
             else:
                 names[unique_id] = name
             coins[unique_id] = start_coins
@@ -1106,6 +1112,26 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/anahtar help"])
+                    elif command in ["ordu", "army"] and extensions["Army"]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
+                            elif text[0] in ["recruit", "eğit", "egit"]:
+                                if len(text) >= 2:
+                                    troop_id = -1
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
+                                    elif text[1] in ["sergeant"]:
+                                        troop_id = 0
+                                    elif text[1] in ["archer"]:
+                                        troop_id = 1
+                                    elif text[1] in ["man_at_arms"]:
+                                        troop_id = 2
+                                    if troop_id != -1:
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], "sa")
+                                        admin_queue_add_command("Recruit Soldier", unique_id, troop_id, 5)
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
 ##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
 ##                        if len(text):
 ##                            if text[0] == "help":
@@ -1584,61 +1610,6 @@ def main_request_handler(client, addr, port):
             file.write(text)
             file.close()
             client.send(b"Banned IP's saved")
-##        elif action == "para_cek":
-##            unique_id = message[0]
-##            amount = int(message[1])
-##            player_id = message[2]
-##            gold = int(message[3])
-##            if not unique_id in players:
-##                players[unique_id] = base_items.copy()
-##            if 0 <= int(players[unique_id][data_id["Bank"]]) - amount:
-##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
-##                players[unique_id][data_id["Gold"]] = str(gold + amount)
-##                send_message_warband(client, message_type["Command"], command_type["Update Gold"], unique_id, players[unique_id][data_id["Gold"]])
-##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para cekme basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-##            elif int(players[unique_id][data_id["Bank"]]) > 0:
-##                amount = int(players[unique_id][data_id["Bank"]])
-##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) - amount)
-##                players[unique_id][data_id["Gold"]] = str(gold + amount)
-##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz cekildi"].format(amount), players[unique_id][data_id["Gold"]]))
-##            else:
-##                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["yetersiz bakiye"]))
-##        elif action == "para_yatir":
-##            unique_id = message[0]
-##            amount = int(message[1])
-##            player_id = message[2]
-##            gold = int(message[3])
-##            if not unique_id in players:
-##                players[unique_id] = base_items.copy()
-##            if 0 <= gold - amount and not gold == 0:
-##                players[unique_id][data_id["Gold"]] = str(gold - amount)
-##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["para yatirma basarili"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-##            elif 0 < gold:
-##                amount = gold
-##                players[unique_id][data_id["Gold"]] = str(gold - amount)
-##                players[unique_id][data_id["Bank"]] = str(int(players[unique_id][data_id["Bank"]]) + amount)
-##                send_message(client, "9|{}|{}|{}|{}".format(player_id, colors["altın"], strings["tum paraniz yatirildi"].format(amount, players[unique_id][data_id["Bank"]]), players[unique_id][data_id["Gold"]]))
-##            else:
-##                send_message(client, "17|{}|{}|{}".format(player_id, colors["beyaz"], strings["paraniz yok"]))
-##        elif action == "refund":
-##            sended_admin_pass = message[0]
-##            unique_id = message[1]
-##            take_give = message[2]
-##            bank_gold = message[3]
-##            amount = message[4]
-##            if sended_admin_pass == admin_pass:
-##                pass
-##            else:
-##                client.send(b"message%Hatali sifre.")
-##                log = "Hatali admin pass ile refund istedi."
-##                while True:
-##                    code = get_random_string(5)
-##                    if code not in bad_ips:
-##                        bad_ips[code] = addr[0]
-##                        break
-##                if admin_client:
-##                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
         elif action == "get_log":
             log_file = message[0]
             try:
@@ -1772,13 +1743,13 @@ try:
 
     if not idle_income in ["0", ""]:
         int(idle_income)
-        add_setting("Idle Income", idle_income)
+        admin_queue_add_setting("Idle Income", idle_income)
 
     if is_high_rpg in ["True", "true", "1"]:
-        add_setting("High RPG", "1")
+        admin_queue_add_setting("High RPG", "1")
 
     if extensions["Play Times"] and authentication_time != "0":
-        add_setting("Authentication Time", authentication_time)
+        admin_queue_add_setting("Authentication Time", authentication_time)
 
     admin_pass = get_random_string(10)
     logging_print("Admin log pass is: {}".format(admin_pass))

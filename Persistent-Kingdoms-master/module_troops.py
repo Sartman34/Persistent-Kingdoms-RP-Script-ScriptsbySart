@@ -100,7 +100,7 @@ troops = [
   ["knight","Knight","a knight",tf_mounted|tf_guarantee_all,0,0,"fac_commoners",
    [],
    str_15|agi_15|pw_attr,wpex(105,120,100,20,50,30),knows_pw|knows_ironflesh_4|knows_power_strike_4|knows_shield_1|knows_athletics_3|knows_riding_3,default_face_1,default_face_2],
-  ["sergeant","Sergeant","a sergeant",tf_guarantee_all,0,0,"fac_commoners",
+  ["sergeant","Sergeant","a sergeant",tf_guarantee_all_wo_ranged,0,0,"fac_commoners",
    [],
    str_15|agi_15|pw_attr,wpex(120,125,110,20,60,40),knows_pw|knows_ironflesh_5|knows_power_strike_4|knows_shield_2|knows_athletics_5|knows_riding_2,default_face_1,default_face_2],
   ["engineer","Engineer","an engineer",tf_guarantee_all,0,0,"fac_commoners",
