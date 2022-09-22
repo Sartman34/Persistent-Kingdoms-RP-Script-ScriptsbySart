@@ -2361,6 +2361,8 @@ agent_is_enemy                           = neg|agent_is_ally      # (agent_is_en
                                                                   # Checks if the agent is hostile to the player.
 agent_is_non_player                      = 1707                   # (agent_is_non_player, <agent_id>),
                                                                   # Checks if the agent is not a player. Working in MP?
+agent_is_player                          = neg^agent_is_non_player
+
 agent_is_defender                        = 1708                   # (agent_is_defender, <agent_id>),
                                                                   # Checks if the agent belongs to the defending side (see encounter operations for details).
 agent_is_attacker                        = neg|agent_is_defender  # (agent_is_attacker, <agent_id>),
@@ -4200,6 +4202,7 @@ can_fail_operations = frozenset([
   agent_is_human,
   agent_is_ally,
   agent_is_non_player,
+  agent_is_player,
   agent_is_defender,
   agent_is_active,
   agent_is_routed,

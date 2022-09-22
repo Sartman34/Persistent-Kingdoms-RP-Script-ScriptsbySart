@@ -37,7 +37,7 @@ import header_lazy_evaluation as lazy
 #    6.5) Consequences block (list), must be a valid operation block. Executed only if the conditions block succeeded.
 ####################################################################################################################
                                                  #aif_start_alarmed
-spawn_points_0_99 = [(x, mtef_visitor_source, 0, 0, 1, []) for x in xrange(0, 100)]
+spawn_points_0_99 = [(x, mtef_visitor_source, 0, aif_start_alarmed, 1, []) for x in xrange(0, 100)]
 
 before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic mission and scene values
    [(server_set_friendly_fire, 1),
@@ -48,10 +48,8 @@ before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic 
       (eq, "$g_game_type", "mt_multiplayer_dm"),
       (multiplayer_make_everyone_enemy),#necessary to hide the white name labels on the middle
     (else_try),
-      (team_set_relation, team_default, team_default, -1),
-      (team_set_relation, team_default, team_spawn_invulnerable, 1),
-      (team_set_relation, team_spawn_invulnerable, team_default, 1),
-      (team_set_relation, team_spawn_invulnerable, team_spawn_invulnerable, 1),
+      (team_set_relation, team_default, team_spawn_invulnerable, 0),
+      (team_set_relation, team_spawn_invulnerable, team_default, 0),
     (try_end),
 
     (call_script, "script_initialize_scene_globals"),
@@ -109,21 +107,22 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
   
   (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
 
-  ] + [elem for sublist in [[
-    (call_script, "script_load_chests", "spr_" + scene_prop),
-  ] for scene_prop in [
-    "pw_item_chest_a",
-    "pw_item_chest_b",
-    "pw_cart_a",
-    "pw_cart_b",
-    "pw_wheelbarrow",
-    "pw_hand_cart",
-    "pw_back_basket",
-    "pw_back_box",
-    "pw_horse_pack",
-    "cm_civ_cart",
-    "cm_war_cart",
-  ]] for elem in sublist] + [
+] + [elem for sublist in [[
+  (call_script, "script_load_chests", "spr_" + scene_prop),
+] for scene_prop in [
+  "pw_item_chest_a",
+  "pw_item_chest_b",
+  "pw_cart_a",
+  "pw_cart_b",
+  "pw_wheelbarrow",
+  "pw_hand_cart",
+  "pw_back_basket",
+  "pw_back_box",
+  "pw_horse_pack",
+  "cm_civ_cart",
+  "cm_war_cart",
+]] for elem in sublist] + [
+  
 ])
 
 player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connecting players
@@ -308,11 +307,28 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [], [ # server and clients: set up new a
 
   (try_begin),
     (multiplayer_is_server),
-    (neg|agent_is_non_player,":agent_id"),
+    (agent_is_player, ":agent_id"),
     (agent_get_player_id, ":group_id", ":agent_id"),
     (team_give_order, ":group_id", grc_everyone, mordr_follow),
     (team_give_order, ":group_id", grc_cavalry, mordr_mount), #Mount cavalry...
   (try_end),
+
+  (try_begin),
+    (multiplayer_is_server),
+    (agent_is_human, ":agent_id"),
+    (agent_is_non_player, ":agent_id"),
+    (agent_get_group, ":group_id", ":agent_id"),
+    (player_is_active, ":group_id"),
+    (try_begin),
+      (player_get_agent_id, ":leader_agent_id", ":group_id"),
+      (agent_is_active, ":leader_agent_id"),
+      (agent_is_alive, ":leader_agent_id"),
+      (agent_get_position, pos0, ":leader_agent_id"),
+      (agent_set_position, ":agent_id", pos0),
+    (try_end),
+  (try_end),
+
+  (call_script, "script_agent_init_relations", ":agent_id"),
 ])
 
 agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: handle messages, score, loot, and more after agents die
@@ -348,6 +364,8 @@ agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: h
       (position_get_z, reg4, pos1),
       (send_message_to_url_advanced, script_ip_address + "/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}", "@WSE2", "script_default_return", "script_default_fail"),
     (try_end),
+
+    (agent_clear_relations_with_agents, ":dead_agent_id"),
 
     (call_script, "script_setup_agent_for_respawn", ":dead_agent_id", ":killer_agent_id"),
     (call_script, "script_check_animal_killed", ":dead_agent_id", ":killer_agent_id"),
@@ -1050,7 +1068,7 @@ def common_triggers(mission_template):
         instrument_with_sheild_pickup,#19
         player_check_loop,#20
         agent_check_attack_loop,#21
-        agent_check_drowning_loop,#22 #** agent_check_loop split to 3 loops
+        agent_check_drowning_loop,#22
         agent_check_health_loop,#23
         agent_check_horse_ammo_loop,#24#
         ship_movement_loop,#25
