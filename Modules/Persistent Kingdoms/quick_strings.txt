@@ -1,4 +1,4 @@
-83
+84
 qstr_close_server close_server
 qstr_/debug /debug
 qstr_/hit /hit
@@ -45,6 +45,7 @@ qstr_Cok_Aciktin! Cok_Aciktin!
 qstr_http://127.0.0.1/pin http://127.0.0.1/ping_tcp
 qstr_ping_tcp_request_fai ping_tcp_request_failed.
 qstr_{reg2} {reg2}
+qstr_No_training_center_n No_training_center_nearby.
 qstr_message_sent_request message_sent_request_failed.
 qstr_Bu_kapi_sana_ait. Bu_kapi_sana_ait.
 qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.

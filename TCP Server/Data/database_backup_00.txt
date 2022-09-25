@@ -1,2 +1,1 @@
-GUID%Faction%Troop%Gold%Health%Hunger%Head%Body%Foot%Gloves%Itm0%Itm1%Itm2%Itm3%Horse%HorseHP%X%Y%Z%Bank%Pigeon%Is-Passed-Out
-3214304%0%27%2000%100%0%0%0%0%0%-1%-1%-1%-1%-1%0%2886%49825%273%5000%0%0
+GUID%Faction%Troop%Gold%Health%Hunger%Head%Body%Foot%Gloves%Itm0%Itm1%Itm2%Itm3%Horse%HorseHP%X%Y%Z%Bank

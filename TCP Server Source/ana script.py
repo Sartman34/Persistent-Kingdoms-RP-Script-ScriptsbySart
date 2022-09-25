@@ -50,7 +50,7 @@ try:
         "Horse Keeper" : 0,
         "Play Times" : 1,
         "Health" : 0,
-        "Army", 0,
+        "Army" : 1,
     }
 except:
     logging_print(traceback.format_exc())
@@ -59,7 +59,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2022, 9, 24)
+    date = datetime.datetime(2022, 10, 5)
     version = "2.3"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
@@ -307,6 +307,17 @@ Kapı (id: {}): {}.\
 {} GUID'leri çıkarıldı.^\
 Kapı (id: {}): {}.\
 ",
+    "/ordu help": "\
+Ordu Sistemi (Beta):^\
+/ordu eğit help\
+",
+    "/ordu eğit help": "\
+/ordu eğit (birlik) [miktar]^\
+Komuta edebileceğiniz birlikler eğitir.    \
+örn: /ordu eğit archer^\
+örn2: /ordu eğit footman 5                 \
+Birlikler: footman (16424), archer (9838), lancer (10150)\
+",
 }
 colors = {
     "beyaz" : 0,
@@ -391,9 +402,14 @@ if extensions["Health"]:
         ("Can Sistemi:", colors["beyaz"]),
         ("/can help", colors["acik yesil"]),
     ])
-special_strings["yardim"].extend([
-    ("Çoban Sistemi +", colors["beyaz"]),
-])
+if extensions["Army"]:
+    special_strings["yardim"].extend([
+        ("Ordu Sistemi (Beta):", colors["beyaz"]),
+        ("/ordu help", colors["acik kahverengi"]),
+    ])
+##special_strings["yardim"].extend([
+##    ("Çoban Sistemi +", colors["beyaz"]),
+##])
 admin_client = None
 admin_addr = None
 admin_q = list()
@@ -480,7 +496,6 @@ admin_queue_commands = {
     "Kick": 1,
     "Settings": 2,
     "Change Name": 3,
-    "Recruit Soldier": 4,
     "Hunger": 13,
 }
 setting_types = {
@@ -498,6 +513,7 @@ message_type = {
 command_type = {
     "Open Personal Inventory": 1,
     "Leave Faction": 2,
+    "Recruit Soldier": 3,
 }
 base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
@@ -1010,9 +1026,9 @@ def main_request_handler(client, addr, port):
                                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup yaz help"])
                                     else:
                                         while True:
-                                            code = random.randint(10, 100000)
-                                            if str(code) not in mails:
-                                                mails[str(code)] = [unique_id, " ".join(text[1:]), "0"]
+                                            code = str(random.randint(10, 100000))
+                                            if code not in mails:
+                                                mails[code] = [unique_id, " ".join(text[1:]), "0"]
                                                 send_message(client, "22|{}|{}".format(player_id, code))
                             elif text[0] == "oku":
                                 if len(text) >= 2:
@@ -1115,23 +1131,22 @@ def main_request_handler(client, addr, port):
                     elif command in ["ordu", "army"] and extensions["Army"]:
                         if len(text):
                             if text[0] == "help":
-                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
                             elif text[0] in ["recruit", "eğit", "egit"]:
                                 if len(text) >= 2:
-                                    troop_id = -1
+                                    troop_list = ["footman", "archer", "lancer"]
                                     if text[1] == "help":
-                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
-                                    elif text[1] in ["sergeant"]:
-                                        troop_id = 0
-                                    elif text[1] in ["archer"]:
-                                        troop_id = 1
-                                    elif text[1] in ["man_at_arms"]:
-                                        troop_id = 2
-                                    if troop_id != -1:
-                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], "sa")
-                                        admin_queue_add_command("Recruit Soldier", unique_id, troop_id, 5)
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
+                                    elif text[1] in troop_list:
+                                        troop_id = troop_list.index(text[1])
+                                        count = 1
+                                        if len(text) >= 3 and text[2].isdigit():
+                                            count = int(text[2])
+                                        send_message_warband(client, message_type["Command"], command_type["Recruit Soldier"], unique_id, troop_id, count)
+                                    else:
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
                         else:
-                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
 ##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
 ##                        if len(text):
 ##                            if text[0] == "help":
