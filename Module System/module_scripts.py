@@ -6046,8 +6046,8 @@ scripts.extend([
     (neg|faction_slot_ge, ":faction_2_id", ":faction_1_slot", 1),
     ]),
 
-  ("cf_faction_change_relation",
-   [(store_script_param, ":faction_id", 1),
+  ("cf_faction_change_relation", [
+    (store_script_param, ":faction_id", 1),
     (store_script_param, ":value_1", 2),
     (store_script_param, ":new_relation", 3),
 
@@ -6060,9 +6060,19 @@ scripts.extend([
       (player_is_active, ":player_id"),
       (multiplayer_send_3_int_to_player, ":player_id", server_event_faction_set_slot, ":faction_id", ":relation_slot",":new_relation"),
     (try_end),
-
-
-   ]),
+    (try_for_agents, ":agent_id"),
+      (agent_is_human, ":agent_id"),
+      (agent_is_non_player, ":agent_id"),
+      (agent_get_team, ":team_id", ":agent_id"),
+      (eq, ":team_id", team_default),
+      (agent_get_group, ":player_id", ":agent_id"),
+      (player_is_active, ":player_id"),
+      (player_get_slot, ":other_faction_id", ":player_id", slot_player_faction_id),
+      (this_or_next|eq, ":other_faction_id", ":faction_id"),
+      (eq, ":other_faction_id", ":value_1"),
+      (call_script, "script_agent_init_relations", ":agent_id"),
+    (try_end),
+  ]),
 
   ("display_faction_relation_change", # server and clients: calculate and display changed faction relations
    [(store_script_param, ":faction_id", 1),

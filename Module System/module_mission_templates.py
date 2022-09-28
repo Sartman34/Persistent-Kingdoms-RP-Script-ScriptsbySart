@@ -251,6 +251,14 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 ##      (try_end),
 ##    (try_end),
   (try_end),
+  (try_for_agents, ":agent_id"),
+    (agent_is_human, ":agent_id"),
+    (agent_is_non_player, ":agent_id"),
+    (agent_get_group, ":group_id", ":agent_id"),
+    (eq, ":group_id", ":player_id"),
+    (agent_clear_relations_with_agents, ":agent_id"),
+    (agent_fade_out, ":agent_id"),
+  (try_end),
 ])
 
 
@@ -378,18 +386,10 @@ agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: h
     
     (multiplayer_is_server),
     (try_begin),
-      (neq, ":killer_agent_id", -1),  # if -1 then the player disconnected. Otherwise they died for another reason.
       (agent_is_human, ":agent_id"),
+      (agent_is_player, ":agent_id"),
       (agent_get_player_id, ":player_id", ":agent_id"),
-      (player_is_active, ":player_id"),
-      (try_for_agents, ":other_agent_id"),
-        (agent_is_human, ":other_agent_id"),
-        (agent_is_non_player, ":other_agent_id"),
-        (agent_get_group, ":group_id", ":other_agent_id"),
-        (eq, ":group_id", ":player_id"),
-        (agent_clear_relations_with_agents, ":other_agent_id"),
-        (agent_fade_out, ":other_agent_id"),
-      (try_end),
+      (neq, ":killer_agent_id", -1),  # if -1 then the player disconnected. Otherwise they died for another reason.
       (player_get_unique_id, reg0, ":player_id"),
       (player_get_gold, reg1, ":player_id"),
       (agent_get_position, pos1, ":agent_id"),
