@@ -309,7 +309,8 @@ Kapı (id: {}): {}.\
 ",
     "/ordu help": "\
 Ordu Sistemi (Beta):^\
-/ordu eğit help\
+/ordu eğit help^\
+/ordu aggro help\
 ",
     "/ordu eğit help": "\
 /ordu eğit (birlik) [miktar]^\
@@ -317,6 +318,10 @@ Komuta edebileceğiniz birlikler eğitir.    \
 örn: /ordu eğit archer^\
 örn2: /ordu eğit footman 5                 \
 Birlikler: footman (16424), archer (9838), lancer (10150)\
+",
+    "/ordu aggro help": "\
+/ordu aggro^\
+Ordunun commonerlara karşı olan saldırganlığını değiştirir.\
 ",
 }
 colors = {
@@ -514,6 +519,7 @@ command_type = {
     "Open Personal Inventory": 1,
     "Leave Faction": 2,
     "Recruit Soldier": 3,
+    "Army Toggle Aggro": 4,
 }
 base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
@@ -1145,6 +1151,16 @@ def main_request_handler(client, addr, port):
                                         send_message_warband(client, message_type["Command"], command_type["Recruit Soldier"], unique_id, troop_id, count)
                                     else:
                                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
+                            elif text[0] in ["aggro"]:
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu aggro help"])
+                                    else:
+                                        send_message_warband(client, message_type["Command"], command_type["Army Toggle Aggro"], unique_id)
+                                else:
+                                    send_message_warband(client, message_type["Command"], command_type["Army Toggle Aggro"], unique_id)
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
 ##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:

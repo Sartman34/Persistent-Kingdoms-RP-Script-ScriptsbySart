@@ -119,10 +119,10 @@ slot_player_first_spawn_occured       = 65
 slot_player_custom_banner_mesh_id     = 66
 
 slot_player_flood_log                 = 67 #**
-slot_player_is_passed_out             = 68
 slot_player_bank                      = 69
 slot_player_is_debug_mode             = 70
 slot_player_time                      = 71
+slot_player_army_aggro                = 72
 
 ########################################################
 ##  AGENT SLOTS            #############################
