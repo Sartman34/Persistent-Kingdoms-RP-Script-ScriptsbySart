@@ -775,7 +775,7 @@ def enpassant(unique_id):
 ##        players[unique_id][data_id["Passed-Out"]] = "0"
     
 def main_request_handler(client, addr, port):
-    global admin_client, admin_addr, ddos_timer
+    global admin_client, admin_addr, ddos_timer, player_count
     if addr[0] in banned_ips:
         if admin_client:
             admin_client.send("!! Banned ip {} tried to connect".format(addr[0]).encode())
