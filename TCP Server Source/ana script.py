@@ -40,17 +40,17 @@ try:
     is_high_rpg = database.pop(0).split(" : ")[1]
 
     extensions = {
-        "Custom Announcement" : 1,
-        "Hunger" : 0,
-        "Door Keys" : 1,
-        "Letter" : 0,
-        "Pass-Out" : 1,
-        "Coin" : 0,
-        "Inventory" : 1,
-        "Horse Keeper" : 0,
-        "Play Times" : 1,
-        "Health" : 0,
-        "Army" : 1,
+        "Custom Announcement" : 0,
+        "Hunger" : 0,#bozuk
+        "Door Keys" : 0,
+        "Letter" : 0,#bozuk
+        "Pass-Out" : 0,
+        "Coin" : 0,#bozuk
+        "Inventory" : 0,
+        "Horse Keeper" : 0,#bozuk
+        "Play Times" : 0,
+        "Health" : 0,#bozuk
+        "Army" : 0,
     }
 except:
     logging_print(traceback.format_exc())
@@ -58,16 +58,15 @@ except:
 message_lenght = 80
 
 class LicenseInfo():
-    is_licensed = True
-    date = datetime.datetime(2022, 10, 12)
-    version = "2.3"
+    is_licensed = False
+    date = datetime.datetime(2022, 11, 8)
+    version = "2.3.2"
     text = []
-    text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Trial"))
+    text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
-    if is_licensed:
-        text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
-    else:
-        text.append("Sunucunun lisansı 1 aylık deneme sürümüdür.")
+    text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
+    if not is_licensed:
+        text.append("Sunucunun lisansı bedava deneme sürümüdür.")
     text[1] = text[1].ljust(message_lenght)
     text = "".join(text)
 
@@ -437,6 +436,7 @@ doors = dict()
 admin_permissions = dict()
 authentication_time = "0"
 force_names = False
+player_count = 0
 banned_ips = list()
 command_perm = list()
 whitelist = list()
@@ -881,8 +881,12 @@ def main_request_handler(client, addr, port):
             if not unique_id in whitelist and whitelist_enabled:
                 kick = "1"
                 response = "You are not whitelisted.^Your GUID: {}".format(unique_id)
+            if not LicenseInfo.is_licensed and player_count > 10:
+                kick = "1"
+                response = "Server has 10 player limit reached. (Free Version)"
             if kick == "0":
                 response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
+            player_count += 1
             send_message_warband(client, player_id, first_spawn_occured, kick, response,
                 players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Health"]],
@@ -1354,6 +1358,7 @@ def main_request_handler(client, addr, port):
                 players[unique_id] = base_items.copy()
             for x in range(data_id["Faction"], data_id["Bank"] + 1):
                 players[unique_id][x] = data[x]
+            player_count -= 1
             send_message(client, "0")
             if extensions["Play Times"]:
                 play_times[unique_id] = play_time

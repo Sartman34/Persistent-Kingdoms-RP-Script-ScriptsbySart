@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 import py2exe
 
 setup(
@@ -16,5 +16,6 @@ setup(
         "py2exe" : {
             "dist_dir": "../TCP Server",
         }
-    }
+    },
+    packages = find_packages(),
 )
