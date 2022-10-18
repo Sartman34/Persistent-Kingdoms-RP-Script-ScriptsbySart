@@ -40,17 +40,17 @@ try:
     is_high_rpg = database.pop(0).split(" : ")[1]
 
     extensions = {
-        "Custom Announcement" : 0,
+        "Custom Announcement" : 1,
         "Hunger" : 0,#bozuk
-        "Door Keys" : 0,
+        "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Pass-Out" : 0,
+        "Pass-Out" : 1,
         "Coin" : 0,#bozuk
-        "Inventory" : 0,
+        "Inventory" : 1,
         "Horse Keeper" : 0,#bozuk
-        "Play Times" : 0,
+        "Play Times" : 1,
         "Health" : 0,#bozuk
-        "Army" : 0,
+        "Army" : 1,
     }
 except:
     logging_print(traceback.format_exc())
@@ -58,8 +58,8 @@ except:
 message_lenght = 80
 
 class LicenseInfo():
-    is_licensed = False
-    date = datetime.datetime(2022, 11, 8)
+    is_licensed = True
+    date = datetime.datetime(2023, 1, 30)
     version = "2.3.2"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
