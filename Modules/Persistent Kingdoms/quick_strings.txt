@@ -1,4 +1,4 @@
-86
+89
 qstr_close_server close_server
 qstr_/debug /debug
 qstr_/hit /hit
@@ -48,7 +48,10 @@ qstr_{reg2} {reg2}
 qstr_No_training_center_n No_training_center_nearby.
 qstr_Army_relation_to_com Army_relation_to_commoners_set_to_passive.
 qstr_Army_relation_to_comm Army_relation_to_commoners_set_to_aggressive.
+qstr_http://127.0.0.1/set http://127.0.0.1/set_equipment<{reg2}<{s0}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}
 qstr_message_sent_request message_sent_request_failed.
+qstr_Applied_your_equipme Applied_your_equipment_to_the_troop_{s0}._Cost_of_recruiting:_{reg0}_dinars_each.
+qstr_set_equipment_reques set_equipment_request_failed.
 qstr_Bu_kapi_sana_ait. Bu_kapi_sana_ait.
 qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.
 qstr_Kapi_ID:__{reg0}_. Kapi_ID:_({reg0}).

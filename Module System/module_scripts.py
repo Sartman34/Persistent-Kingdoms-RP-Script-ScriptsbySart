@@ -683,8 +683,9 @@ scripts.extend([
       (else_try),
         (eq, ":command_id", 3),
 ##        (assign, ":unique_id", reg2),
-        (assign, ":troop_no", reg3),
+        (assign, ":troop_index", reg3),
         (assign, ":count", reg4),
+        #reg5 - reg12 items
         (dict_has_key, "$g_player_id_dict", "@{reg2}"),
         (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg2}"),
         (player_get_agent_id, ":agent_id", ":player_id"),
@@ -692,15 +693,14 @@ scripts.extend([
         (agent_is_alive, ":agent_id"),
         (try_begin),
   ] + [elem for sublist in [[
-          (eq, ":troop_no", i),
+          (eq, ":troop_index", i),
           (assign, ":troop_id", troop[0]),
           (assign, ":troop_scene_prop", troop[1]),
-          (assign, ":gold_cost", troop[2]),
         (else_try),
   ] for i, troop in enumerate([
-    ("trp_footman", "spr_pw_change_troop_footman", 840 + 2330 + 612 + 1350 + 432 + 663 + 485),
-    ("trp_archer", "spr_pw_change_troop_archer", 356 + 623 + 400 + 615 + 72 + 545 + 558),
-    ("trp_lancer", "spr_pw_change_troop_lancer", 540 + 270 + 545 + 760 + 580 + 880),
+    ("trp_footman", "spr_pw_change_troop_footman"),
+    ("trp_archer", "spr_pw_change_troop_archer"),
+    ("trp_lancer", "spr_pw_change_troop_lancer"),
   ])] for elem in sublist][:-1] + [
         (try_end),
         (agent_get_position, pos0, ":agent_id"),
@@ -714,13 +714,23 @@ scripts.extend([
         (try_end),
         (try_begin),
           (eq, ":near", 1),
-          (scene_prop_get_slot, ":troop_cost", ":prop_instance", slot_scene_prop_gold_value),
-          (val_mul, ":gold_cost", 2),
-          (val_add, ":gold_cost", ":troop_cost"),
-          (val_mul, ":gold_cost", ":count"),
+          (assign, ":item_cost", 0),
+  ] + [elem for sublist in [[
+          (assign, ":item_id", reg5 + i),
+          (player_set_slot, ":player_id", slot_player_army_equipment_begin + i, ":item_id"),
           (try_begin),
-            (call_script, "script_cf_check_enough_gold", ":player_id", ":gold_cost"),
-            (call_script, "script_player_adjust_gold", ":player_id", ":gold_cost", -1),
+            (neq, ":item_id", 0),
+            (store_item_value, ":item_value", ":item_id"),
+            (val_add, ":item_cost", ":item_value"),
+          (try_end),
+  ] for i in range(8)] for elem in sublist] + [
+          (store_mul, ":cost", ":item_cost", 2),
+          (scene_prop_get_slot, ":troop_cost", ":prop_instance", slot_scene_prop_gold_value),
+          (val_add, ":cost", ":troop_cost"),
+          (val_mul, ":cost", ":count"),
+          (try_begin),
+            (call_script, "script_cf_check_enough_gold", ":player_id", ":cost"),
+            (call_script, "script_player_adjust_gold", ":player_id", ":cost", -1),
             (store_current_scene, ":scene_id"),
             (modify_visitors_at_site, ":scene_id"),
             (add_visitors_to_current_scene, 0, ":troop_id", ":count", team_default, ":player_id"),
@@ -757,11 +767,71 @@ scripts.extend([
           (agent_clear_relations_with_agents, ":agent_id"),
           (call_script, "script_agent_init_relations", ":agent_id"),
         (try_end),
+      (else_try),
+        (eq, ":command_id", 5),
+##        (assign, ":unique_id", reg2),
+        #s0: troop_name
+        (dict_has_key, "$g_player_id_dict", "@{reg2}"),
+        (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg2}"),
+        (player_get_agent_id, ":agent_id", ":player_id"),
+        (agent_is_active, ":agent_id"),
+        (agent_is_alive, ":agent_id"),
+  ] + [elem for sublist in [[
+        (agent_get_item_slot, ":item_id", ":agent_id", i),
+        (val_max, ":item_id", 0),
+        (assign, reg3 + i, ":item_id"),
+  ] for i in range(8)] for elem in sublist] + [
+        (send_message_to_url_advanced,
+          script_ip_address
+          + "/set_equipment<{reg2}<{s0}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}",
+          "@WSE2", "script_set_equipment_return", "script_set_equipment_fail"
+        ),
       (try_end),
     (try_end),
   ]),
   
   ("message_sent_fail", [ (display_message, "@message_sent request failed."), ]),
+
+  ("set_equipment_return", [
+    (assign, ":success", reg0),
+##    (assign, ":unique_id", reg1),
+    (assign, ":troop_index", reg2),
+    #reg3 - reg10 items
+    (try_begin),
+      (eq, ":success", 1),
+      (dict_has_key, "$g_player_id_dict", "@{reg1}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg1}"),
+      (try_begin),
+  ] + [elem for sublist in [[
+        (eq, ":troop_index", i),
+        (str_store_troop_name, s0, troop[0]),
+        (assign, ":troop_scene_prop", troop[1]),
+      (else_try),
+  ] for i, troop in enumerate([
+    ("trp_footman", "spr_pw_change_troop_footman"),
+    ("trp_archer", "spr_pw_change_troop_archer"),
+    ("trp_lancer", "spr_pw_change_troop_lancer"),
+  ])] for elem in sublist][:-1] + [
+      (try_end),
+      (assign, ":item_cost", 0),
+  ] + [elem for sublist in [[
+      (assign, ":item_id", reg3 + i),
+      (try_begin),
+        (neq, ":item_id", 0),
+        (store_item_value, ":item_value", ":item_id"),
+        (val_add, ":item_cost", ":item_value"),
+      (try_end),
+  ] for i in range(8)] for elem in sublist] + [
+      (val_mul, ":item_cost", 2),
+      (scene_prop_get_instance, ":prop_instance", ":troop_scene_prop", 0),
+      (scene_prop_get_slot, ":troop_cost", ":prop_instance", slot_scene_prop_gold_value),
+      (store_add, reg0, ":item_cost", ":troop_cost"),
+      (str_store_string, s0, "@Applied your equipment to the troop {s0}. Cost of recruiting: {reg0} dinars each."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["acik yesil"], 0),
+    (try_end),
+  ]),
+
+  ("set_equipment_fail", [ (display_message, "@set_equipment request failed."), ]),
 
   ("check_door_key_return", [
     (assign, ":agent_id", reg0),

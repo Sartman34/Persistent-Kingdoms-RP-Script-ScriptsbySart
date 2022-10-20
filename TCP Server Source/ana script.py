@@ -11,6 +11,8 @@ import sys
 import traceback
 import ntplib
 
+from module_items import warband_items
+
 def logging_print(*string):
     print(*string)
 
@@ -84,8 +86,8 @@ if current_date > LicenseInfo.date:
 
 strings = {
     "/yardim help" : "\
-/yardim: Komutlar listesini gosterir.^\
-Bunu da sormazsin bu arada :D\
+/yardim: Komutlar listesini gosterir :D^\
+Help parametresi güvenli bir şekilde komutları öğrenmeni sağlar.\
 ",
     "hatali komut" : "\
 Böyle bir komut bulunamadı. /yardim yazarak komutları öğrenebilirsiniz.\
@@ -308,7 +310,10 @@ Kapı (id: {}): {}.\
 ",
     "/ordu help": "\
 Ordu Sistemi (Beta):^\
-/ordu eğit help^\
+/ordu birlikler^\
+/ordu komutlar^\
+/ordu eğit help         \
+/ordu ekipman help^\
 /ordu aggro help\
 ",
     "/ordu eğit help": "\
@@ -316,11 +321,29 @@ Ordu Sistemi (Beta):^\
 Komuta edebileceğiniz birlikler eğitir.    \
 örn: /ordu eğit archer^\
 örn2: /ordu eğit footman 5                 \
-Birlikler: footman (16424), archer (9838), lancer (10150)\
+Birlikleri listelemek için \"/ordu birlikler\".\
 ",
     "/ordu aggro help": "\
 /ordu aggro^\
 Ordunun commonerlara karşı olan saldırganlığını değiştirir.\
+",
+    "/ordu komutlar help": "\
+/ordu komutlar^\
+Orduyu yönetmek için kullanılan sayı ve function tuşlarını listeler.\
+",
+    "/ordu birlikler": "\
+Kullanılabilen birlikler:^\
+- footman^\
+- archer^\
+- lancer\
+",
+    "/ordu birlikler help": "\
+/ordu birlikler^\
+Orduda kullanılabilecek birlikleri listeler.\
+",
+    "/ordu ekipman help": "\
+/ordu ekipman (birlik)^\
+Kuşandığınız ekipmanları birliğin ekipmanı olarak tanımlar.\
 ",
 }
 colors = {
@@ -363,6 +386,12 @@ special_strings = {
         ("/b (mesaj)", colors["koyu mavi"]),
         ("/me (mesaj)", colors["acik kahverengi"]),
         ("/do (mesaj)", colors["acik yesil"]),
+    ],
+    "/ordu_komutlar": [
+        ("Groups:^1 - Soldiers^2 - Missiles^3 - Cavalry^0 - Everyone", colors["beyaz"]),
+        ("^F1 - Movement Orders^    F1 - Hold Position^    F2 - Follow Me^    F3 - Charge", colors["beyaz"]),
+        ("^F2 - Formation Orders^    F1 - 1 Row^    F2 - 2 Rows^    F3 - 3 Rows", colors["beyaz"]),
+        ("^    F4 - 4 Rows^    F5 - 5 Rows^    F6 - Spread Out^    F7 - Stand Closer", colors["beyaz"]),
     ],
 }
 
@@ -429,6 +458,7 @@ enpassants = dict()
 patients = dict()
 coins = dict()
 inventories = dict()
+armies = dict()
 play_times = dict()
 join_times = dict()
 chests = dict()
@@ -518,8 +548,14 @@ message_type = {
 command_type = {
     "Open Personal Inventory": 1,
     "Leave Faction": 2,
-    "Recruit Soldier": 3,
+    "Army Recruit": 3,
     "Army Toggle Aggro": 4,
+    "Army Set Equipment": 5,
+}
+troops = {
+    "footman": 0,
+    "archer": 1,
+    "lancer": 2,
 }
 base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
@@ -636,6 +672,29 @@ def import_inventories():
         unique_id = x[0]
         inventory = x[1:]
         inventories[unique_id] = inventory
+def import_armies():
+    if not extensions["Army"]:
+        return
+    with open("Data\\armies.txt", "r+") as file:
+        database = file.read().split("\n")
+    armies.clear()
+    for line in database:
+        troop, *raw_equipments = line.split("%")
+        equipments = list()
+        for equipment in raw_equipments:
+            if equipment in warband_items:
+                equipments.append(str(warband_items.index(equipment)))
+            else:
+                print("WARNING! While importing the troop: {}, an invalid item: {} was found.".format(troop, equipment))
+        if len(equipments) > 8:
+            print("WARNING! While importing the troop: {}, more than 8 items was found.".format(troop))
+            equipments = equipments[:8]
+        armies[troop] = equipments + ["0" for i in range(8 - len(equipments))]
+    for troop in troops:
+        troop_name = "base_{}".format(troop)
+        if not troop_name in armies:
+            print("WARNING! troop: {} is not defined. Creating an empty one.".format(troop_name))
+            armies[troop_name] = ["0" for i in range(8)]
 def import_chests():
     file = open("Data\\chests.txt", "r+")
     database = file.read().split("\n")
@@ -1144,15 +1203,18 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
                             elif text[0] in ["recruit", "eğit", "egit"]:
                                 if len(text) >= 2:
-                                    troop_list = ["footman", "archer", "lancer"]
                                     if text[1] == "help":
                                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
-                                    elif text[1] in troop_list:
-                                        troop_id = troop_list.index(text[1])
+                                    elif text[1] in troops:
+                                        troop = troops[text[1]]
                                         count = 1
                                         if len(text) >= 3 and text[2].isdigit():
                                             count = int(text[2])
-                                        send_message_warband(client, message_type["Command"], command_type["Recruit Soldier"], unique_id, troop_id, count)
+                                        troop_name = "{}_{}".format(unique_id, text[1])
+                                        if not troop_name in armies:
+                                            troop_name = "base_{}".format(text[1])
+                                        equipments = armies[troop_name]
+                                        send_message_warband(client, message_type["Command"], command_type["Army Recruit"], unique_id, troop, count, *equipments)
                                     else:
                                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu eğit help"])
                                 else:
@@ -1165,6 +1227,34 @@ def main_request_handler(client, addr, port):
                                         send_message_warband(client, message_type["Command"], command_type["Army Toggle Aggro"], unique_id)
                                 else:
                                     send_message_warband(client, message_type["Command"], command_type["Army Toggle Aggro"], unique_id)
+                            elif text[0] in ["komutlar", "orders"]:
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu komutlar help"])
+                                    else:
+                                        send_message_special(client, unique_id, "/ordu_komutlar")
+                                else:
+                                    send_message_special(client, unique_id, "/ordu_komutlar")
+                            elif text[0] in ["birlikler", "troops"]:
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu birlikler help"])
+                                    else:
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu birlikler"])
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu birlikler"])
+                            elif text[0] in ["ekipman", "equipment"]:
+                                if len(text) >= 2:
+                                    if text[1] == "help":
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu ekipman help"])
+                                    elif text[1] in troops:
+                                        send_message_warband(client, message_type["Command"], command_type["Army Set Equipment"], text[1], unique_id)
+                                    else:
+                                        send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu ekipman help"])
+                                else:
+                                    send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu ekipman help"])
+                            else:
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
 ##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
@@ -1222,6 +1312,10 @@ def main_request_handler(client, addr, port):
                 ), log = False)
             else:
                 send_message(client, "0", lenght = 1, log = False)
+        elif action == "set_equipment":
+            unique_id, troop, *items = message
+            armies["{}_{}".format(unique_id, troop)] = items
+            send_message_warband(client, "1", unique_id, troops[troop], *items)
         elif action == "heal_buy_success":
             player_id = message[0]
             unique_id = message[1]
@@ -1546,6 +1640,17 @@ def main_request_handler(client, addr, port):
             except:
                 logging_print(traceback.format_exc())
             try:
+                if extensions["Army"]:
+                    file = open("Data\\armies.txt", "w", encoding = 'utf8')
+                    text = ""
+                    for troop, items in armies.items():
+                        text += troop + "%"
+                        text += "%".join([warband_items[int(item_id)] for item_id in items]) + "\n"
+                    file.write(text[:-1])
+                    file.close()
+            except:
+                logging_print(traceback.format_exc())
+            try:
                 file = open("Data\\chests.txt", "w", encoding = 'utf8')
                 text = ""
                 for variation_id, items in chests.items():
@@ -1774,6 +1879,7 @@ try:
     import_names()
     import_coins()
     import_inventories()
+    import_armies()
     import_chests()
     import_play_times()
 

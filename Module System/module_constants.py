@@ -123,6 +123,14 @@ slot_player_bank                      = 69
 slot_player_is_debug_mode             = 70
 slot_player_time                      = 71
 slot_player_army_aggro                = 72
+slot_player_army_equipment_begin      = 73
+slot_player_army_equipment_1          = 74
+slot_player_army_equipment_2          = 75
+slot_player_army_equipment_3          = 76
+slot_player_army_equipment_4          = 77
+slot_player_army_equipment_5          = 78
+slot_player_army_equipment_6          = 79
+slot_player_army_equipment_7          = 80
 
 ########################################################
 ##  AGENT SLOTS            #############################
