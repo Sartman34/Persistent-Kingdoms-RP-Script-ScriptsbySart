@@ -32,6 +32,7 @@ qstr_cm_civ_cart cm_civ_cart
 qstr_cm_war_cart cm_war_cart
 qstr_Chest__{s0}_{reg2}__ Chest_({s0},_{reg2})_loaded_with_{reg3}_items_inside.
 qstr_load_chest_request_f load_chest_request_failed.
+qstr_{reg0} {reg0}
 qstr_http://127.0.0.1/load_ http://127.0.0.1/load_admin<{reg1}<{reg2}
 qstr_load_player_request_ load_player_request_failed.
 qstr_load_admin_request_f load_admin_request_failed.
@@ -80,11 +81,10 @@ qstr_http://127.0.0.1/ban_ http://127.0.0.1/ban_player<{reg0}<1<1
 qstr_[E]_Could_not_get_on [E]_Could_not_get_one_or_more_skybox_prop_instances!
 qstr_Updating_Settings Updating_Settings
 qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
-qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{reg1}<{s0}
-qstr_{reg0} {reg0}
+qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{s0}
 qstr_http://127.0.0.1/save http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}<{reg19}<{reg20}
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}
-qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}<{reg1}<{reg2}
+qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}<{reg1}
 qstr_http://127.0.0.1/str http://127.0.0.1/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}
 qstr_Dogrulanmadan_agresi Dogrulanmadan_agresif_yapamazsiniz.
 qstr_Dogrulanmamis_oyuncu Dogrulanmamis_oyunculara_agresif_yapamazsiniz.

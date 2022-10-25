@@ -185,11 +185,10 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
   (call_script, "script_update_ghost_mode_rule", ":player_id"),
   (call_script, "script_apply_mute", ":player_id", "$g_mute_all_players"),
 
-  (assign, reg0, ":player_id"),
-  (player_get_unique_id, reg1, reg0),
+  (player_get_unique_id, reg0, ":player_id"),
   (str_store_player_username, s0, ":player_id"),
-  (dict_set_int, "$g_player_id_dict", "@{reg1}", ":player_id"),
-  (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{reg1}<{s0}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
+  (dict_set_int, "$g_player_id_dict", "@{reg0}", ":player_id"),
+  (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{s0}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
 ])
 
 player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on exit
@@ -206,9 +205,7 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
     (player_get_slot, reg1, ":player_id", slot_player_faction_id),
     (player_get_troop_id, reg2, ":player_id"),
     (player_get_gold, reg3, ":player_id"),
-
     (store_agent_hit_points, reg4, ":agent_id", 0),
-
     (agent_get_slot, reg5, ":agent_id", slot_agent_food_amount),
 
     (player_get_slot, reg6, ":player_id", slot_player_equip_head),
@@ -331,10 +328,9 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [], [ # server and clients: set up new a
       (player_get_slot, ":spawn_state", ":player_id", slot_player_spawn_state),
       (eq, ":spawn_state", 1),
       (player_get_unique_id, ":unique_id", ":player_id"),
-      (assign, reg0, ":player_id"),
-      (assign, reg1, ":unique_id"),
-      (assign, reg2, ":first_spawn_occured"),
-      (send_message_to_url_advanced, script_ip_address + "/load_gear<{reg0}<{reg1}<{reg2}", "@WSE2", "script_load_gear_return", "script_load_gear_fail"),
+      (assign, reg0, ":unique_id"),
+      (assign, reg1, ":first_spawn_occured"),
+      (send_message_to_url_advanced, script_ip_address + "/load_gear<{reg0}<{reg1}", "@WSE2", "script_load_gear_return", "script_load_gear_fail"),
     (try_end),
   (try_end),
 

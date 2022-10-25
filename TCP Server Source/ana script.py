@@ -878,9 +878,8 @@ def main_request_handler(client, addr, port):
     try:
         if action == "load_player":
             #Faction<Troop
-            player_id = message[0]
-            unique_id = message[1]
-            name = message[2]
+            unique_id = message[0]
+            name = message[1]
             if force_names and unique_id in names:
                 admin_queue_add_command("Change Name", unique_id, names[unique_id])
             else:
@@ -895,7 +894,7 @@ def main_request_handler(client, addr, port):
             if not unique_id in play_times:
                 play_times[unique_id] = "0"
             send_message_warband(client,
-                player_id,
+                unique_id,
                 players[unique_id][data_id["Faction"]],
                 players[unique_id][data_id["Troop"]],
                 players[unique_id][data_id["Bank"]],
@@ -904,13 +903,12 @@ def main_request_handler(client, addr, port):
                 *inventories[unique_id],
             )
         elif action == "load_admin":
-            player_id = message[0]
-            unique_id = message[1]
+            unique_id = message[0]
             if not unique_id in admin_permissions:
                 if admin_client:
                     admin_client.send("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id).encode())
                 logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
-                send_message(client, player_id + "|1" * len(admin_permissions_ids))
+                send_message(client, unique_id + "|1" * len(admin_permissions_ids))
             else:
                 send_message_warband(client,
                     player_id,
@@ -919,9 +917,8 @@ def main_request_handler(client, addr, port):
                 )
         elif action == "load_gear":
             #Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z<Bank
-            player_id = message[0]
-            unique_id = message[1]
-            first_spawn_occured = message[2]
+            unique_id = message[0]
+            first_spawn_occured = message[1]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
@@ -946,7 +943,7 @@ def main_request_handler(client, addr, port):
             if kick == "0":
                 response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
             player_count += 1
-            send_message_warband(client, player_id, first_spawn_occured, kick, response,
+            send_message_warband(client, unique_id, first_spawn_occured, kick, response,
                 players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Health"]],
                 players[unique_id][data_id["Hunger"]],
