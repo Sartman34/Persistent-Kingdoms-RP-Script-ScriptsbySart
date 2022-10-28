@@ -1473,9 +1473,9 @@ def main_request_handler(client, addr, port):
             if not variation_id_tuple in chests:
                 chests[variation_id_tuple] = []
             if int(index) < len(chests[variation_id_tuple]):
-                send_message(client, "1|{}|{}|{}|{}|{}".format(scene_prop, variation_id, index, instance_id, chests[variation_id_tuple][int(index)]))
+                send_message_warband(client, 1, scene_prop, variation_id, index, instance_id, chests[variation_id_tuple][int(index)])
             else:
-                send_message(client, "2|{}".format(scene_prop, variation_id, index))
+                send_message_warband(client, 2, scene_prop, variation_id, index)
         elif action == "save_inventory":
             unique_id = message[0]
             data = message[1:]
