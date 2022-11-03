@@ -48,6 +48,7 @@ before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic 
       (eq, "$g_game_type", "mt_multiplayer_dm"),
       (multiplayer_make_everyone_enemy),#necessary to hide the white name labels on the middle
     (else_try),
+      (team_set_relation, team_default, team_default, -1),
       (team_set_relation, team_default, team_spawn_invulnerable, 0),
       (team_set_relation, team_spawn_invulnerable, team_default, 0),
     (try_end),
@@ -307,7 +308,6 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
     (agent_is_non_player, ":agent_id"),
     (agent_get_group, ":group_id", ":agent_id"),
     (eq, ":group_id", ":player_id"),
-    (agent_clear_relations_with_agents, ":agent_id"),
     (agent_fade_out, ":agent_id"),
   (try_end),
 ])
@@ -450,8 +450,6 @@ agent_killed = (ti_on_agent_killed_or_wounded, 0, 0, [], # server and clients: h
       (agent_is_alive, ":horse_agent_id"),
       (remove_agent, ":horse_agent_id"),
     (try_end),
-
-    (agent_clear_relations_with_agents, ":agent_id"),
 
     (call_script, "script_setup_agent_for_respawn", ":agent_id", ":killer_agent_id"),
     (call_script, "script_check_animal_killed", ":agent_id", ":killer_agent_id"),
