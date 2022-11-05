@@ -320,9 +320,8 @@ scripts.extend([
       
       (try_begin),
         (player_is_admin, ":player_id"),
-        (assign, reg1, ":player_id"),
-        (player_get_unique_id, reg2, ":player_id"),
-        (send_message_to_url_advanced, script_ip_address + "/load_admin<{reg1}<{reg2}", "@WSE2", "script_load_admin_return", "script_load_admin_fail"),
+        (player_get_unique_id, reg1, ":player_id"),
+        (send_message_to_url_advanced, script_ip_address + "/load_admin<{reg1}", "@WSE2", "script_load_admin_return", "script_load_admin_fail"),
       (try_end),
     (try_end),
   ]),

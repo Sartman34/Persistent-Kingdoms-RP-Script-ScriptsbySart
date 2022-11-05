@@ -197,8 +197,8 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 
   (player_get_unique_id, reg0, ":player_id"),
   (dict_erase, "$g_player_id_dict", "@{reg0}"),
-  (player_get_agent_id, ":agent_id", ":player_id"),
   (try_begin),
+    (player_get_agent_id, ":agent_id", ":player_id"),
     (agent_is_active, ":agent_id"),
     (agent_is_alive, ":agent_id"),
 
@@ -245,21 +245,21 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
       + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}<{reg16}<{reg17}<{reg18}<{reg19}<{reg20}",
       "@WSE2", "script_default_return", "script_default_fail"
     ),
-  
+  (try_end),
+  (try_begin),
     (troop_get_slot, ":instance_id", "trp_personal_inventories", ":player_id"),
-    (try_begin),
-      (prop_instance_is_valid, ":instance_id"),
+    (prop_instance_is_valid, ":instance_id"),
 ] + [elem for sublist in [[
-      (scene_prop_get_slot, reg1 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
-      (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
+    (scene_prop_get_slot, reg1 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
+    (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
 ] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
-      (player_get_unique_id, reg0, ":player_id"),
-      (send_message_to_url_advanced,
-        script_ip_address
-        + "/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}",
-        "@WSE2", "script_default_return", "script_default_fail"
-      ),
-    (try_end),
+    (player_get_unique_id, reg0, ":player_id"),
+    (send_message_to_url_advanced,
+      script_ip_address
+      + "/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}",
+      "@WSE2", "script_default_return", "script_default_fail"
+    ),
+  (try_end),
 ##    (try_begin),
 ##      (player_get_slot, reg6, ":player_id", slot_player_equip_head),
 ##      (player_get_slot, reg7, ":player_id", slot_player_equip_body),
@@ -302,7 +302,6 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 ##        (agent_equip_item, ":agent_id", reg13),
 ##      (try_end),
 ##    (try_end),
-  (try_end),
   (try_for_agents, ":agent_id"),
     (agent_is_human, ":agent_id"),
     (agent_is_non_player, ":agent_id"),

@@ -33,7 +33,7 @@ qstr_cm_war_cart cm_war_cart
 qstr_Chest__{s0}_{reg2}__ Chest_({s0},_{reg2})_loaded_with_{reg3}_items_inside.
 qstr_load_chest_request_f load_chest_request_failed.
 qstr_{reg0} {reg0}
-qstr_http://127.0.0.1/load_ http://127.0.0.1/load_admin<{reg1}<{reg2}
+qstr_http://127.0.0.1/load_ http://127.0.0.1/load_admin<{reg1}
 qstr_load_player_request_ load_player_request_failed.
 qstr_load_admin_request_f load_admin_request_failed.
 qstr_http://127.0.0.1/spe http://127.0.0.1/special_string<{reg0}<welcome<0

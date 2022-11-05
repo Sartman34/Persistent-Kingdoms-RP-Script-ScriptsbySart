@@ -61,8 +61,8 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 1, 30)
-    version = "2.3.2"
+    date = datetime.datetime(2023, 2, 15)
+    version = "2.3.5"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
@@ -911,7 +911,7 @@ def main_request_handler(client, addr, port):
                 send_message(client, unique_id + "|1" * len(admin_permissions_ids))
             else:
                 send_message_warband(client,
-                    player_id,
+                    unique_id,
                     *admin_permissions[unique_id],
                     *["1" for x in range(min(len(admin_permissions_ids) - len(admin_permissions[unique_id]), 0))]
                 )
