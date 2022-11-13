@@ -33,7 +33,6 @@ try:
     start_hunger = database.pop(0).split(" : ")[1]
     start_bank = database.pop(0).split(" : ")[1]
     start_money = database.pop(0).split(" : ")[1]
-    bank_lost_percentage = int(database.pop(0).split(" : ")[1])
     base_health = database.pop(0).split(" : ")[1]
     log_file_location = database.pop(0).split(" : ")[1]
     whitelist_enabled = int(database.pop(0).split(" : ")[1])
@@ -47,11 +46,9 @@ try:
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
         "Pass-Out" : 1,
-        "Coin" : 0,#bozuk
         "Inventory" : 1,
         "Horse Keeper" : 0,#bozuk
         "Play Times" : 1,
-        "Health" : 0,#bozuk
         "Army" : 1,
     }
 except:
@@ -61,7 +58,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 2, 15)
+    date = datetime.datetime(2022, 11, 21)
     version = "2.3.5"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
@@ -200,94 +197,11 @@ Aradığınız isim bulunamadı.\
     "guidiniz" : "\
 Guidiniz: {}\
 ",
-    "enpassant_info" : "\
-Bir süre baygın kaldıktan sonra kanlar içinde gözlerini açtın.^\
-Eşyalarını kontrol edip kafanı toparlamaya çalışıyorsun.^\
-Sana zarar verenler halen etrafındalar mı ?\
-",
-    "enpassant_first_stage" : "\
-Şuurun yerine gelmeye başladı. Vücudun seni dinlemeye başladı.^\
-Hayatta kalabileceğin en yakın yer neresi diye düşünüyorsun.\
-",
-    "enpassant_first_stage_2" : "\
-Çok güçsüzsün ve kılıcını zar zor tutuyorsun.^\
-Eşkiyalara görünmeden kendini güvenli bir yere atmalısın.^\
-Bir doktora görünmeli veya güvenli bir yerde dinlenmelisin.\
-",
-    "enpassant_second_stage" : "\
-Başarılı bir şekilde hayatta kaldın.^\
-Yaralarının acısını hissetsen de kudretine kavuştun.^\
-Bakalım ilerideki maceralarında seni neler bekliyor.\
-",
-    "/coin" : "\
-Your Coins: Gold: {}, Silver: {}, Bronze: {}.\
-",
-    "/para" : "\
-Madeni Paralarınız: Altın: {}, Gümüş: {}, Bakır: {}.\
-",
-    "/coin help" : "\
-/coin: Shows your coins.\
-",
-    "/para help" : "\
-/para: Madeni paralarınızı gösterir.\
-",
-    "/para bırak help" : "\
-/para bırak (altın miktarı)a (gümüş miktarı)g (bakır miktarı)b          \
--> Yere belirttiğiniz madeni paraları barındıran bir kese bırakır.      \
-                                                                        \
-Örn: '/para bırak 200a 150g 350b' komutu yere                           \
-200 altın, 150 gümüş, 350 bakır bırakır.\
-",
-    "/coin drop help" : "\
-/coin drop (gold amount)g (silver amount)s (bronze amount)b             \
--> Drops a bag containing coins.                                        \
-                                                                        \
-E.g: '/coin drop 200g 150s 350b' command drops                          \
-200 gold, 150 silver, 350 bronze.\
-",
-    "bırakma başarılı" : "\
-{} {} yere bırakıldı.\
-",
-    "drop successful" : "\
-{} {} dropped.\
-",
     "/envanter help" : "\
 /envanter: Kişisel envanterinizi açar.\
 ",
     "/bağla help" : "\
 /bağla: Atınızı bağlar/çözer.\
-",
-    "/can help" : "\
-bankada bulunan doktor hizmetini kullanmanızı sağlar.^\
-/can ameliyat help^\
-/can ilaç help\
-",
-    "/can ameliyat help": "\
-/can ameliyat^\
-Canınız 70'den az ise ameliyat edilebilirsiniz.^\
-20 saniye sürer. 75 cana ulaşırsınız.^\
-Ücret: 10 bin dinar.\
-",
-    "/can ilac help": "\
-/can ilaç^\
-Canınızı yavaşta iyileştirir.^\
-12 dakika sürer. Canınız 30 artar.^\
-Ücret: 10 bin dinar.\
-",
-    "surgery start": "\
-Ameliyat başladı. Kendinizi doktorunuza bırakın.\
-",
-    "medication start": "\
-İyileşme süreci başladı.\
-",
-    "can cannot use both": "\
-Aynı anda 2 tedavi kullanılamaz.\
-",
-    "surgery finished": "\
-Ameliyat bitti.\
-",
-    "medication finished": "\
-İyileşme bitti.\
 ",
     "/anahtar help": "\
 /anahtar göster^\
@@ -406,12 +320,6 @@ if extensions["Letter"]:
         ("Mektup Sistemi:", colors["beyaz"]),
         ("/mektup help", colors["mektup"]),
     ])
-if extensions["Coin"]:
-    special_strings["yardim"].extend([
-        ("Madeni Para Sistemi:", colors["beyaz"]),
-        ("/para", colors["altın"]),
-        ("/coin", colors["altın"]),
-    ])
 if extensions["Door Keys"]:
     special_strings["yardim"].extend([
         ("Kapı Kilidi Sistemi +", colors["beyaz"]),
@@ -429,11 +337,6 @@ if extensions["Horse Keeper"]:
     special_strings["yardim"].extend([
         ("At Bağlama Sistemi:", colors["beyaz"]),
         ("/bağla help", colors["koyu kahverengi"]),
-    ])
-if extensions["Health"]:
-    special_strings["yardim"].extend([
-        ("Can Sistemi:", colors["beyaz"]),
-        ("/can help", colors["acik yesil"]),
     ])
 if extensions["Army"]:
     special_strings["yardim"].extend([
@@ -454,9 +357,6 @@ hunger_count = dict()
 hunger_count_copy = dict()
 banned_players = dict()
 mails = dict()
-enpassants = dict()
-patients = dict()
-coins = dict()
 inventories = dict()
 armies = dict()
 play_times = dict()
@@ -559,7 +459,6 @@ troops = {
 }
 base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
-start_coins = ["0", "0", "0"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
         
 def import_custom_announcement():
@@ -641,23 +540,6 @@ def import_names():
     for line in lines:
         unique_id, name = line.split(" : ")
         names[unique_id] = name
-def import_coins():
-    global coins, start_coins
-    if not extensions["Coin"]:
-        return
-    file = open("Data\\coins.txt", "r+")
-    database = file.read().split("\n")
-    file.close()
-    if not database[0]:
-        return
-    start_coins = database.pop(0).split("%")
-    for x in database:
-        x = x.split("%")
-        unique_id = x[0]
-        gold = x[1]
-        silver = x[2]
-        bronze = x[3]
-        coins[unique_id] = [gold, silver, bronze]
 def import_inventories():
     if not extensions["Inventory"]:
         return
@@ -729,11 +611,9 @@ def get_random_string(length):
         random_list.append(random.choice(string.ascii_uppercase + string.digits))
     return ''.join(random_list)
 
-def send_message(client, message, lenght = 128, log = True):
+def send_message(client, message, lenght = 128):
     text = "HTTP/1.1 200 OK\r\nContent-Lenght: {1}\r\n\r\n{0}\r\n".format(message, lenght)
     client.send(text.encode())
-    #if log:
-    #    print("Sent: " + message)
 
 def send_message_warband(client, *message):
     message = ("{}|" * len(message)).format(*message)[:-1]
@@ -785,53 +665,6 @@ def refresh_admin():
             finally:
                 admin_client.close()
                 admin_client = None
-
-def surgery(unique_id):
-    t = threading.currentThread()
-    time.sleep(20)
-    if not getattr(t, "do_run", True):
-        return
-##    admin_q.append("24|{}|{}".format(unique_id, 75))
-##    admin_q.append("38|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["surgery finished"]))
-    patients.pop(unique_id)
-
-def medication(unique_id):
-    t = threading.currentThread()
-    i = 0
-    while i < 5:
-        time.sleep(120)
-        if not getattr(t, "do_run", True):
-            return
-##        admin_q.append("35|{}|{}".format(unique_id, 5))
-        i += 1
-    if not getattr(t, "do_run", True):
-        return
-##    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["medication finished"]))
-    patients.pop(unique_id)
-
-def enpassant(unique_id):
-    t = threading.currentThread()
-    time.sleep(13)
-##    admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_info"]))
-    
-    time.sleep(20)
-    if getattr(t, "do_run", True):
-##        admin_q.append("24|{}|{}".format(unique_id, "10"))
-##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage"]))
-        time.sleep(3)
-##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik kirmizi"], strings["enpassant_first_stage_2"]))
-        if int(players[unique_id][data_id["Health"]]) < int("10"):
-            players[unique_id][data_id["Health"]] = "10"
-
-    time.sleep(180)
-    if getattr(t, "do_run", True):
-##        admin_q.append("24|{}|{}".format(unique_id, base_health))
-##        admin_q.append("27|{}|{}|{}".format(unique_id, colors["acik yesil"], strings["enpassant_second_stage"]))
-        if int(players[unique_id][data_id["Health"]]) < int(base_health):
-            players[unique_id][data_id["Health"]] = base_health
-
-##        admin_q.append("26|{}".format(unique_id))
-##        players[unique_id][data_id["Passed-Out"]] = "0"
     
 def main_request_handler(client, addr, port):
     global admin_client, admin_addr, ddos_timer, player_count
@@ -884,7 +717,6 @@ def main_request_handler(client, addr, port):
                 admin_queue_add_command("Change Name", unique_id, names[unique_id])
             else:
                 names[unique_id] = name
-            coins[unique_id] = start_coins
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
@@ -922,8 +754,6 @@ def main_request_handler(client, addr, port):
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
-                if extensions["Coin"]:
-                    coins[unique_id] = start_coins
             kick = "0"
             if unique_id in banned_players:
                 permanently = int(banned_players[unique_id][0])
@@ -1120,36 +950,6 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
-##                    elif command in ["para", "coin"] and extensions["Coin"]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin help" if command == "coin" else "/para help"]))
-##                            elif text[0] in ["bırak", "birak", "drop"]:
-##                                if len(text) >= 2:
-##                                    if text[1] == "help":
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
-##                                    else:
-##                                        parameters = {"a" : 0, "g" : 1, "b" : 2} if text[0] != "drop" else {"g" : 0, "s" : 1, "b" : 2}
-##                                        transactions = []
-##                                        can_continue = True
-##                                        for parameter in text[2:]:
-##                                            if parameter[-1] in parameters and parameters[:-1].isnumeric():
-##                                                transactions.append(parameters[parameter[-1]], int(parameters[:-1]))
-##                                            else:
-##                                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/para bırak help" if text[0] != "drop" else "/coin drop help"]))
-##                                                can_continue = False
-##                                                break
-##                                        if can_continue:
-##                                            coin_names = ["Altın", "Gümüş", "Bakır"] if text[0] != "drop" else ["Gold", "Silver", "Bronze"]
-##                                            coin_colors = ["altın", "gümüş", "bakır"]
-##                                            for transaction in transactions:
-##                                                if coins[unique_id][transaction[0]] >= transaction[1]:
-##                                                    coins[unique_id][transaction[0]] -= transaction[1]
-##                                                    admin_q.append("5|{}|{}|{}".format(player_id, colors[coin_colors[transaction[0]]], strings["bırakma başarılı" if text[0] != "drop" else "drop successful"].format(transaction[1], coin_names[transaction[0]])))
-##                            else:
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
-##                        else:
-##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/coin" if command == "coin" else "/para"].format(*coins[unique_id])))
                     elif command in ["envanter", "inventory"] and extensions["Inventory"]:
                         if len(text):
                             if text[0] == "help":
@@ -1262,30 +1062,6 @@ def main_request_handler(client, addr, port):
 ##                                send_message(client, "32|{}".format(player_id))
 ##                        else:
 ##                            send_message(client, "32|{}".format(player_id))
-##                    elif command in ["can", "health"] and extensions["Health"]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
-##                            elif text[0] in ["ilaç", "ilac", "medication"]:
-##                                if len(text) >= 2:
-##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ilac help"]))
-##                                else:
-##                                    if unique_id in patients and patients[unique_id].is_alive():
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
-##                                    else:
-##                                        send_message(client, "36|{}|{}".format(player_id, 1))
-##                            elif text[0] in ["ameliyat", "surgery"]:
-##                                if len(text) >= 2:
-##                                    send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can ameliyat help"]))
-##                                else:
-##                                    if unique_id in patients and patients[unique_id].is_alive():
-##                                        send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["can cannot use both"]))
-##                                    else:
-##                                        send_message(client, "36|{}|{}".format(player_id, 0))
-##                            else:
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
-##                        else:
-##                            send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/can help"]))
                     else:
                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["hatali komut"])
                 else:
@@ -1306,27 +1082,13 @@ def main_request_handler(client, addr, port):
                     special_strings[string0][counter][0],
                     string0,
                     special_strings[string0][counter][1],
-                ), log = False)
+                ))
             else:
-                send_message(client, "0", lenght = 1, log = False)
+                send_message(client, "0", lenght = 1)
         elif action == "set_equipment":
             unique_id, troop, *items = message
             armies["{}_{}".format(unique_id, troop)] = items
             send_message_warband(client, "1", unique_id, troops[troop], *items)
-        elif action == "heal_buy_success":
-            player_id = message[0]
-            unique_id = message[1]
-            sv_action = message[2]
-            if sv_action == "0":
-                patient_thread = threading.Thread(target = surgery, args = (unique_id,))
-                patient_thread.start()
-                patients[unique_id] = patient_thread
-                send_message(client, "37|{}|{}|{}".format(player_id, colors["acik yesil"], strings["surgery start"]))
-            elif sv_action == "1":
-                patient_thread = threading.Thread(target = medication, args = (unique_id,))
-                patient_thread.start()
-                patients[unique_id] = patient_thread
-                send_message(client, "5|{}|{}|{}".format(player_id, colors["acik yesil"], strings["medication start"]))
         elif action == "kuzgun_buy_success":
             player_id = message[0]
             unique_id = message[1]
@@ -1443,18 +1205,23 @@ def main_request_handler(client, addr, port):
                 client.send(b"Failed to register hunger")
                 logging_print("Sent: {}".format("Failed to register hunger"))
         elif action == "save_player": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
-            unique_id = message[0]
-            *data, play_time = message[1:]
+            unique_id = message.pop(0)
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
-            for x in range(data_id["Faction"], data_id["Bank"] + 1):
-                players[unique_id][x] = data[x]
-            player_count -= 1
-            send_message(client, "0")
+            for i in range(data_id["Faction"], data_id["Gold"] + 1):
+                players[unique_id][i] = message.pop(0)
+            players[unique_id][data_id["Bank"]] = message.pop(0)
             if extensions["Play Times"]:
                 play_times[unique_id] = play_time
-##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
-##                patients.pop(unique_id).do_run = False
+            player_count -= 1
+            send_message(client, "0")
+        elif action == "save_agent": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
+            unique_id = message.pop(0)
+            if not unique_id in players:
+                players[unique_id] = base_items.copy()
+            for i in range(data_id["Health"], data_id["Z"] + 1):
+                players[unique_id][i] = message.pop(0)
+            send_message(client, "0")
         elif action == "save_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1482,21 +1249,11 @@ def main_request_handler(client, addr, port):
             inventories[unique_id] = data
             send_message(client, "0")
         elif action == "strip_gear":
-            unique_id = message[0]
-            gold = message[1]
-            x = message[2]
-            y = message[3]
-            z = message[4]
-            if not unique_id in players:
-                players[unique_id] = base_items.copy()
-            faction = players[unique_id][data_id["Faction"]]
-            troop = players[unique_id][data_id["Troop"]]
-            bank = str(int(players[unique_id][data_id["Bank"]]) - int(int(players[unique_id][data_id["Bank"]]) * bank_lost_percentage / 100))
+            unique_id = message.pop(0)
+            x = message.pop(0)
+            y = message.pop(0)
+            z = message.pop(0)
             players[unique_id] = base_items.copy()
-            players[unique_id][data_id["Faction"]] = faction
-            players[unique_id][data_id["Troop"]] = troop
-            players[unique_id][data_id["Gold"]] = gold
-            players[unique_id][data_id["Bank"]] = bank
             if extensions["Pass-Out"]:
                 players[unique_id][data_id["X"]] = x
                 players[unique_id][data_id["Y"]] = y
@@ -1505,13 +1262,6 @@ def main_request_handler(client, addr, port):
                 players[unique_id][data_id["Body"]] = "0"
                 players[unique_id][data_id["Foot"]] = "0"
                 players[unique_id][data_id["Gloves"]] = "0"
-##                if unique_id in enpassants and enpassants[unique_id].is_alive():
-##                    enpassants[unique_id].do_run = False
-##                enpassant_thread = threading.Thread(target = enpassant, args = (unique_id,))
-##                enpassant_thread.start()
-##                enpassants[unique_id] = enpassant_thread
-##            if extensions["Health"] and unique_id in patients and patients[unique_id].is_alive():
-##                patients.pop(unique_id).do_run = False
             send_message(client, "0", lenght = 1)
         elif action == "ban_player":
             unique_id = message[0]
@@ -1568,7 +1318,6 @@ def main_request_handler(client, addr, port):
                         if unique_id != "GUID":
                             if int(players[unique_id][data_id["Health"]]) < int(base_health):
                                 players[unique_id][data_id["Health"]] = base_health
-##                            players[unique_id][data_id["Passed-Out"]] = "0"
                     except:
                         logging_print(traceback.format_exc(), "\n", players[unique_id])
                     text += "{}%".format(unique_id) + "%".join(players[unique_id]) + "\n"
@@ -1874,7 +1623,6 @@ try:
     import_whitelist()
     import_mails()
     import_names()
-    import_coins()
     import_inventories()
     import_armies()
     import_chests()
