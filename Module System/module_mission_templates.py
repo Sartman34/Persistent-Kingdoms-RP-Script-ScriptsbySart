@@ -178,6 +178,12 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
     (agent_equip_item, ":agent_id", "itm_surgeon_scalpel"),
     (agent_equip_item, ":agent_id", "itm_spiked_mace"),
   (try_end),
+  (init_position, pos0),
+  (try_for_prop_instances, ":instance_id", "spr_barrier_8m"),
+    (prop_instance_get_variation_id, ":var1", ":instance_id"),
+    (eq, ":var1", 1),
+    (prop_instance_set_position, ":instance_id", pos0),
+  (try_end),
 ])
 
 player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connecting players

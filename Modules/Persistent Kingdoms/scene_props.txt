@@ -57,7 +57,7 @@ spr_barrier_20m 16393 0 barrier_20m bo_barrier_20m 0
 spr_barrier_16m 16393 0 barrier_16m bo_barrier_16m 0
 
 
-spr_barrier_8m 16393 0 barrier_8m bo_barrier_8m 0
+spr_barrier_8m 81929 0 barrier_8m bo_barrier_8m 0
 
 
 spr_barrier_4m 16393 0 barrier_4m bo_barrier_4m 0

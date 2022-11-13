@@ -258,6 +258,7 @@ g_presentation_obj_animation_menu_end
 g_dbg_presentation_overlays_end
 g_dbg_presentation_registers_end
 g_is_hit_disabled
+g_is_nlr_closed
 g_player_id_dict
 g_idle_income
 g_is_hrpg
