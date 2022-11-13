@@ -4,7 +4,6 @@ Base Hunger  : 0
 Start Hunger : 0
 Start Bank   : 5000
 Start Money  : 2000
-Bank Lost %  : 0
 Base Health  : 35
 Log Location : ../Logs
 Whitelisted  : 0

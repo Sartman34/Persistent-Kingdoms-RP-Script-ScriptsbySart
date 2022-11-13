@@ -10,18 +10,27 @@ from urllib.request import urlopen
 import sys
 import traceback
 import ntplib
+import msvcrt
 
 from module_items import warband_items
+from module_directories import directories
 
-def logging_print(*string):
-    print(*string)
+def check_file(directory):
+    try:
+        with open(directory, mode = "x", encoding = "utf-8"):
+            print_("Created the file: \"{}\".".format(directory.basename()))
+    except FileExistsError:
+        pass
 
-    file = open("Data\\logs.txt", "a", encoding = "utf8")
-    old_stdout = sys.stdout
-    sys.stdout = file
-    print(*string)
-    sys.stdout = old_stdout
-    file.close()
+def print_(*string, sep = " ", end = "\n", flush = False):
+    print("[{}]".format(datetime.datetime.now().strftime("%H:%M:%S")), *string, sep = sep, end = end, flush = flush)
+    directories.log.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d"))
+    check_file(directories.log)
+    with open(directories.log, "a", encoding="utf-8") as file:
+        old_stdout = sys.stdout
+        sys.stdout = file
+        print("[{}]".format(datetime.datetime.now().strftime("%H:%M:%S")), *string, sep = sep, end = end, flush = flush)
+        sys.stdout = old_stdout
 
 try:
     file = open("Data\\basic_settings.txt", "r+")
@@ -45,21 +54,22 @@ try:
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Pass-Out" : 1,
+        "Pass-Out" : 0,#bozuk
         "Inventory" : 1,
         "Horse Keeper" : 0,#bozuk
         "Play Times" : 1,
         "Army" : 1,
     }
 except:
-    logging_print(traceback.format_exc())
+    print_(traceback.format_exc())
+    input()
 
 message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
     date = datetime.datetime(2022, 11, 21)
-    version = "2.3.5"
+    version = "2.4.0"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
@@ -69,17 +79,14 @@ class LicenseInfo():
     text[1] = text[1].ljust(message_lenght)
     text = "".join(text)
 
-def clear_spaces(string):
-    for character in [" ", "\t"]:
-        string = string.replace(character, "")
-    return string
-
 current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
 ##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
 if current_date > LicenseInfo.date:
-    logging_print("License date is over.")
+    print_("License date is over.")
     input()
     sys.exit()
+
+print_("Version: {}, Date: {}".format(LicenseInfo.version, LicenseInfo.date.strftime("%Y.%m.%d")))
 
 strings = {
     "/yardim help" : "\
@@ -343,9 +350,6 @@ if extensions["Army"]:
         ("Ordu Sistemi (Beta):", colors["beyaz"]),
         ("/ordu help", colors["acik kahverengi"]),
     ])
-##special_strings["yardim"].extend([
-##    ("Çoban Sistemi +", colors["beyaz"]),
-##])
 admin_client = None
 admin_addr = None
 admin_q = list()
@@ -437,6 +441,8 @@ setting_types = {
     "Idle Income" : 0,
     "High RPG" : 1,
     "Authentication Time" : 2,
+    "Base Health" : 3,
+    "Base Hunger" : 4,
 }
 message_type = {
     "Local Chat": 1,
@@ -460,6 +466,11 @@ troops = {
 base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+
+def clear_spaces(string):
+    for character in [" ", "\t"]:
+        string = string.replace(character, "")
+    return string
         
 def import_custom_announcement():
     if not extensions["Custom Announcement"]:
@@ -637,7 +648,7 @@ def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified
     admin_queue_add_command("Kick", unique_id)
     ban_message = "Player with (unique id: {}) got banned {}. Reason: {}".format(unique_id, "permanently" if permanently else "temporarily", reason)
     admin_q.append(ban_message)
-    logging_print(ban_message)
+    print_(ban_message)
     if admin_client:
         admin_client.send(ban_message.encode())
 
@@ -650,7 +661,7 @@ def warning(client, message, log, addr, lenght = 128):
             break
     if admin_client:
         admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-    logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+    print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
 
 def refresh_admin():
     global admin_client, admin_addr
@@ -671,7 +682,7 @@ def main_request_handler(client, addr, port):
     if addr[0] in banned_ips:
         if admin_client:
             admin_client.send("!! Banned ip {} tried to connect".format(addr[0]).encode())
-        logging_print("!! Banned ip {} tried to connect".format(addr[0]))
+        print_("!! Banned ip {} tried to connect".format(addr[0]))
         client.close()
         return
     is_admin = False
@@ -687,7 +698,7 @@ def main_request_handler(client, addr, port):
                 break
         if admin_client:
             admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-        logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+        print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         return
     except UnicodeDecodeError:
         client.close()
@@ -707,7 +718,7 @@ def main_request_handler(client, addr, port):
     action = message[0].replace("%20", "_")
     message = message[1:]
     if (not action in ["special_string", "save_to_db", "ping_tcp", "save_chest", "load_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
-        logging_print("Got: ", action, message, port)
+        print_("Got: ", action, message, port)
     try:
         if action == "load_player":
             #Faction<Troop
@@ -739,7 +750,7 @@ def main_request_handler(client, addr, port):
             if not unique_id in admin_permissions:
                 if admin_client:
                     admin_client.send("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id).encode())
-                logging_print("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
+                print_("!! Kayitsiz admin girisi. Unique_ID: {}".format(unique_id))
                 send_message(client, unique_id + "|1" * len(admin_permissions_ids))
             else:
                 send_message_warband(client,
@@ -750,7 +761,6 @@ def main_request_handler(client, addr, port):
         elif action == "load_gear":
             #Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z<Bank
             unique_id = message[0]
-            first_spawn_occured = message[1]
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
                 players[unique_id][data_id["Health"]] = "100"
@@ -773,7 +783,7 @@ def main_request_handler(client, addr, port):
             if kick == "0":
                 response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
             player_count += 1
-            send_message_warband(client, unique_id, first_spawn_occured, kick, response,
+            send_message_warband(client, unique_id, kick, response,
                 players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Health"]],
                 players[unique_id][data_id["Hunger"]],
@@ -1200,10 +1210,10 @@ def main_request_handler(client, addr, port):
             if (text == "13" and not text in admin_q) or not text == "13": 
                 admin_q.append(text)
                 client.send(text.encode())
-                logging_print("Sent: {}".format(text))
+                print_("Sent: {}".format(text))
             else:
                 client.send(b"Failed to register hunger")
-                logging_print("Sent: {}".format("Failed to register hunger"))
+                print_("Sent: {}".format("Failed to register hunger"))
         elif action == "save_player": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
             unique_id = message.pop(0)
             if not unique_id in players:
@@ -1212,7 +1222,7 @@ def main_request_handler(client, addr, port):
                 players[unique_id][i] = message.pop(0)
             players[unique_id][data_id["Bank"]] = message.pop(0)
             if extensions["Play Times"]:
-                play_times[unique_id] = play_time
+                play_times[unique_id] = message.pop(0)
             player_count -= 1
             send_message(client, "0")
         elif action == "save_agent": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
@@ -1254,14 +1264,6 @@ def main_request_handler(client, addr, port):
             y = message.pop(0)
             z = message.pop(0)
             players[unique_id] = base_items.copy()
-            if extensions["Pass-Out"]:
-                players[unique_id][data_id["X"]] = x
-                players[unique_id][data_id["Y"]] = y
-                players[unique_id][data_id["Z"]] = z
-                players[unique_id][data_id["Head"]] = "0"
-                players[unique_id][data_id["Body"]] = "0"
-                players[unique_id][data_id["Foot"]] = "0"
-                players[unique_id][data_id["Gloves"]] = "0"
             send_message(client, "0", lenght = 1)
         elif action == "ban_player":
             unique_id = message[0]
@@ -1305,7 +1307,7 @@ def main_request_handler(client, addr, port):
                         break
                 if admin_client:
                     admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                _logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+                _print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "save_to_db":
             try:
                 os.remove("Data\\database_backup_02.txt")
@@ -1319,13 +1321,13 @@ def main_request_handler(client, addr, port):
                             if int(players[unique_id][data_id["Health"]]) < int(base_health):
                                 players[unique_id][data_id["Health"]] = base_health
                     except:
-                        logging_print(traceback.format_exc(), "\n", players[unique_id])
+                        print_(traceback.format_exc(), "\n", players[unique_id])
                     text += "{}%".format(unique_id) + "%".join(players[unique_id]) + "\n"
                 file = open("Data\\database.txt", "w")
                 file.write(text[:-1])
                 file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 file = open("Data\\banned_players.txt", "w")
                 text = ""
@@ -1339,7 +1341,7 @@ def main_request_handler(client, addr, port):
                 file.write(text[:-1])
                 file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 if extensions["Letter"]:
                     file = open("Data\\mails.txt", "w", encoding = 'utf8')
@@ -1353,7 +1355,7 @@ def main_request_handler(client, addr, port):
                     file.write(text[:-1])
                     file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 file = open("Data\\names.txt", "w", encoding = 'utf8')
                 text = "Force Usernames : {}\n".format("1" if force_names else "0")
@@ -1363,7 +1365,7 @@ def main_request_handler(client, addr, port):
                 file.write(text[:-1])
                 file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 if extensions["Door Keys"]:
                     with open("Data\\door_keys.txt", "w", encoding = 'utf8') as file:
@@ -1372,7 +1374,7 @@ def main_request_handler(client, addr, port):
                             text.append("%".join([door, *keys]))
                         file.write("\n".join(text))
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 if extensions["Inventory"]:
                     file = open("Data\\inventories.txt", "w", encoding = 'utf8')
@@ -1384,7 +1386,7 @@ def main_request_handler(client, addr, port):
                     file.write(text[:-1])
                     file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 if extensions["Army"]:
                     file = open("Data\\armies.txt", "w", encoding = 'utf8')
@@ -1395,7 +1397,7 @@ def main_request_handler(client, addr, port):
                     file.write(text[:-1])
                     file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 file = open("Data\\chests.txt", "w", encoding = 'utf8')
                 text = ""
@@ -1407,7 +1409,7 @@ def main_request_handler(client, addr, port):
                 file.write(text[:-1])
                 file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             try:
                 if extensions["Play Times"]:
                     file = open("Data\\play_times.txt", "w", encoding = 'utf8')
@@ -1418,7 +1420,7 @@ def main_request_handler(client, addr, port):
                     file.write(text[:-1])
                     file.close()
             except:
-                logging_print(traceback.format_exc())
+                print_(traceback.format_exc())
             client.send(b"All players and bans have been saved")
 
         elif action == "reimport":
@@ -1441,7 +1443,7 @@ def main_request_handler(client, addr, port):
                         break
                 if admin_client:
                     admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "help":
             warning(client,
                     "Unknown Message. Use 'help' to see commands.",
@@ -1449,7 +1451,7 @@ def main_request_handler(client, addr, port):
                     addr
                     )
         elif action == "show_admin_pass":
-            logging_print(admin_pass)
+            print_(admin_pass)
             client.send(b"Admin Pass printed.")
         elif action == "admin_connect":
             password = message[0]
@@ -1533,7 +1535,7 @@ def main_request_handler(client, addr, port):
                         break
                 if admin_client:
                     admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "set_file":
             sent_admin_pass = message[0]
             sent_file = message[1]
@@ -1555,7 +1557,7 @@ def main_request_handler(client, addr, port):
                         break
                 if admin_client:
                     admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                logging_print("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         else:
             warning(client,
                     "Unknown Message. Use 'help' to see commands.",
@@ -1574,7 +1576,7 @@ def main_request_handler(client, addr, port):
     except ConnectionResetError:
         return
     except:
-        logging_print(traceback.format_exc())
+        print_(traceback.format_exc())
     finally:
         if not is_admin:
             client.close()
@@ -1583,7 +1585,7 @@ def main_request_handler(client, addr, port):
 def warband_listener(port, ip_adress):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    logging_print(ip_adress)
+    print_(ip_adress)
     server.bind((ip_adress, port))
     server.listen(20)
     while True:
@@ -1628,6 +1630,9 @@ try:
     import_chests()
     import_play_times()
 
+    admin_queue_add_setting("Base Health", base_health)
+    admin_queue_add_setting("Base Hunger", base_hunger)
+
     if not idle_income in ["0", ""]:
         int(idle_income)
         admin_queue_add_setting("Idle Income", idle_income)
@@ -1639,10 +1644,11 @@ try:
         admin_queue_add_setting("Authentication Time", authentication_time)
 
     admin_pass = get_random_string(10)
-    logging_print("Admin log pass is: {}".format(admin_pass))
+    print_("Admin log pass is: {}".format(admin_pass))
 
     threading.Thread(target = refresh_admin).start()
     threading.Thread(target = warband_listener, args = (80, "127.0.0.1")).start()
+
 except:
-    logging_print(traceback.format_exc())
+    print_(traceback.format_exc())
     input()
