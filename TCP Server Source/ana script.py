@@ -13,6 +13,7 @@ import ntplib
 import msvcrt
 
 from module_items import warband_items
+from module_troops import warband_troops
 from module_directories import directories
 
 def check_file(directory):
@@ -42,6 +43,7 @@ try:
     start_hunger = database.pop(0).split(" : ")[1]
     start_bank = database.pop(0).split(" : ")[1]
     start_money = database.pop(0).split(" : ")[1]
+    start_troop = str(warband_troops.index(database.pop(0).split(" : ")[1].strip().lower().replace(" ", "_")))
     base_health = database.pop(0).split(" : ")[1]
     log_file_location = database.pop(0).split(" : ")[1]
     whitelist_enabled = int(database.pop(0).split(" : ")[1])
@@ -58,7 +60,7 @@ try:
         "Inventory" : 1,
         "Horse Keeper" : 0,#bozuk
         "Play Times" : 1,
-        "Army" : 1,
+        "Army" : 0,
     }
 except:
     print_(traceback.format_exc())
@@ -68,8 +70,8 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2022, 11, 21)
-    version = "2.4.0"
+    date = datetime.datetime(2023, 1, 1)#y, m, d
+    version = "2.4.2"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
@@ -116,7 +118,8 @@ Sadece {0} yazarakta ekleyebilirsiniz.\
 /me (mesaj): local chate eyleminizi bildirirsiniz. \
 ",
     "/dene help" : "\
-/dene: 50/50 Başarılı yada Başarısız yazar. \
+/dene: Başarılı ya da Başarısız yazar.^\
+/dene {zar}: 0 ile zar arasında sınırlar dahil bir sayı yazar ve renklendirir.\
 ",
     "/do help" : "\
 /do (mesaj): local chat e durumunuzu bildirirsiniz. \
@@ -463,7 +466,7 @@ troops = {
     "archer": 1,
     "lancer": 2,
 }
-base_items = ["0", "4", start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
+base_items = ["0", start_troop, start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
 
@@ -857,19 +860,27 @@ def main_request_handler(client, addr, port):
                                 )
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("do"))
-                    elif command == "roll" or command == "dene":
-                        basarili = random.randint(0, 1)
-                        colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
+                    elif command in ["roll", "dene"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/dene help"])
-                            else:
-                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
-                                    "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)
+                            elif text[0].isnumeric():
+                                roll = random.randint(0, int(text[0]))
+                                middle = int(text[0]) / 2
+                                if roll == middle:
+                                    colour = colors["turuncu"]
+                                elif roll < middle:
+                                    colour = colors["koyu kirmizi"]
+                                else:
+                                    colour = colors["söylenti"]
+                                send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour,
+                                    "({}) rolled [{}]: *{}*".format(names[unique_id], text[0], roll)
                                 )
                         else:
-                            send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
-                                "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız") + " ".join(text)
+                            basarili = random.randint(0, 1)
+                            colour = colors["söylenti"] if basarili else colors["koyu kirmizi"]
+                            send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour,
+                                "({}) *{}*".format(names[unique_id], "Başarılı" if basarili else "Başarısız")
                             )
                     elif command == "duyuru" and extensions["Custom Announcement"]:
                         if len(text):

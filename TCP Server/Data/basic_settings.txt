@@ -4,9 +4,10 @@ Base Hunger  : 0
 Start Hunger : 0
 Start Bank   : 5000
 Start Money  : 2000
+Start Troop  : Peasant
 Base Health  : 35
 Log Location : ../Logs
 Whitelisted  : 0
 Idle Income  : 0
-Owner Name   : Advocate
+Owner Name   : 
 Is HRPG      : 0

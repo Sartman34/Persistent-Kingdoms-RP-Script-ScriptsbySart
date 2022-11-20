@@ -31,6 +31,8 @@ colors = {
     "local chat shout" : 17,
     "commoners" : 18,
 }
+
+is_battle_oriented = False
 #
 
 ########################################################

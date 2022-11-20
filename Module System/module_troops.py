@@ -2,6 +2,7 @@ from header_common import *
 from header_items import *
 from header_troops import *
 from header_skills import *
+from module_constants import *
 
 ####################################################################################################################
 #  Each troop contains the following fields:
@@ -87,22 +88,57 @@ troops = [
    str_15|agi_14|pw_attr,wpex(100,100,130,10,45,80),knows_pw|knows_ironflesh_5|knows_power_strike_4|knows_power_throw_2|knows_shield_1|knows_athletics_5|knows_riding_2|knows_sailing_3,default_face_1,default_face_2],
   ["archer","Archer","an archer",tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_14|agi_14|pw_attr,wpex(90,60,70,150,50,50),knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_draw_4|knows_athletics_4|knows_riding_2|knows_sailing_3,default_face_1,default_face_2],
+   str_14|agi_14|pw_attr,wpex(90,60,70,150,50,50),
+   (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_draw_4|knows_athletics_4|knows_riding_2|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_draw_4|knows_athletics_4|knows_riding_2|knows_sailing_3
+   ),
+   default_face_1,default_face_2
+  ],
   ["crossbowman","Crossbowman","a crossbowman",tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_14|agi_14|pw_attr,wpex(90,60,60,50,150,50),knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_athletics_4|knows_riding_2|knows_sailing_3,default_face_1,default_face_2],
+   str_14|agi_14|pw_attr,wpex(90,60,60,50,150,50),
+   (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_athletics_4|knows_riding_2|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_athletics_4|knows_riding_2|knows_sailing_3
+   ),
+   default_face_1,default_face_2
+  ],
   ["lancer","Lancer","a lancer",tf_mounted|tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_14|agi_14|pw_attr,wpex(90,60,120,10,30,80),knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_throw_2|knows_athletics_1|knows_riding_6,default_face_1,default_face_2],
+   str_14|agi_14|pw_attr,wpex(90,60,120,10,30,80),
+   (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_throw_2|knows_athletics_1|knows_riding_6|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_ironflesh_3|knows_power_strike_3|knows_power_throw_2|knows_athletics_1|knows_riding_6
+   ),
+   default_face_1,default_face_2
+  ],
   ["man_at_arms","Man at Arms","a man at arms",tf_mounted|tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_15|agi_15|pw_attr,wpex(105,100,120,20,50,30),knows_pw|knows_ironflesh_4|knows_power_strike_4|knows_shield_1|knows_athletics_2|knows_riding_4,default_face_1,default_face_2],
+   str_15|agi_15|pw_attr,wpex(105,100,120,20,50,30),
+   (
+     knows_pw|knows_ironflesh_4|knows_power_strike_4|knows_shield_1|knows_athletics_2|knows_riding_4|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_ironflesh_4|knows_power_strike_4|knows_shield_1|knows_athletics_2|knows_riding_4
+   ),
+   default_face_1,default_face_2,
+  ],
   ["knight","Knight","a knight",tf_mounted|tf_guarantee_all,0,0,"fac_commoners",
    [],
    str_15|agi_15|pw_attr,wpex(105,120,100,20,50,30),knows_pw|knows_ironflesh_4|knows_power_strike_4|knows_shield_1|knows_athletics_3|knows_riding_3,default_face_1,default_face_2],
   ["sergeant","Sergeant","a sergeant",tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_15|agi_15|pw_attr,wpex(120,125,110,20,60,40),knows_pw|knows_ironflesh_5|knows_power_strike_4|knows_shield_2|knows_athletics_5|knows_riding_2,default_face_1,default_face_2],
+   str_15|agi_15|pw_attr,wpex(120,125,110,20,60,40),
+   (
+     knows_pw|knows_ironflesh_5|knows_power_strike_4|knows_shield_2|knows_athletics_5|knows_riding_2|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_ironflesh_5|knows_power_strike_4|knows_shield_2|knows_athletics_5|knows_riding_2
+   ),
+   default_face_1,default_face_2
+  ],
   ["engineer","Engineer","an engineer",tf_guarantee_all,0,0,"fac_commoners",
    [],
    str_10|agi_12|pw_attr,wpex(90,50,60,30,65,50),knows_pw|knows_musician_3|knows_ironflesh_2|knows_power_strike_2|knows_athletics_2|knows_labouring_1|knows_engineer_5|knows_riding_2|knows_looting_1|knows_sailing_4,default_face_1,default_face_2],
@@ -111,7 +147,15 @@ troops = [
    str_12|agi_12|pw_attr,wpex(100,55,70,30,70,50),knows_pw|knows_musician_3|knows_ironflesh_3|knows_power_strike_3|knows_athletics_2|knows_labouring_1|knows_engineer_7|knows_riding_2|knows_looting_2|knows_sailing_4,default_face_1,default_face_2],
   ["doctor","Doctor","a doctor",tf_guarantee_all,0,0,"fac_commoners",
    [],
-   str_10|agi_10|pw_attr,wpex(70,40,50,10,20,30),knows_pw|knows_musician_3|knows_ironflesh_1|knows_athletics_2|knows_power_strike_2|knows_wound_treatment_5|knows_riding_2,default_face_1,default_face_2],
+   (str_14|agi_14 if is_battle_oriented else str_10|agi_10)|pw_attr,
+   wpex(70,40,50,10,20,30),
+   (
+     knows_pw|knows_ironflesh_1|knows_athletics_2|knows_power_strike_3|knows_wound_treatment_5|knows_riding_2|knows_musician_3|knows_labouring_5|knows_engineer_7|knows_herding_5|knows_tailoring_3|knows_sailing_3
+   ) if is_battle_oriented else (
+     knows_pw|knows_musician_3|knows_ironflesh_1|knows_athletics_2|knows_power_strike_2|knows_wound_treatment_5|knows_riding_2
+   ),
+   default_face_1,default_face_2
+  ],
   ["sailor","Sailor","a sailor",tf_guarantee_all,0,0,"fac_commoners",
    [],
    str_14|agi_12|pw_attr,wpex(95,70,80,30,40,70),knows_pw|knows_musician_3|knows_ironflesh_3|knows_power_strike_3|knows_athletics_2|knows_sailing_9|knows_riding_1,default_face_1,default_face_2],
