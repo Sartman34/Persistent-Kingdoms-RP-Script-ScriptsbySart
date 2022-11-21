@@ -1641,7 +1641,7 @@ animations = [
 ["sleeping", acf_enforce_all, amf_play|amf_keep|amf_priority_continue|amf_continue_to_next,
  [5.0, "sleeping", 0, 50, arf_blend_in_3],
 ],
-["sleeping_final", acf_enforce_all, amf_play|amf_keep|amf_priority_continue,
+["sleeping_final", acf_enforce_all, amf_play|amf_keep|amf_priority_striked,
  [2.0, "sleeping", 50, 70, arf_use_stand_progress|arf_cyclic],
 ],
 ["tracking", acf_enforce_all, amf_play|amf_keep|amf_priority_continue,

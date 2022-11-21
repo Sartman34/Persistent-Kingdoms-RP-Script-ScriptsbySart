@@ -205,6 +205,7 @@ slot_agent_rest_use_start_time        = 68
 
 slot_agent_walk_mode                  = 73
 slot_agent_last_hit_time              = 74 #**
+slot_agent_is_downed                  = 75
 
 
 ########################################################

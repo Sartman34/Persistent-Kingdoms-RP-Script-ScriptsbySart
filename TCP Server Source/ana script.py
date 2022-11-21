@@ -446,13 +446,15 @@ setting_types = {
     "Authentication Time" : 2,
     "Base Health" : 3,
     "Base Hunger" : 4,
+    "Knock Out" : 5,
 }
 message_type = {
     "Local Chat": 1,
     "Message": 2,
     "Special Message": 3,
     "Announce": 4,
-    "Command": 5
+    "Command": 5,
+    "Whisper": 6,
 }
 command_type = {
     "Open Personal Inventory": 1,
@@ -904,6 +906,14 @@ def main_request_handler(client, addr, port):
                                     send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti"))
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti"))
+                    elif command in ["w", "whisper", "fısılda", "fisilda"]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/soylenti help"])
+                            else:
+                                send_message_warband(client, message_type["Whisper"], unique_id, colors["turuncu"], " ".join(text))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti"))
                     elif command == "discord":
                         if len(text):
                             if text[0] == "help":
@@ -1243,6 +1253,13 @@ def main_request_handler(client, addr, port):
             for i in range(data_id["Health"], data_id["Z"] + 1):
                 players[unique_id][i] = message.pop(0)
             send_message(client, "0")
+        elif action == "strip_agent":
+            unique_id = message.pop(0)
+            if not unique_id in players:
+                players[unique_id] = base_items.copy()
+            for i in range(data_id["Health"], data_id["Z"] + 1):
+                players[unique_id][i] = base_items[i]
+            send_message(client, "0")
         elif action == "save_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1269,13 +1286,6 @@ def main_request_handler(client, addr, port):
             data = message[1:]
             inventories[unique_id] = data
             send_message(client, "0")
-        elif action == "strip_gear":
-            unique_id = message.pop(0)
-            x = message.pop(0)
-            y = message.pop(0)
-            z = message.pop(0)
-            players[unique_id] = base_items.copy()
-            send_message(client, "0", lenght = 1)
         elif action == "ban_player":
             unique_id = message[0]
             permanently = message[1]
@@ -1643,6 +1653,7 @@ try:
 
     admin_queue_add_setting("Base Health", base_health)
     admin_queue_add_setting("Base Hunger", base_hunger)
+    admin_queue_add_setting("Knock Out", 0)
 
     if not idle_income in ["0", ""]:
         int(idle_income)

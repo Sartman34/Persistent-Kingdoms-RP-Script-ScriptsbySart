@@ -1,4 +1,4 @@
-93
+94
 qstr_close_server close_server
 qstr_/debug /debug
 qstr_/hit /hit
@@ -53,6 +53,7 @@ qstr_No_training_center_n No_training_center_nearby.
 qstr_Army_relation_to_com Army_relation_to_commoners_set_to_passive.
 qstr_Army_relation_to_comm Army_relation_to_commoners_set_to_aggressive.
 qstr_http://127.0.0.1/set http://127.0.0.1/set_equipment<{reg2}<{s0}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}
+qstr_[{s1}]_whispers_[{s2 [{s1}]_whispers_[{s2}]_{s0}
 qstr_message_sent_request message_sent_request_failed.
 qstr_Applied_your_equipme Applied_your_equipment_to_the_troop_{s0}._Cost_of_recruiting:_{reg0}_dinars_each.
 qstr_set_equipment_reques set_equipment_request_failed.
@@ -87,8 +88,8 @@ qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
 qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{s0}
 qstr_http://127.0.0.1/save http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}
+qstr_http://127.0.0.1/str http://127.0.0.1/strip_agent<{reg0}
 qstr_http://127.0.0.1/save_i http://127.0.0.1/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}
 qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}
-qstr_http://127.0.0.1/str http://127.0.0.1/strip_gear<{reg0}<{reg1}<{reg2}<{reg3}
 qstr_Dogrulanmadan_agresi Dogrulanmadan_agresif_yapamazsiniz.
 qstr_Dogrulanmamis_oyuncu Dogrulanmamis_oyunculara_agresif_yapamazsiniz.
