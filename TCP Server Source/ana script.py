@@ -50,6 +50,8 @@ try:
     idle_income = database.pop(0).split(" : ")[1]
     license_name = database.pop(0).split(" : ")[1]
     is_high_rpg = database.pop(0).split(" : ")[1]
+    autosave = database.pop(0).split(" : ")[1]
+    keep_inventory = database.pop(0).split(" : ")[1]
 
     extensions = {
         "Custom Announcement" : 1,
@@ -71,7 +73,7 @@ message_lenght = 80
 class LicenseInfo():
     is_licensed = True
     date = datetime.datetime(2023, 1, 1)#y, m, d
-    version = "2.4.2"
+    version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
@@ -447,6 +449,8 @@ setting_types = {
     "Base Health" : 3,
     "Base Hunger" : 4,
     "Knock Out" : 5,
+    "Autosave" : 6,
+    "Keep Equipment" : 7,
 }
 message_type = {
     "Local Chat": 1,
@@ -745,6 +749,7 @@ def main_request_handler(client, addr, port):
                 unique_id,
                 players[unique_id][data_id["Faction"]],
                 players[unique_id][data_id["Troop"]],
+                players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Bank"]],
                 play_times[unique_id] if extensions["Play Times"] else "0",
                 "1" if extensions["Inventory"] else "0",
@@ -789,7 +794,6 @@ def main_request_handler(client, addr, port):
                 response = "Bakiyeniz: {}".format(players[unique_id][data_id["Bank"]])
             player_count += 1
             send_message_warband(client, unique_id, kick, response,
-                players[unique_id][data_id["Gold"]],
                 players[unique_id][data_id["Health"]],
                 players[unique_id][data_id["Hunger"]],
                 *players[unique_id][data_id["Head"] : data_id["Gloves"] + 1],
@@ -1246,11 +1250,22 @@ def main_request_handler(client, addr, port):
                 play_times[unique_id] = message.pop(0)
             player_count -= 1
             send_message(client, "0")
-        elif action == "save_agent": #<GUID<Faction<Troop<Gold<Health<Hunger<Head<Body<Foot<Gloves<Itm0<Itm1<Itm2<Itm3<Horse<HorseHP<X<Y<Z
+        elif action == "save_agent":
             unique_id = message.pop(0)
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
             for i in range(data_id["Health"], data_id["Z"] + 1):
+                players[unique_id][i] = message.pop(0)
+            send_message(client, "0")
+        elif action == "save_equipment":
+            unique_id = message.pop(0)
+            if not unique_id in players:
+                players[unique_id] = base_items.copy()
+            for i in range(data_id["Health"], data_id["Z"] + 1):
+                players[unique_id][i] = base_items[i]
+            for i in range(data_id["Itm0"], data_id["Itm3"] + 1):
+                players[unique_id][i] = message.pop(0)
+            for i in range(data_id["Head"], data_id["Gloves"] + 1):
                 players[unique_id][i] = message.pop(0)
             send_message(client, "0")
         elif action == "strip_agent":
@@ -1654,6 +1669,8 @@ try:
     admin_queue_add_setting("Base Health", base_health)
     admin_queue_add_setting("Base Hunger", base_hunger)
     admin_queue_add_setting("Knock Out", 0)
+    admin_queue_add_setting("Autosave", autosave)
+    admin_queue_add_setting("Keep Equipment", keep_inventory),
 
     if not idle_income in ["0", ""]:
         int(idle_income)

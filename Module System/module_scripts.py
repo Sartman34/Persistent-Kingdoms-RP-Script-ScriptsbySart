@@ -29,22 +29,8 @@ scripts.extend([
 ##    (store_script_param, ":num_parts", 2),
 
     (try_begin),
-      (str_equals, s0, "@close server"),
-  ] + [elem for sublist in [[
-      (call_script, "script_save_chests", "spr_" + scene_prop),
-  ] for scene_prop in [
-    "pw_item_chest_a",
-    "pw_item_chest_b",
-    "pw_cart_a",
-    "pw_cart_b",
-    "pw_wheelbarrow",
-    "pw_hand_cart",
-    "pw_back_basket",
-    "pw_back_box",
-    "pw_horse_pack",
-    "cm_civ_cart",
-    "cm_war_cart",
-  ]] for elem in sublist] + [
+      (str_equals, s0, "@save"),
+      (call_script, "script_save_server"),
       (set_trigger_result, 1),
     (try_end),
   ]),
@@ -198,9 +184,6 @@ scripts.extend([
     (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
    ]),
 
-  ("autosave", [
-  ]),
-
   ("save_chests", [
     (store_script_param, ":scene_prop_id", 1),
     (try_for_prop_instances, ":instance_id", ":scene_prop_id"),
@@ -295,14 +278,21 @@ scripts.extend([
   
   ("load_chest_fail", [ (display_message, "@load_chest request failed."), ]),
 
+  ("load_faction_return", [
+##  (display_message, "@Chest ({s0}, {reg2}) loaded with {reg3} items inside."),
+  ]),
+  
+  ("load_faction_fail", [ (display_message, "@load_faction request failed."), ]),
+
   ("load_player_return", [
     (assign, ":unique_id", reg0),
     (assign, ":faction_id", reg1),
     (assign, ":troop_id", reg2),
-    (assign, ":bank", reg3),
-    (assign, ":time", reg4),
-    (assign, ":is_personal_inventory_enabled", reg5),
-    #reg6 inventory begin
+    (assign, ":gold", reg3),
+    (assign, ":bank", reg4),
+    (assign, ":time", reg5),
+    (assign, ":is_personal_inventory_enabled", reg6),
+    #reg7 inventory begin
 
     (try_begin),
       (dict_has_key, "$g_player_id_dict", "@{reg0}"),
@@ -318,6 +308,7 @@ scripts.extend([
         (player_set_troop_id, ":player_id", ":troop_id"),
       (try_end),
 
+      (call_script, "script_player_adjust_gold", ":player_id", ":gold", 0),
       (player_set_slot, ":player_id", slot_player_bank, ":bank"),
       (player_set_slot, ":player_id", slot_player_time, ":time"),
 
@@ -344,8 +335,8 @@ scripts.extend([
           (troop_set_slot, "trp_personal_inventories", ":player_id", ":instance_id"),
         (try_end),
   ] + [elem for sublist in [[
-        (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg6 + i),
-        (multiplayer_send_3_int_to_player, ":player_id", server_event_scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg6 + i),
+        (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg7 + i),
+        (multiplayer_send_3_int_to_player, ":player_id", server_event_scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, reg7 + i),
   ] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
       (try_end),
       
@@ -377,16 +368,15 @@ scripts.extend([
   ("load_gear_return", [
 ##    (assign, ":unique_id", reg0),
     (assign, ":kick", reg1),
-    (assign, ":gold", reg2),
-    (assign, ":health", reg3),
-    (assign, ":food", reg4),
-    #reg5 - reg8: armors
-    #reg9 - reg12: items
-    (assign, ":horse_item_id", reg13),
-    (assign, ":horse_health", reg14),
-    (assign, ":x", reg15),
-    (assign, ":y", reg16),
-    (assign, ":z", reg17),
+    (assign, ":health", reg2),
+    (assign, ":food", reg3),
+    #reg4 - reg7: armors
+    #reg8 - reg11: items
+    (assign, ":horse_item_id", reg12),
+    (assign, ":horse_health", reg13),
+    (assign, ":x", reg14),
+    (assign, ":y", reg15),
+    (assign, ":z", reg16),
     #s0: response
     
     (try_begin),
@@ -394,8 +384,6 @@ scripts.extend([
       (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg0}"),
       
       (player_get_agent_id, ":agent_id", ":player_id"),
-    
-      (call_script, "script_player_adjust_gold", ":player_id", ":gold", 0),
     
       (agent_set_hit_points, ":agent_id", ":health", 0),
     
@@ -405,9 +393,9 @@ scripts.extend([
       (assign, ":is_naked", 1),
   ] + [elem for sublist in [[
       (try_begin),
-        (neq, reg5 + i, -1),
-        (call_script, "script_change_armor", ":agent_id", reg5 + i),
-        (player_set_slot, ":player_id", slot_player_equip_head + i, reg5 + i),
+        (neq, reg4 + i, -1),
+        (call_script, "script_change_armor", ":agent_id", reg4 + i),
+        (player_set_slot, ":player_id", slot_player_equip_head + i, reg4 + i),
         (assign, ":is_naked", 0),
       (try_end),
   ] for i in xrange(4)] for elem in sublist] + [
@@ -417,8 +405,8 @@ scripts.extend([
       (try_end),
   ] + [elem for sublist in [[
       (try_begin),
-        (ge, reg9 + i, all_items_begin),
-        (agent_equip_item, ":agent_id", reg9 + i),
+        (ge, reg8 + i, all_items_begin),
+        (agent_equip_item, ":agent_id", reg8 + i),
       (try_end),
   ] for i in xrange(4)] for elem in sublist] + [
 
@@ -515,7 +503,9 @@ scripts.extend([
     "$g_authentication_time",
     "$g_base_health",
     "$g_base_hunger",
-    "$g_is_downing_enabled",
+    "$g_is_knock_out_enabled",
+    "$g_is_autosave_enabled",
+    "$g_keep_equipment",
   ])] for elem in sublist][:-1] + [
       (try_end),
     (else_try),
@@ -1138,6 +1128,98 @@ scripts.extend([
     (player_set_slot, ":player_id", slot_player_equip_foot, ":boot_item"),
   ]),
 
+  ("cf_save_agent", [
+    (store_script_param, ":player_id", 1),
+    
+    (player_get_agent_id, ":agent_id", ":player_id"),
+    (agent_is_active, ":agent_id"),
+    (agent_is_alive, ":agent_id"),
+
+    (player_get_unique_id, reg0, ":player_id"),
+    (store_agent_hit_points, reg1, ":agent_id", 0),
+    (agent_get_slot, reg2, ":agent_id", slot_agent_food_amount),
+
+    (player_get_slot, reg3, ":player_id", slot_player_equip_head),
+    (player_get_slot, reg4, ":player_id", slot_player_equip_body),
+    (player_get_slot, reg5, ":player_id", slot_player_equip_foot),
+    (player_get_slot, reg6, ":player_id", slot_player_equip_gloves),
+
+    (agent_get_item_slot, reg7, ":agent_id", 0),
+    (agent_get_item_slot, reg8, ":agent_id", 1),
+    (agent_get_item_slot, reg9, ":agent_id", 2),
+    (agent_get_item_slot, reg10, ":agent_id", 3),
+  
+    (try_begin),
+      (agent_get_horse, ":horse_agent_id", ":agent_id"),
+      (agent_is_active, ":horse_agent_id"),
+      (agent_is_alive, ":horse_agent_id"),
+      (agent_get_item_id, reg11, ":horse_agent_id"),
+      (store_agent_hit_points, reg12, ":horse_agent_id", 0),
+      (agent_fade_out, ":horse_agent_id"),
+    (else_try),
+      (assign, reg11, -1),
+      (assign, reg12, 0),
+    (try_end),
+
+    (set_fixed_point_multiplier, 100),
+    (agent_get_position, pos1, ":agent_id"),
+    (position_get_x, reg13, pos1),
+    (position_get_y, reg14, pos1),
+    (position_get_z, reg15, pos1),
+
+    (send_message_to_url_advanced,
+      script_ip_address
+      + "/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}",
+      "@WSE2", "script_default_return", "script_default_fail"
+    ),
+  ]),
+
+  ("save_server", [
+] + [elem for sublist in [[
+    (call_script, "script_save_chests", "spr_" + scene_prop),
+] for scene_prop in [
+    "pw_item_chest_a",
+    "pw_item_chest_b",
+    "pw_cart_a",
+    "pw_cart_b",
+    "pw_wheelbarrow",
+    "pw_hand_cart",
+    "pw_back_basket",
+    "pw_back_box",
+    "pw_horse_pack",
+    "cm_civ_cart",
+    "cm_war_cart",
+]] for elem in sublist] + [
+    (try_for_range, ":faction_id", castle_factions_begin, factions_end),
+      (faction_get_slot, ":banner_mesh_id", ":faction_id", slot_faction_banner_mesh),
+      (str_store_faction_name, s0, ":faction_id"),
+    (try_end),
+    (display_message, "@Server got saved."),
+  ]),
+
+  ("faction_set_banner_mesh", [
+    (store_script_param, ":faction_id", 1),
+    (store_script_param, ":banner_mesh_id", 2),
+   
+    (faction_set_slot, ":faction_id", slot_faction_banner_mesh, ":banner_mesh_id"),
+    (call_script, "script_faction_set_color_from_banner", ":faction_id", ":banner_mesh_id"),
+    (try_for_players, ":player_id", 1),
+      (multiplayer_send_3_int_to_player, ":player_id", server_event_faction_set_slot, ":faction_id", slot_faction_banner_mesh, ":banner_mesh_id"),
+    (try_end),
+    (call_script, "script_redraw_castle_banners", redraw_faction_banners, ":faction_id"),
+  ]),
+
+  ("faction_set_name", [
+    (store_script_param, ":faction_id", 1),
+    
+    (faction_set_name, ":faction_id", s0),
+    (faction_set_slot, ":faction_id", slot_faction_name_is_custom, 1),
+    (try_for_players, ":player_id", 1),
+      (multiplayer_send_3_int_to_player, ":player_id", server_event_troop_set_slot, "trp_mission_data", slot_mission_data_faction_to_change_name_of, ":faction_id"),
+      (multiplayer_send_string_to_player, ":player_id", server_event_faction_set_name, s0),
+    (try_end),
+  ]),
+
   ("game_receive_network_message", [ # called by the game whenever a custom network message is received, both clients and servers
     (store_script_param, ":sender_player_id", 1),
     (store_script_param, ":event_type", 2),
@@ -1289,13 +1371,7 @@ scripts.extend([
             (call_script, "script_cf_check_enough_gold", ":sender_player_id", faction_cost_change_name),
             (call_script, "script_player_adjust_gold", ":sender_player_id", faction_cost_change_name, -1),
             (str_store_faction_name, s10, ":faction_id"),
-            (faction_set_name, ":faction_id", s0),
-            (faction_set_slot, ":faction_id", slot_faction_name_is_custom, 1),
-            (try_for_players, ":player_id", 1),
-              (player_is_active, ":player_id"),
-              (multiplayer_send_3_int_to_player, ":player_id", server_event_troop_set_slot, "trp_mission_data", slot_mission_data_faction_to_change_name_of, ":faction_id"),
-              (multiplayer_send_string_to_player, ":player_id", server_event_faction_set_name, s0),
-            (try_end),
+            (call_script, "script_faction_set_name", ":faction_id"),
             (str_store_string, s1, s0),
             (assign, reg10, ":faction_id"),
             (server_add_message_to_log, "str_log_s10_now_known_as_s1"),
@@ -1434,6 +1510,7 @@ scripts.extend([
           (player_get_team_no, ":player_team", ":sender_player_id"),
           (eq, ":player_team", team_spectators),
           (player_set_team_no, ":sender_player_id", team_default),
+          (player_set_slot, ":sender_player_id", slot_player_first_spawn_occured, 0),
           (try_begin), # clean up spawn state if the player's agent was faded out without resetting it
             (player_slot_eq, ":sender_player_id", slot_player_spawn_state, player_spawn_state_alive),
             (player_get_agent_id, ":agent_id", ":sender_player_id"),
@@ -1451,6 +1528,9 @@ scripts.extend([
           (server_get_ghost_mode, ":spectator_is_enabled"),
           (this_or_next | le, ":spectator_is_enabled", 1),
           (eq, ":display_as_admin", 1),
+          (try_begin),
+            (call_script, "script_cf_save_agent", ":sender_player_id"),
+          (try_end),
           (player_set_team_no, ":sender_player_id", team_spectators),
         (try_end),
       (try_end),
@@ -3686,7 +3766,6 @@ scripts.extend([
       (faction_set_slot, ":faction_id", slot_faction_is_locked, 0),
       (faction_set_slot, ":faction_id", slot_faction_name_is_custom, 0),
       (faction_set_slot, ":faction_id", slot_faction_lord_player_uid, 0),
-      (faction_set_slot, ":faction_id", slot_faction_lord_last_seen_time, 0),
       (faction_set_slot, ":faction_id", slot_faction_poll_end_time, 0),
       (faction_set_slot, ":faction_id", slot_faction_poll_last_time, 0),
       (try_for_range, ":relations_slot", slot_faction_relations_begin, ":slot_relations_end"),
@@ -3694,7 +3773,6 @@ scripts.extend([
       (try_end),
     (try_end),
     (faction_set_slot, factions_end, slot_faction_poll_end_time, 0),
-    (troop_set_slot, "trp_inactive_players_array", slot_player_array_size, 0),
     (troop_set_slot, "trp_last_chat_message", slot_last_chat_message_event_type, 0),
     (troop_set_slot, "trp_last_chat_message", slot_last_chat_message_not_recieved, 0),
     (str_clear, s0),
@@ -4703,9 +4781,7 @@ scripts.extend([
    [(store_script_param, ":player_id", 1), # must be valid
 
     (assign, ":spawn", 0),
-    (player_get_slot, ":spawn_state", ":player_id", slot_player_spawn_state),
     (try_begin),
-      (eq, ":spawn_state", player_spawn_state_dead),
       (player_get_team_no, ":team_no", ":player_id"),
       (try_begin),
         (this_or_next|eq, ":team_no", team_spectators),
@@ -4724,9 +4800,7 @@ scripts.extend([
       (try_end),
       (try_begin),
         (eq, ":spawn", 1),
-
         (player_set_team_no, ":player_id", team_default),
-
         (player_get_troop_id, ":troop_id", ":player_id"),
         (is_between, ":troop_id", playable_troops_begin, playable_troops_end),
         (try_begin),
@@ -4743,37 +4817,17 @@ scripts.extend([
         (call_script, "script_player_add_default_troop_items", ":player_id", ":troop_id"),
         (call_script, "script_player_add_default_troop_armor", ":player_id", ":troop_id"),
         (call_script, "script_player_add_spawn_items", ":player_id", 0),
-
         (player_set_slot, ":player_id", slot_player_commit_suicide_time, 0),
-
         (call_script, "script_player_get_spawn_point", ":player_id"),
         (player_set_slot, ":player_id", slot_player_spawn_entry_point, reg0),
         (player_spawn_new_agent, ":player_id", reg0),
-        (player_set_slot, ":player_id", slot_player_spawn_state, player_spawn_state_invulnerable),
-        (store_mission_timer_a, ":spawn_time"),
-        (player_set_slot, ":player_id", slot_player_spawn_invulnerable_time, ":spawn_time"),
-      (try_end),
-    (else_try), # if the player is currently alive under spawn protection, check if the time is up
-      (eq, ":spawn_state", player_spawn_state_invulnerable),
-      (player_get_agent_id, ":agent_id", ":player_id"),
-      (agent_is_active, ":agent_id"),
-      (agent_is_alive, ":agent_id"),
-      (player_get_slot, ":spawn_invulnerable_time", ":player_id", slot_player_spawn_invulnerable_time),
-      (store_mission_timer_a, ":current_time"),
-      (val_sub, ":current_time", ":spawn_invulnerable_time"),
-      (try_begin),
-        (ge, ":current_time", spawn_invulnerable_time),
-        (player_set_slot, ":player_id", slot_player_spawn_state, player_spawn_state_alive),
-        (player_set_slot, ":player_id", slot_player_spawn_invulnerable_time, 0),
-##        (agent_set_team, ":agent_id", team_default),
-        (call_script, "script_player_equip_stored_default_items", ":player_id"),
       (try_end),
     (try_end),
     (eq, ":spawn", 1),
     ]),
 
-  ("on_agent_spawned", # server and clients: set agent slots and attributes after spawning
-   [(store_script_param, ":agent_id", 1), # must be valid
+  ("on_agent_spawned", [# server: set agent slots and attributes after spawning
+    (store_script_param, ":agent_id", 1), # must be valid
 
     (agent_set_slot, ":agent_id", slot_agent_horse_last_rider, -1),
     (agent_set_slot, ":agent_id", slot_agent_freeze_instance_id, -1),
@@ -4785,44 +4839,39 @@ scripts.extend([
     (agent_set_slot, ":agent_id", slot_agent_animal_herd_manager, -1),
     (agent_set_slot, ":agent_id", slot_agent_animal_carcass_instance_id, -1),
     (agent_set_team, ":agent_id", team_default),
+    
     (try_begin),
       (eq, "$g_full_respawn_health", 0),
       (agent_is_human, ":agent_id"),
       (agent_set_max_hit_points, ":agent_id", max_hit_points_percent),
     (try_end),
-    (agent_get_player_id, ":player_id", ":agent_id"),
+
     (try_begin),
-      (player_is_active, ":player_id"),
-      (player_get_slot, ":food_amount", ":player_id", slot_player_spawn_food_amount),
+      (agent_is_player, ":agent_id"),
+      (agent_get_player_id, ":player_id", ":agent_id"),
+    
       (try_begin),
+        (player_get_slot, ":food_amount", ":player_id", slot_player_spawn_food_amount),
         (gt, ":food_amount", 0),
         (agent_set_slot, ":agent_id", slot_agent_food_amount, ":food_amount"),
         (player_set_slot, ":player_id", slot_player_spawn_food_amount, 0),
       (try_end),
+    
       (try_begin),
         (player_is_admin, ":player_id"),
         (player_get_troop_id, ":troop_id", ":player_id"),
         (eq, ":troop_id", "trp_godlike_hero"),
         (agent_set_use_speed_modifier, ":agent_id", 1000),
       (try_end),
+    
       (try_for_range, ":equip_slot", ek_head, ek_gloves + 1),
         (agent_get_item_slot, ":item_id", ":agent_id", ":equip_slot"),
         (ge, ":item_id", all_items_begin),
         (call_script, "script_agent_calculate_stat_modifiers_for_item", ":agent_id", ":item_id", 1, 1),
       (try_end),
-      (multiplayer_is_server),
-      (player_get_slot, ":spawn_state", ":player_id", slot_player_spawn_state),
+    
       (try_begin),
-        (eq, ":spawn_state", player_spawn_state_invulnerable),
-##        (agent_set_team, ":agent_id", team_spawn_invulnerable),
-##        (try_begin),
-##          (eq, "$g_full_respawn_health", 0),
-##          (player_get_slot, ":spawn_health_percent", ":player_id", slot_player_next_spawn_health_percent),
-##          (agent_set_hit_points, ":agent_id", ":spawn_health_percent", 0),
-##        (try_end),
-      (else_try),
-        (player_set_slot, ":player_id", slot_player_spawn_state, player_spawn_state_alive),
-        (eq, ":spawn_state", player_spawn_state_at_marker),
+        (player_slot_eq, ":player_id", slot_player_spawn_state, player_spawn_state_at_marker),
         (scene_prop_get_instance, ":instance_id", "spr_code_spawn_marker", ":player_id"),
         (prop_instance_get_position, pos1, ":instance_id"),
         (agent_set_position, ":agent_id", pos1),
@@ -4834,10 +4883,7 @@ scripts.extend([
         (try_end),
         (call_script, "script_player_set_stored_ammo_counts", ":player_id"),
       (try_end),
-##      (try_begin),
-##        (neq, ":spawn_state", player_spawn_state_invulnerable),
-##        (agent_set_team, ":agent_id", team_default),
-##      (try_end),
+    
       (try_begin),
         (eq, "$g_mute_global_chat", 1),
         (player_set_is_muted, ":player_id", "$g_mute_global_chat"),
@@ -4859,51 +4905,66 @@ scripts.extend([
       (try_end),
       (agent_set_slot, ":agent_id", slot_agent_died_normally, 1),
       (agent_set_slot, ":agent_id", slot_agent_cannot_attack, 0), # so the attack restrictons checking loop will skip this agent
+      (agent_is_player, ":agent_id"),
       (agent_get_player_id, ":player_id", ":agent_id"),
-      (player_is_active, ":player_id"),
-      (try_begin),#**
+
+      (player_set_slot, ":player_id", slot_player_equip_horse, 0),
+      (try_for_range, ":slot_id", slot_player_equip_item_0, slot_player_equip_item_3 + 1),
+        (player_set_slot, ":player_id", ":slot_id", 0),
+      (try_end),
+    
+      (try_begin),
+        (this_or_next|eq, "$g_keep_equipment", 1),
         (eq, ":killer_agent_id", -1),
-        (try_for_range, ":equip_slot", ek_item_0, ek_item_3 + 1),
-          (agent_get_item_slot, ":item_id", ":agent_id", ":equip_slot"),
+        (try_for_range, ":slot_id", 0, 4),
+          (agent_get_item_slot, ":item_id", ":agent_id", ":slot_id"),
           (ge, ":item_id", all_items_begin),
-          (store_add, ":unequip_slot", ":equip_slot", 1),
-          (agent_unequip_item, ":agent_id", ":item_id", ":unequip_slot"), # if spawning an item manually, remove it so the engine definitely won't drop a duplicate
+          (val_add, ":slot_id", 1),
+          (agent_unequip_item, ":agent_id", ":item_id", ":slot_id"),
+          (val_add, ":slot_id", slot_player_equip_item_0 - 1),
+          (player_set_slot, ":player_id", ":slot_id", ":item_id"),
+        (try_end),
+      (else_try),
+        (agent_get_position, pos1, ":agent_id"),
+        (set_spawn_position, pos1),
+        (store_random_in_range, ":imod", imod_plain, imod_cracked + 1),
+        (spawn_item, "itm_agent_corpse", ":imod", "$g_spawn_item_prune_time"),
+        (assign, ":corpse_instance_id", reg0),
+        #Set the according slot to keep the record of the corpse's owner's agent id
+        (call_script, "script_log_drop_loot", ":corpse_instance_id", ":agent_id"),
+        (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_is_mercenary, 1),#To perevent faction names appearing in logs in inventory transfers
+        #End
+        (prop_instance_set_position, ":corpse_instance_id", pos1),
+        (store_mission_timer_a, ":prune_time"),
+        (val_add, ":prune_time", "$g_spawn_item_prune_time"),
+        (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_prune_time, ":prune_time"),
+        (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_count, corpse_inventory_slots),
+        (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_max_length, corpse_inventory_max_length),
+        (val_add, "$g_last_inventory_unique_id", 1),
+        (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_unique_id, "$g_last_inventory_unique_id"),
+        (assign, ":inventory_slot", slot_scene_prop_inventory_begin),
+        (try_for_range, ":player_equip_slot", slot_player_equip_head, slot_player_equip_gloves + 1),
+          (player_get_slot, ":item_id", ":player_id", ":player_equip_slot"),
+          (ge, ":item_id", all_items_begin),
+          (scene_prop_set_slot, ":corpse_instance_id", ":inventory_slot", ":item_id"),
+          (val_add, ":inventory_slot", 1),
+        (try_end),
+        (try_begin), # if the only items dropped were rubbish default items, remove the corpse now for performance reasons
+          (eq, ":inventory_slot", slot_scene_prop_inventory_begin),
+          (scene_prop_set_prune_time, ":corpse_instance_id", 1),
         (try_end),
       (try_end),
-      (neq, ":killer_agent_id", -1),#
-      (agent_get_position, pos1, ":agent_id"),
-      (set_spawn_position, pos1),
-      (store_random_in_range, ":imod", imod_plain, imod_cracked + 1),
-      (spawn_item, "itm_agent_corpse", ":imod", "$g_spawn_item_prune_time"),
-      (assign, ":corpse_instance_id", reg0),
-      #Set the according slot to keep the record of the corpse's owner's agent id
-      (call_script, "script_log_drop_loot", ":corpse_instance_id", ":agent_id"),
-      (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_is_mercenary, 1),#To perevent faction names appearing in logs in inventory transfers
-      #End
-      (prop_instance_set_position, ":corpse_instance_id", pos1),
-      (store_mission_timer_a, ":prune_time"),
-      (val_add, ":prune_time", "$g_spawn_item_prune_time"),
-      (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_prune_time, ":prune_time"),
-      (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_count, corpse_inventory_slots),
-      (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_max_length, corpse_inventory_max_length),
-      (val_add, "$g_last_inventory_unique_id", 1),
-      (scene_prop_set_slot, ":corpse_instance_id", slot_scene_prop_inventory_unique_id, "$g_last_inventory_unique_id"),
-      (assign, ":inventory_slot", slot_scene_prop_inventory_begin),
-      (try_for_range, ":player_equip_slot", slot_player_equip_head, slot_player_equip_gloves + 1),
-        (player_get_slot, ":item_id", ":player_id", ":player_equip_slot"),
-        (ge, ":item_id", all_items_begin),
-        (scene_prop_set_slot, ":corpse_instance_id", ":inventory_slot", ":item_id"),
-        (val_add, ":inventory_slot", 1),
-      (try_end),
-      (try_begin), # if the only items dropped were rubbish default items, remove the corpse now for performance reasons
-        (eq, ":inventory_slot", slot_scene_prop_inventory_begin),
-        (scene_prop_set_prune_time, ":corpse_instance_id", 1),
-      (try_end),
-      (try_for_range, ":player_equip_slot", slot_player_equip_item_0, slot_player_equip_end),
-        (player_set_slot, ":player_id", ":player_equip_slot", 0),
-      (try_end),
-      (agent_get_slot, ":freeze_instance_id", ":agent_id", slot_agent_freeze_instance_id),
+
       (try_begin),
+        (this_or_next|eq, "$g_keep_equipment", 0),
+        (eq, ":killer_agent_id", -1),
+        (try_for_range, ":slot_id", slot_player_equip_head, slot_player_equip_gloves + 1),
+          (player_set_slot, ":player_id", ":slot_id", 0),
+        (try_end),
+      (try_end),
+    
+      (try_begin),
+        (agent_get_slot, ":freeze_instance_id", ":agent_id", slot_agent_freeze_instance_id),
         (gt, ":freeze_instance_id", -1),
         (call_script, "script_remove_scene_prop", ":freeze_instance_id"),
         (agent_set_slot, ":agent_id", slot_agent_freeze_instance_id, -1),
@@ -4976,47 +5037,7 @@ scripts.extend([
       (gt, ":capture_faction_id", 0),
       (multiplayer_send_3_int_to_player, ":player_id", server_event_scene_prop_set_slot, ":pole_instance_id", slot_scene_prop_capture_faction_id, ":capture_faction_id"),
     (try_end),
-    (player_get_unique_id, ":player_unique_id", ":player_id"),
-    (troop_get_slot, ":inactive_array_size", "trp_inactive_players_array", slot_player_array_size),
     (try_begin), # try find player data in the inactive array, from a previous play session
-      (gt, ":inactive_array_size", 0),
-      (store_sub, ":inactive_last_entry_number", ":inactive_array_size", 1),
-      (store_mul, ":inactive_index", ":inactive_last_entry_number", player_array_entry_size),
-      (val_add, ":inactive_index", slot_player_array_begin),
-      (assign, ":loop_end", ":inactive_array_size"),
-      (try_for_range, ":unused", 0, ":loop_end"),
-        (troop_get_slot, ":inactive_unique_id", "trp_inactive_players_array", ":inactive_index"),
-        (neq, ":inactive_unique_id", ":player_unique_id"),
-        (val_sub, ":inactive_index", player_array_entry_size),
-      (else_try),
-        (troop_set_slot, "trp_inactive_players_array", ":inactive_index", 0),
-        (assign, ":loop_end", -1),
-      (try_end),
-      (eq, ":loop_end", -1),
-      (store_add, ":temp_index", ":inactive_index", player_array_troop_id),
-      (troop_get_slot, ":troop_id", "trp_inactive_players_array", ":temp_index"),
-      (store_add, ":temp_index", ":inactive_index", player_array_faction_id),
-      (troop_get_slot, ":faction_id", "trp_inactive_players_array", ":temp_index"),
-      (store_add, ":temp_index", ":inactive_index", player_array_gold_value),
-      (troop_get_slot, ":gold_value", "trp_inactive_players_array", ":temp_index"),
-      (store_add, ":temp_index", ":inactive_index", player_array_outlaw_rating),
-      (troop_get_slot, ":outlaw_rating", "trp_inactive_players_array", ":temp_index"),
-      (try_begin),
-        (gt, ":outlaw_rating", 0),
-        (multiplayer_send_3_int_to_player, ":player_id", server_event_player_set_slot, ":player_id", slot_player_outlaw_rating, ":outlaw_rating"),
-      (try_end),
-      (try_begin),
-        (neq, ":faction_id", 0),
-        (try_for_players, ":other_player_id", 1),
-          (player_is_active, ":other_player_id"),
-          (multiplayer_send_3_int_to_player, ":other_player_id", server_event_player_set_slot, ":player_id", slot_player_faction_id, ":faction_id"),
-        (try_end),
-        (try_begin),
-          (faction_slot_eq, ":faction_id", slot_faction_lord_player_uid, ":player_unique_id"),
-          (call_script, "script_player_set_lord", ":player_id", ":faction_id"),
-        (try_end),
-      (try_end),
-    (else_try), # otherwise, set default attributes
       (assign, ":troop_id", playable_troops_begin),
       (assign, ":faction_id", factions_begin),
       (try_begin),
@@ -5074,7 +5095,6 @@ scripts.extend([
     (store_mission_timer_a, ":mission_timer"),
     (multiplayer_send_2_int_to_player, ":player_id", server_event_return_game_rules, command_set_server_mission_timer, ":mission_timer"),
     (multiplayer_send_2_int_to_player, ":player_id", server_event_return_game_rules, command_limit_musician, "$g_force_disable_name_labels"),
-    (multiplayer_send_2_int_to_player, ":player_id", server_event_script_message_set_color, "$g_script_message_color"),
     (try_begin),
       (eq, "$g_day_night_cycle_enabled", 1),
       (call_script, "script_skybox_send_info_to_player", ":player_id"),
@@ -5085,66 +5105,6 @@ scripts.extend([
    [
     (assign, "$g_preset_message_display_enabled", 1),
     (call_script, "script_redraw_castle_banners", redraw_client_banner_positions, -1),
-    ]),
-
-  ("cf_save_player_exit", # server: when a player disconnects, save attributes to the inactive players list
-   [(store_script_param, ":player_id", 1), # must be valid
-
-    (player_get_troop_id, ":troop_id", ":player_id"),
-    (is_between, ":troop_id", playable_troops_begin, playable_troops_end),
-    (player_get_unique_id, ":player_unique_id", ":player_id"),
-    (troop_get_slot, ":inactive_array_size", "trp_inactive_players_array", slot_player_array_size),
-    (assign, ":loop_end", ":inactive_array_size"),
-    (assign, ":inactive_index", slot_player_array_begin),
-    (try_for_range, ":unused", 0, ":loop_end"),
-      (this_or_next|troop_slot_eq, "trp_inactive_players_array", ":inactive_index", 0),
-      (troop_slot_eq, "trp_inactive_players_array", ":inactive_index", ":player_unique_id"),
-      (assign, ":loop_end", -1),
-    (else_try),
-      (val_add, ":inactive_index", player_array_entry_size),
-    (try_end),
-    (try_begin),
-      (call_script, "script_cf_player_store_inactive", ":player_id", ":inactive_index"),
-      (troop_set_slot, "trp_inactive_players_array", ":inactive_index", ":player_unique_id"),
-      (player_set_slot, ":player_id", slot_player_inactive_index, ":inactive_index"),
-      (neq, ":loop_end", -1),
-      (val_add, ":inactive_array_size", 1),
-      (troop_set_slot, "trp_inactive_players_array", slot_player_array_size, ":inactive_array_size"),
-    (try_end),
-    (assign, ":loop_end", factions_end),
-    (try_for_range, ":faction_id", castle_factions_begin, ":loop_end"),
-      (faction_get_slot, ":lord_player_uid", ":faction_id", slot_faction_lord_player_uid),
-      (eq, ":lord_player_uid", ":player_unique_id"),
-      (assign, ":loop_end", -1),
-      (store_mission_timer_a, ":current_time"),
-      (faction_set_slot, ":faction_id", slot_faction_lord_last_seen_time, ":current_time"),
-    (try_end),
-    ]),
-
-  ("cf_player_store_inactive", # server: store player attributes starting at a specified index in a list
-   [(store_script_param, ":player_id", 1), # must be valid
-    (store_script_param, ":inactive_index", 2),
-
-    (player_get_troop_id, ":troop_id", ":player_id"),
-    (is_between, ":troop_id", playable_troops_begin, playable_troops_end),
-    (try_begin),
-      (neq, "$g_game_type", "mt_permanent_death"),
-      (player_get_slot, ":faction_id", ":player_id", slot_player_faction_id),
-      (player_get_gold, ":gold_value", ":player_id"),
-    (else_try),
-      (assign, ":troop_id", playable_troops_begin),
-      (assign, ":faction_id", factions_begin),
-      (assign, ":gold_value", 0),
-    (try_end),
-    (store_add, ":temp_index", ":inactive_index", player_array_troop_id),
-    (troop_set_slot, "trp_inactive_players_array", ":temp_index", ":troop_id"),
-    (store_add, ":temp_index", ":inactive_index", player_array_faction_id),
-    (troop_set_slot, "trp_inactive_players_array", ":temp_index", ":faction_id"),
-    (store_add, ":temp_index", ":inactive_index", player_array_gold_value),
-    (troop_set_slot, "trp_inactive_players_array", ":temp_index", ":gold_value"),
-    (player_get_slot, ":outlaw_rating", ":player_id", slot_player_outlaw_rating),
-    (store_add, ":temp_index", ":inactive_index", player_array_outlaw_rating),
-    (troop_set_slot, "trp_inactive_players_array", ":temp_index", ":outlaw_rating"),
     ]),
 
   ("apply_consequences_for_agent_death", # server and clients: when an agent dies, adjust scores, display messages, drop a loot money bag, check outlaw rating
@@ -5232,18 +5192,18 @@ scripts.extend([
         (call_script, "script_player_change_check_outlaw_rating", ":killer_player_id", outlaw_rating_for_kill, 0),
       (try_end),
       (try_begin),
-          (neq, ":killer_agent_id", -1),#**
-          (this_or_next|neq, ":dead_faction_id", ":killer_faction_id"),
-          (this_or_next|eq, ":dead_faction_id", "fac_commoners"),
-          (eq, ":dead_faction_id", "fac_outlaws"),
-          (player_is_active, ":dead_player_id"),
-          (neq, "$g_game_type", "mt_no_money"),
-          (try_begin),
-            (eq, ":dead_faction_id", "fac_commoners"),
-            (call_script, "script_player_drop_loot", ":dead_player_id", 1),
-          (else_try),
-            (call_script, "script_player_drop_loot", ":dead_player_id", 0),
-          (try_end),
+        (neq, ":killer_agent_id", -1),#**
+        (this_or_next|neq, ":dead_faction_id", ":killer_faction_id"),
+        (this_or_next|eq, ":dead_faction_id", "fac_commoners"),
+        (eq, ":dead_faction_id", "fac_outlaws"),
+        (player_is_active, ":dead_player_id"),
+        (neq, "$g_game_type", "mt_no_money"),
+        (try_begin),
+          (eq, ":dead_faction_id", "fac_commoners"),
+          (call_script, "script_player_drop_loot", ":dead_player_id", 1),
+        (else_try),
+          (call_script, "script_player_drop_loot", ":dead_player_id", 0),
+        (try_end),
       (try_end),
     (else_try),
       (agent_is_active, ":killer_agent_id"),
@@ -6375,8 +6335,6 @@ scripts.extend([
     (assign, ":fail", 0),
     (try_begin),
       (neg|player_is_active, ":player_id"),
-      (store_mission_timer_a, ":last_seen_time"),
-      (faction_set_slot, ":faction_id", slot_faction_lord_last_seen_time, ":last_seen_time"),
     (else_try),
       (player_slot_eq, ":player_id", slot_player_faction_id, ":faction_id"),
       (player_get_unique_id, ":player_unique_id", ":player_id"),
@@ -6426,7 +6384,6 @@ scripts.extend([
     (player_set_slot, ":player_id", slot_player_can_faction_announce, 1),
     (player_set_slot, ":player_id", slot_player_is_marshal, 0),
     (player_set_slot, ":player_id", slot_player_faction_chat_muted, 0),
-    (faction_set_slot, ":faction_id", slot_faction_lord_last_seen_time, 0),
     (str_store_faction_name, s1, ":faction_id"),
     (str_store_player_username, s10, ":player_id"),
     (server_add_message_to_log, "str_s10_now_lord_of_s1"),
@@ -9601,8 +9558,7 @@ scripts.extend([
     (store_script_param, ":instance_id", 1), # must be valid
     (store_script_param, ":hit_damage", 2),
     (store_script_param, ":resource_class", 3),
-    (set_fixed_point_multiplier, 1),
-    (position_get_x, ":agent_id", pos2), # expects agent id in pos2.x from ti_on_scene_prop_hit
+    (store_script_param, ":agent_id", 4),
     (set_fixed_point_multiplier, 100),
 
     (try_begin), # only allow repairing standing doors if they are open
@@ -14520,7 +14476,7 @@ scripts.extend([
       (assign, ":log_string_id", "str_log_admin_target_self"),
     (try_end),
     (server_add_message_to_log, ":log_string_id"),
-    ]),
+  ]),
 
   ("cf_faction_admin_action", # server: check player requests to use faction lord tools, applying if successful
    [(store_script_param, ":action", 1), # constants starting with faction_admin_action_
@@ -14545,13 +14501,7 @@ scripts.extend([
       (neq, ":loop_end", -1),
       (call_script, "script_cf_check_enough_gold", ":sender_player_id", faction_cost_change_banner),
       (call_script, "script_player_adjust_gold", ":sender_player_id", faction_cost_change_banner, -1),
-      (faction_set_slot, ":faction_id", slot_faction_banner_mesh, ":value_1"),
-      (call_script, "script_faction_set_color_from_banner", ":faction_id", ":value_1"),#**
-      (try_for_players, ":player_id", 1),
-        (player_is_active, ":player_id"),
-        (multiplayer_send_3_int_to_player, ":player_id", server_event_faction_set_slot, ":faction_id", slot_faction_banner_mesh, ":value_1"),
-      (try_end),
-      (call_script, "script_redraw_castle_banners", redraw_faction_banners, ":faction_id"),
+      (call_script, "script_faction_set_banner_mesh", ":faction_id", ":value_1"),
     (else_try),
       (this_or_next|eq, ":action", faction_admin_action_kick_player),
       (eq, ":action", faction_admin_action_outlaw_player),

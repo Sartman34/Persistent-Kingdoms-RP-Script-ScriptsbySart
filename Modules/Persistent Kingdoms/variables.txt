@@ -265,7 +265,9 @@ g_is_hrpg
 g_authentication_time
 g_base_health
 g_base_hunger
-g_is_downing_enabled
+g_is_knock_out_enabled
+g_is_autosave_enabled
+g_keep_equipment
 g_spawn_item_prune_time
 g_actual_ghost_mode
 g_mute_all_players
@@ -331,5 +333,3 @@ skybox_current
 g_fire_place_instance_no
 g_fish_school_instance_no
 g_herd_animal_spawn_instance_no
-g_test_ship_collision_prop
-g_test_unlinked_prop

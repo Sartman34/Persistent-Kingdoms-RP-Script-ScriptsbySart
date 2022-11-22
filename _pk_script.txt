@@ -10,7 +10,7 @@ set_pass XQCFGHTY
 set_mission conquest # other options: quick_battle, no_money
 set_map scene_5 # this is the map that is started first
 
-set_respawn_period 20
+set_respawn_period 3
 
 
 set_maps_voteable 0
@@ -45,7 +45,7 @@ set_starting_gold 0 # adjustment in percent to the default starting gold of 30 â
 set_combat_gold_bonus 10 # gold drop on death percentage for commoners
 set_round_gold_bonus 20 # gold drop on death percentage
 
-set_ghost_mode 2 # enable spectator 0=free camera, 1=camera locked on players, 2=off, 3=off with death cam
+set_ghost_mode 0 # enable spectator 0=free camera, 1=camera locked on players, 2=off, 3=off with death cam
 
 #PERFORMANCE SETTINGS
 set_round_max_seconds 1200 # time in seconds before items are removed; set the same value in module.ini for mission_object_prune_time

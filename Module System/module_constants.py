@@ -46,9 +46,8 @@ slot_player_spawn_health_percent      = 3 # saved health percentage to be applie
 slot_player_spawn_entry_point         = 4 # entry point used at last spawn
 
 player_spawn_state_dead               = 0
-player_spawn_state_invulnerable       = 1 # while invlunerable soon after spawning
-player_spawn_state_at_marker          = 2 # set before spawning to indicate that the agent should be shifted to the player's marker scene prop
-player_spawn_state_alive              = 3
+player_spawn_state_at_marker          = 1 # set before spawning to indicate that the agent should be shifted to the player's marker scene prop
+player_spawn_state_alive              = 2
 
 slot_player_inactive_index            = 5 # index in the inactive players array, if stored
 slot_player_next_chat_event_type      = 6 # next chat event number that the server expects this player's client to use
@@ -84,7 +83,7 @@ slot_player_equip_item_3_ammo         = 34
 
 slot_player_spawn_food_amount         = 35 # saved food for next spawn
 slot_player_faction_chat_muted        = 36
-slot_player_kick_at_time              = 37 # time to kick a player after the name server has rejected them, to allow time to recieve the message
+##slot_player_kick_at_time              = 37 # time to kick a player after the name server has rejected them, to allow time to recieve the message
 slot_player_can_faction_announce      = 38
 slot_player_next_spawn_health_percent = 39 # spawn health percentage for the troop applied after death, if that server option is enabled
 slot_player_accessing_unique_id       = 40 # a unique number identifying an inventory scene prop being accessed that could despawn and the instance id be reused, like corpses
@@ -376,7 +375,7 @@ slot_faction_banner_mesh              = 0
 slot_faction_name_is_custom           = 1 # 1 if the name has been changed from the default
 slot_faction_is_active                = 2 # 1 if the faction has at least one capture point associated with their castle at mission start
 slot_faction_lord_player_uid          = 3 # player unique id of the faction lord
-slot_faction_lord_last_seen_time      = 4
+##slot_faction_lord_last_seen_time      = 4
 slot_faction_castle_banner_variant    = 5 # work around an unwanted engine optimization: change tableau id used when changing faction banners to force them to update
 slot_faction_list_button_id           = 6 # overlay id in the faction list presentation
 slot_faction_is_locked                = 7 # 1 if an adminstrator locked the faction to prevent lord polls
@@ -447,16 +446,6 @@ slot_troop_equipment_horse_begin      = 9 * troop_slot_count_per_equipment_type
 
 slot_troop_ranking                    = 50 # used for sorting troop types in the player stats chart
 slot_troop_spawn_health_percent       = 51 # respawn health percentage when dying as this troop
-
-slot_player_array_size                = 0
-slot_player_array_begin               = 1
-
-player_array_unique_id                = 0
-player_array_troop_id                 = 1
-player_array_faction_id               = 2
-player_array_gold_value               = 3
-player_array_outlaw_rating            = 4
-player_array_entry_size               = 5 # number of values stored in the disconnected players array
 
 max_castle_count = 8
 slot_mission_data_castle_owner_faction_begin    = 0 # owner factions of all castles
