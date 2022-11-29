@@ -60,7 +60,7 @@ try:
         "Letter" : 0,#bozuk
         "Pass-Out" : 0,#bozuk
         "Inventory" : 1,
-        "Horse Keeper" : 0,#bozuk
+        "Horse Keeper" : 1,
         "Play Times" : 1,
         "Army" : 0,
     }
@@ -213,7 +213,7 @@ Guidiniz: {}\
 /envanter: Kişisel envanterinizi açar.\
 ",
     "/bağla help" : "\
-/bağla: Atınızı bağlar/çözer.\
+/bağla: Bindiğiniz atı bağlar/çözer.\
 ",
     "/anahtar help": "\
 /anahtar göster^\
@@ -466,13 +466,14 @@ command_type = {
     "Army Recruit": 3,
     "Army Toggle Aggro": 4,
     "Army Set Equipment": 5,
+    "Tie Horse": 6,
 }
 troops = {
     "footman": 0,
     "archer": 1,
     "lancer": 2,
 }
-base_items = ["0", start_troop, start_money, base_health, base_hunger, "-1", "-1", "-1", "-1", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
+base_items = ["0", start_troop, start_money, base_health, base_hunger, "0", "142", "316", "0", "0", "0", "0", "0", "-1", "0", "-1", "-1", "-1", start_bank, "0", "0"]
 hunger_damages = ["5", "5", "5", "5", "5", "5", "10", "10", "10", "10", "10", "10", "15", "25", "45", "70", "90", "200"]
 base_inventory = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
 
@@ -1089,14 +1090,14 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/ordu help"])
-##                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
-##                        if len(text):
-##                            if text[0] == "help":
-##                                send_message(client, "5|{}|{}|{}".format(player_id, colors["beyaz"], strings["/bağla help"]))
-##                            else:
-##                                send_message(client, "32|{}".format(player_id))
-##                        else:
-##                            send_message(client, "32|{}".format(player_id))
+                    elif command in ["bağla", "bagla", "tie"] and extensions["Horse Keeper"]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/bağla help"])
+                            else:
+                                send_message_warband(client, message_type["Command"], command_type["Tie Horse"], unique_id)
+                        else:
+                            send_message_warband(client, message_type["Command"], command_type["Tie Horse"], unique_id)
                     else:
                         send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["hatali komut"])
                 else:
@@ -1668,7 +1669,7 @@ try:
 
     admin_queue_add_setting("Base Health", base_health)
     admin_queue_add_setting("Base Hunger", base_hunger)
-    admin_queue_add_setting("Knock Out", 0)
+    admin_queue_add_setting("Knock Out", 1)
     admin_queue_add_setting("Autosave", autosave)
     admin_queue_add_setting("Keep Equipment", keep_inventory),
 

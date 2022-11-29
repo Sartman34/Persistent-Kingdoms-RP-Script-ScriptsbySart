@@ -133,6 +133,10 @@ slot_player_army_equipment_5          = 78
 slot_player_army_equipment_6          = 79
 slot_player_army_equipment_7          = 80
 
+slot_player_death_coord_x             = 81
+slot_player_death_coord_y             = 82
+slot_player_death_coord_z             = 83
+
 ########################################################
 ##  AGENT SLOTS            #############################
 ########################################################
@@ -205,6 +209,7 @@ slot_agent_rest_use_start_time        = 68
 slot_agent_walk_mode                  = 73
 slot_agent_last_hit_time              = 74 #**
 slot_agent_is_downed                  = 75
+slot_agent_owner_agent_id             = 76
 
 
 ########################################################
