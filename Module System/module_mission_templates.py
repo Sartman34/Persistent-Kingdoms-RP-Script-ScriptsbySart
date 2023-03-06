@@ -1113,6 +1113,24 @@ flood_log_refresh = (5, 0, 0, [
 ], [])
 
 #ScriptsBySartman
+teleport_door_refresh = (2, 0, 0, [
+  (multiplayer_is_server),
+  (troop_get_slot, ":cache_count", "trp_teleport_timer_caches", 0),
+  (val_add, ":cache_count", 1),
+  (try_for_range, ":cache_index", 0, ":cache_count"),
+    (troop_get_slot, ":instance_id", "trp_teleport_timer_caches", ":cache_index"),
+    (neg^scene_prop_slot_eq, ":instance_id", slot_scene_prop_teleport_timer, 0),
+    (scene_prop_get_slot, ":value", ":instance_id", slot_scene_prop_teleport_timer),
+    (val_sub, ":value", 2),
+    (val_max, ":value", 0),
+    (scene_prop_set_slot, ":instance_id", slot_scene_prop_teleport_timer, ":value"),
+    (try_begin),
+      (scene_prop_slot_eq, ":instance_id", slot_scene_prop_teleport_timer, 0),
+      (prop_instance_play_sound, ":instance_id", "snd_lock"),
+    (try_end),
+  (try_end),
+], [])
+
 idle_income = (0, 0, 900, [
   (multiplayer_is_server),
   (neq, "$g_idle_income", 0),
@@ -1187,6 +1205,7 @@ def common_triggers(mission_template):
         ping_tcp_server,#39
         autosave,#40
         time_update,#41
+        teleport_door_refresh,#42
     ]
 
 mission_templates = [

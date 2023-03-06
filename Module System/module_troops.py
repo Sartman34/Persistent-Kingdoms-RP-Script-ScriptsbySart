@@ -207,4 +207,5 @@ troops = [
   ["animation_durations","animation_durations","animation_durations",0,0,0,0,[],0,0,0,0,0],
   
   ["personal_inventories", "personal_inventories", "personal_inventories",0,0,0,0,[],0,0,0,0,0],
+  ["teleport_timer_caches", "teleport_timer_caches", "teleport_timer_caches",0,0,0,0,[],0,0,0,0,0],
 ]

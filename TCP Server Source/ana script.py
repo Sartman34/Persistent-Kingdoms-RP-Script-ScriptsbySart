@@ -58,10 +58,10 @@ try:
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Pass-Out" : 0,#bozuk
+        "Knock-Out" : 1,
         "Inventory" : 1,
         "Horse Keeper" : 1,
-        "Play Times" : 1,
+        "Play Times" : 0,
         "Army" : 0,
     }
 except:
@@ -72,7 +72,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 1, 1)#y, m, d
+    date = datetime.datetime(2023, 5, 2)#y, m, d
     version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
@@ -91,6 +91,19 @@ if current_date > LicenseInfo.date:
     sys.exit()
 
 print_("Version: {}, Date: {}".format(LicenseInfo.version, LicenseInfo.date.strftime("%Y.%m.%d")))
+
+if not LicenseInfo.is_licensed:
+    extensions = {
+        "Custom Announcement" : 0,
+        "Hunger" : 0,#bozuk
+        "Door Keys" : 0,
+        "Letter" : 0,#bozuk
+        "Knock-Out" : 0,
+        "Inventory" : 0,
+        "Horse Keeper" : 0,
+        "Play Times" : 0,
+        "Army" : 0,
+    }
 
 strings = {
     "/yardim help" : "\
@@ -336,7 +349,7 @@ if extensions["Door Keys"]:
     special_strings["yardim"].extend([
         ("Kapı Kilidi Sistemi +", colors["beyaz"]),
     ])
-if extensions["Pass-Out"]:
+if extensions["Knock-Out"]:
     special_strings["yardim"].extend([
         ("Bayılma Sistemi +", colors["beyaz"]),
     ])
@@ -1185,38 +1198,32 @@ def main_request_handler(client, addr, port):
                 response = "0"
             send_message(client, response)
         elif action == "check_door_key":
-            agent_id = message[0]
+            unique_id = message[0]
             instance_id = message[1]
             left = message[2]
-            unique_id = message[3]
-            player_id = message[4]
             is_private = 0
             has_keys = 0
             if instance_id in doors:
                 is_private = 1
                 if unique_id in doors[instance_id]:
                     has_keys = 1
-            send_message(client, "{}|{}|{}|{}|{}|{}".format(agent_id, instance_id, left, player_id, is_private, has_keys))
-            if unique_id in key_checkers and admin_client:
-                admin_client.send("Door: {}".format(instance_id).encode())
-        elif action == "check_door_key_teleport":
+            send_message_warband(client, 1, unique_id, instance_id, left, is_private, has_keys)
+        elif action == "check_door_key_tp":
+            unique_id = message[0]
             instance_id = message[1]
-            linked_door_instance_id = message[2]
-            x_offset = message[3]
-            y_offset = message[4]
-            z_offset = message[5]
+            x_offset = message[2]
+            y_offset = message[3]
+            z_offset = message[4]
+            is_pickable = message[5]
             horse_can_tp = message[6]
-            unique_id = message[7]
-            player_id = message[8]
             is_private = 0
             has_keys = 0
             if instance_id in doors:
                 is_private = 1
                 if unique_id in doors[instance_id]:
                     has_keys = 1
-            send_message(client, "30|{}|{}|{}|{}|{}|{}|{}|{}".format(linked_door_instance_id, x_offset, y_offset, z_offset, horse_can_tp, player_id, is_private, has_keys))
-            if unique_id in key_checkers and admin_client:
-                admin_client.send("Door: {}".format(instance_id).encode())
+            print(is_private, has_keys)
+            send_message_warband(client, 1, unique_id, instance_id, x_offset, y_offset, z_offset, is_pickable, horse_can_tp, is_private, has_keys)
         elif action == "update_food":
             player_id = message[0]
             unique_id = message[1]
@@ -1669,7 +1676,7 @@ try:
 
     admin_queue_add_setting("Base Health", base_health)
     admin_queue_add_setting("Base Hunger", base_hunger)
-    admin_queue_add_setting("Knock Out", 1)
+    admin_queue_add_setting("Knock Out", str(extensions["Knock-Out"]))
     admin_queue_add_setting("Autosave", autosave)
     admin_queue_add_setting("Keep Equipment", keep_inventory),
 

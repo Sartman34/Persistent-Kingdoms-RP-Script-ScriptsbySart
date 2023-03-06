@@ -32,7 +32,7 @@ colors = {
     "commoners" : 18,
 }
 
-is_battle_oriented = False
+is_battle_oriented = True
 #
 
 ########################################################
@@ -294,6 +294,9 @@ slot_scene_prop_sitting_agent         = 57
 slot_scene_prop_personal_inventory_player_id = 58
 slot_scene_prop_value                 = 59
 
+slot_scene_prop_is_cached             = 60
+slot_scene_prop_teleport_timer        = 61
+
 scene_prop_state_active               = 0
 scene_prop_state_destroyed            = 1
 scene_prop_state_hidden               = 2
@@ -515,10 +518,10 @@ def sq(distance):
 max_distance_to_play_sound            = 10000
 max_distance_to_see_labels            = 1500
 max_distance_horse_rider              = 5000
-max_distance_local_chat               = 3000
-max_distance_local_chat_shout         = 5000
-ambient_distance_local_chat           = 1000
-ambient_distance_local_chat_shout     = 2000
+max_distance_local_chat               = 1500
+max_distance_local_chat_shout         = 2500
+ambient_distance_local_chat           = 350
+ambient_distance_local_chat_shout     = 700
 max_distance_local_animation          = 2500
 z_position_to_hide_object             = -4999 # lower values might cause the position to "wrap around" up into the sky
 z_position_water_level                = -30 # approximate visible water level based on tests

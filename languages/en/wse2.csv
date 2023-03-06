@@ -54,6 +54,7 @@ ui_postprocess_color|MAKE MY EYES BLEED
 ui_multiplayer_kills|Kill Messages
 ui_all_kills|All
 ui_own|Own
+ui_player_deaths|Player deaths
 ui_sun_flare|Sun Flare
 ui_enable_alt_f4|Enable Quit With Alt+F4
 ui_invert_mouse_x_axis|Invert Mouse X Axis
