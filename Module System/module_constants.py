@@ -518,9 +518,9 @@ def sq(distance):
 max_distance_to_play_sound            = 10000
 max_distance_to_see_labels            = 1500
 max_distance_horse_rider              = 5000
-max_distance_local_chat               = 1500
+max_distance_local_chat               = 1250
 max_distance_local_chat_shout         = 2500
-ambient_distance_local_chat           = 350
+ambient_distance_local_chat           = 150
 ambient_distance_local_chat_shout     = 700
 max_distance_local_animation          = 2500
 z_position_to_hide_object             = -4999 # lower values might cause the position to "wrap around" up into the sky
