@@ -649,9 +649,11 @@ def send_message(client, message, lenght = 128):
     text = "HTTP/1.1 200 OK\r\nContent-Lenght: {1}\r\n\r\n{0}\r\n".format(message, lenght)
     client.send(text.encode())
 
+def serialize(*args):
+    return ("{}|" * len(args))[:-1].format(*args)
+
 def send_message_warband(client, *message):
-    message = ("{}|" * len(message)).format(*message)[:-1]
-    text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(128, message)
+    text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(128, serialize(*message))
     client.send(text.encode())
 
 def send_message_special(client, unique_id, message_id):
@@ -661,10 +663,10 @@ def send_message_special(client, unique_id, message_id):
     )
 
 def admin_queue_add_command(command, *args):
-    admin_q.append(("{}|" * (len(args) + 1))[:-1].format(admin_queue_commands[command], *args))
+    admin_q.append(serialize(admin_queue_commands[command], *args))
     
 def admin_queue_add_setting(setting_type, *args):
-    admin_queue_add_command("Settings", setting_types[setting_type], *args)
+    settings.append(serialize(admin_queue_commands["Settings"], setting_types[setting_type], *args))
     
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
     banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
