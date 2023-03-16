@@ -1110,6 +1110,12 @@ weather_situation_check = (loop_weather_adjust_interval, 0, 0, [], # server: adj
     (call_script, "script_scene_adjust_weather_situation"),
     ])
 
+skybox_update_interval = (5, 0, 0, [], [
+  (multiplayer_is_server),
+  (eq, "$g_day_night_cycle_enabled", 1),
+  (call_script, "script_skybox_send_info_to_players"),
+])
+
 #** Added by us.
 flood_log_refresh = (5, 0, 0, [
   (multiplayer_is_server),
@@ -1212,6 +1218,7 @@ def common_triggers(mission_template):
         autosave,#40
         time_update,#41
         teleport_door_refresh,#42
+        skybox_update_interval,#43
     ]
 
 mission_templates = [

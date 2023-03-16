@@ -388,6 +388,7 @@ doors = dict()
 admin_permissions = dict()
 authentication_time = "0"
 force_names = False
+kick_unmatched_name = 0
 player_count = 0
 banned_ips = list()
 command_perm = list()
@@ -472,6 +473,7 @@ message_type = {
     "Announce": 4,
     "Command": 5,
     "Whisper": 6,
+    "Local Whisper": 7,
 }
 command_type = {
     "Open Personal Inventory": 1,
@@ -558,19 +560,24 @@ def import_mails():
         seal = x[3]
         mails[code] = [name, post, seal]
 def import_names():
-    global force_names
+    global force_names, kick_unmatched_name
     names.clear()
     with open("Data\\names.txt", "r", encoding = "utf-8") as file:
         data = file.read()
     if not data:
         with open("Data\\names.txt", "w", encoding = "utf-8") as file:
             file.write("Force Usernames : 0")
+            file.write("Kick Unmatched : 0")
         return
-    force_names, *lines = data.split("\n")
-    if force_names in ["True", "true", "+", "1"]:
+    force_names, kick_unmatched_name, *lines = data.split("\n")
+    if force_names.split(" : ")[1] in ["True", "true", "+", "1"]:
         force_names = True
     else:
         force_names = False
+    if kick_unmatched_name.split(" : ")[1] in ["True", "true", "+", "1"]:
+        kick_unmatched_name = 1
+    else:
+        kick_unmatched_name = 0
     for line in lines:
         unique_id, name = line.split(" : ")
         names[unique_id] = name
@@ -750,7 +757,7 @@ def main_request_handler(client, addr, port):
             unique_id = message[0]
             name = message[1]
             if force_names and unique_id in names:
-                admin_queue_add_command("Change Name", unique_id, names[unique_id])
+                admin_queue_add_command("Change Name", names[unique_id], unique_id, kick_unmatched_name)
             else:
                 names[unique_id] = name
             if not unique_id in players:
@@ -929,11 +936,19 @@ def main_request_handler(client, addr, port):
                     elif command in ["w", "whisper", "fısılda", "fisilda"]:
                         if len(text):
                             if text[0] == "help":
-                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/soylenti help"])
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], "")#strings["/whisper help"])
                             else:
                                 send_message_warband(client, message_type["Whisper"], unique_id, colors["turuncu"], " ".join(text))
                         else:
-                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti"))
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("whisper"))
+                    elif command in ["l"]:
+                        if len(text):
+                            if text[0] == "help":
+                                send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], "")#strings["/l help"])
+                            else:
+                                send_message_warband(client, message_type["Local Whisper"], unique_id, colors["turuncu"], " ".join(text))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("l"))
                     elif command == "discord":
                         if len(text):
                             if text[0] == "help":
@@ -1224,7 +1239,6 @@ def main_request_handler(client, addr, port):
                 is_private = 1
                 if unique_id in doors[instance_id]:
                     has_keys = 1
-            print(is_private, has_keys)
             send_message_warband(client, 1, unique_id, instance_id, x_offset, y_offset, z_offset, is_pickable, horse_can_tp, is_private, has_keys)
         elif action == "update_food":
             player_id = message[0]
@@ -1404,7 +1418,10 @@ def main_request_handler(client, addr, port):
                 print_(traceback.format_exc())
             try:
                 file = open("Data\\names.txt", "w", encoding = 'utf8')
-                text = "Force Usernames : {}\n".format("1" if force_names else "0")
+                text = "\
+Force Usernames : {}\n\
+Kick Unmatched : {}\n\
+".format("1" if force_names else "0", str(kick_unmatched_name))
                 for unique_id in names.keys():
                     text += unique_id + " : "
                     text += names[unique_id] + "\n"
