@@ -43,7 +43,9 @@ import header_lazy_evaluation as lazy
 spawn_points_0_99 = [(x, mtef_visitor_source, 0, aif_start_alarmed, 1, []) for x in xrange(0, 100)]
 
 before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic mission and scene values
-   [(server_set_friendly_fire, 1),
+   [
+  (display_message, "@Initializing scripts..."),
+    (server_set_friendly_fire, 1),
     (server_set_melee_friendly_fire, 1),
     (server_set_friendly_fire_damage_self_ratio, 0),
     (server_set_friendly_fire_damage_friend_ratio, 100),
@@ -107,7 +109,7 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
     (multiplayer_is_server),
     (call_script, "script_skybox_spawn_all"),
   (try_end),
-  (display_message, "@Updating Settings"),
+  (display_message, "@Connecting to script server."),
   
   (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
 
@@ -315,22 +317,11 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [(multiplayer_is_server),], [ # server: 
         (assign, ":is_naked", 1),
         (try_begin),
           (eq, "$g_keep_equipment", 1),
+          (call_script, "script_player_set_stored_ammo_counts", ":player_id"),
           (try_for_range, ":slot_id", slot_player_equip_head, slot_player_equip_gloves + 1),
             (player_get_slot, ":item_id", ":player_id", ":slot_id"),
             (ge, ":item_id", all_items_begin),
-            (call_script, "script_change_armor", ":agent_id", ":item_id"),
             (assign, ":is_naked", 0),
-          (try_end),
-          (try_for_range, ":slot_id", 0, 4),
-            (agent_get_item_slot, ":item_id", ":agent_id", ":slot_id"),
-            (ge, ":item_id", all_items_begin),
-            (agent_unequip_item, ":agent_id", ":item_id"),
-          (try_end),
-          (try_for_range, ":slot_id", slot_player_equip_item_0, slot_player_equip_item_3 + 1),
-            (player_get_slot, ":item_id", ":player_id", ":slot_id"),
-            (store_sub, ":weapon_slot_no", ":slot_id", slot_player_equip_item_0 - 1),
-            (ge, ":item_id", all_items_begin),
-            (agent_equip_item, ":agent_id", ":item_id", ":weapon_slot_no"),
           (try_end),
         (try_end),
         (try_begin),
@@ -1073,6 +1064,16 @@ herd_animal_spawn_check = (60, 0, 0, [], # server: check all herd animal spawner
       (lt, "$g_herd_animal_count", "$g_max_herd_animal_count"),
       (scene_prop_get_instance, ":instance_id", "spr_pw_herd_animal_spawn", "$g_herd_animal_spawn_instance_no"),
       (val_add, "$g_herd_animal_spawn_instance_no", 1),
+      (assign, ":fail", 0),
+      (try_for_agents, ":agent_id"),
+        (agent_is_active, ":agent_id"),
+        (agent_is_alive, ":agent_id"),
+        (neg^agent_is_human, ":agent_id"),
+        (agent_slot_eq, ":agent_id", slot_agent_animal_spawn_instance, ":instance_id"),
+        (assign, ":fail", 1),
+        (break_loop),
+      (try_end),
+      (eq, ":fail", 0),
       (scene_prop_get_slot, ":spawn_time", ":instance_id", slot_scene_prop_state_time),
       (store_mission_timer_a, ":time"),
       (try_begin), # if the spawning time has been reached
@@ -1099,6 +1100,7 @@ herd_animal_spawn_check = (60, 0, 0, [], # server: check all herd animal spawner
         (try_end),
         (prop_instance_get_position, pos1, ":instance_id"),
         (call_script, "script_cf_spawn_herd_animal", ":animal_item_id", -1),
+        (agent_set_slot, reg0, slot_agent_animal_spawn_instance, ":instance_id"),
       (try_end),
     (else_try),
       (assign, "$g_herd_animal_spawn_instance_no", 0),
@@ -1171,6 +1173,15 @@ time_update = (60, 0, 0, [
     (player_set_slot, ":player_id", slot_player_time, ":time"),
   (try_end),
 ], [])
+
+rot_update = (60, 0, 0, [
+  (multiplayer_is_server),
+  (try_for_prop_instances, ":instance_id"),
+    (scene_prop_get_slot, ":count", ":instance_id", slot_scene_prop_inventory_count),
+    (gt, ":count", 0),
+    
+  (try_end),
+], [])
 #
 
 def common_triggers(mission_template):
@@ -1219,6 +1230,7 @@ def common_triggers(mission_template):
         time_update,#41
         teleport_door_refresh,#42
         skybox_update_interval,#43
+        rot_update,#44
     ]
 
 mission_templates = [

@@ -210,6 +210,7 @@ slot_agent_walk_mode                  = 73
 slot_agent_last_hit_time              = 74 #**
 slot_agent_is_downed                  = 75
 slot_agent_owner_agent_id             = 76
+slot_agent_animal_spawn_instance      = 77
 
 
 ########################################################
@@ -294,7 +295,7 @@ slot_scene_prop_sitting_agent         = 57
 slot_scene_prop_personal_inventory_player_id = 58
 slot_scene_prop_value                 = 59
 
-slot_scene_prop_is_cached             = 60
+slot_scene_prop_is_cached             = 60#**
 slot_scene_prop_teleport_timer        = 61
 
 scene_prop_state_active               = 0
@@ -315,6 +316,8 @@ slot_scene_prop_inventory_obj_begin   = 500 # container slot overlay ids
 slot_scene_prop_inventory_obj_item_0  = 590 # player equipment overlay ids
 slot_scene_prop_inventory_mesh_begin  = 600 # container item mesh overlay ids
 slot_scene_prop_inventory_mesh_item_0 = 690 # player equipment item mesh overlay ids
+slot_scene_prop_inventory_rot_begin   = 700 #**
+slot_scene_prop_inventory_rot_item_0  = 790
 slot_scene_prop_inventory_end         = slot_scene_prop_inventory_ammo_begin
 slot_scene_prop_inventory_mod_end     = slot_scene_prop_inventory_obj_begin
 slot_scene_prop_inventory_obj_end     = slot_scene_prop_inventory_mesh_begin

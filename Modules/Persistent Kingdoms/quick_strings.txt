@@ -1,4 +1,4 @@
-105
+106
 qstr_save save
 qstr_/debug /debug
 qstr_/hit /hit
@@ -94,7 +94,8 @@ qstr_http://127.0.0.1/chec http://127.0.0.1/check_door_key<{reg0}<{reg1}<{reg2}
 qstr_http://127.0.0.1/ban http://127.0.0.1/ban_player<{reg0}<0<1
 qstr_http://127.0.0.1/ban_ http://127.0.0.1/ban_player<{reg0}<1<1
 qstr_[E]_Could_not_get_on [E]_Could_not_get_one_or_more_skybox_prop_instances!
-qstr_Updating_Settings Updating_Settings
+qstr_Initializing_scripts Initializing_scripts...
+qstr_Connecting_to_script Connecting_to_script_server.
 qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
 qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{s0}
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}

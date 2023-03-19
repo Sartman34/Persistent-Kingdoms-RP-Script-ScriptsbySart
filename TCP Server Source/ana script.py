@@ -833,6 +833,17 @@ def main_request_handler(client, addr, port):
             string0 = string0.replace("%20", " ")
             string0 = string0.replace("%C5%9F", "ş").replace("%C3%A7", "ç").replace("%C4%B1", "ı").replace("%C3%B6", "ö").replace("%C4%9F", "ğ").replace("%C3%BC", "ü")
             string0 = string0.replace("%C5%9E", "Ş").replace("%C3%87", "Ç").replace("%C4%B0", "İ").replace("%C3%96", "Ö").replace("%C4%9E", "Ğ").replace("%C3%9C", "Ü")
+            string1 = ""
+            skip = 0
+            for char in string0:
+                if skip:
+                    skip -= 1
+                    continue
+                if char == "%":
+                    skip = 2
+                    continue
+                string1 += char
+            string0 = string1
             if len(string0) > 256:
                 ban_player(unique_id, permanently = True, reason = "Chat Overflow.")
                 sys.exit()
@@ -1346,8 +1357,6 @@ def main_request_handler(client, addr, port):
                     if code not in bad_ips:
                         bad_ips[code] = addr[0]
                         break
-                if admin_client:
-                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
         elif action == "remove_ban":
             sended_admin_pass = message[0]
             unique_id = message[1]
@@ -1365,8 +1374,6 @@ def main_request_handler(client, addr, port):
                     if code not in bad_ips:
                         bad_ips[code] = addr[0]
                         break
-                if admin_client:
-                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
                 _print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "save_to_db":
             try:

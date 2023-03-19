@@ -520,7 +520,7 @@ def spr_hit_vine_triggers(resource_item, resources=1, length=300, height=150, fu
 
 # A mine that produces 'resource_item' when hit with a mining tool, every 'resource_hp' plus a random extra amount from 0 to 'random_hp'; the maximum hit points is adjustable in the scene editor.
 # The 'hardness' value makes attacks do less damage, making mining resources slower.
-def spr_hit_mine_triggers(resource_item, resource_hp=100, random_hp=0, hardness=1, regrow_interval=14400, use_string="str_mine"):
+def spr_hit_mine_triggers(resource_item, resource_hp=100, random_hp=0, hardness=1, regrow_interval=3600, use_string="str_mine"):
   return [(ti_on_scene_prop_init,
      [(store_trigger_param_1, ":instance_id"),
       (scene_prop_set_slot, ":instance_id", slot_scene_prop_use_string, use_string),
