@@ -44,7 +44,7 @@ spawn_points_0_99 = [(x, mtef_visitor_source, 0, aif_start_alarmed, 1, []) for x
 
 before_mission_start_setup = (ti_before_mission_start, 0, 0, [], # set up basic mission and scene values
    [
-  (display_message, "@Initializing scripts..."),
+  (display_message, "@^Initializing scripts..."),
     (server_set_friendly_fire, 1),
     (server_set_melee_friendly_fire, 1),
     (server_set_friendly_fire_damage_self_ratio, 0),
@@ -200,7 +200,12 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
   (player_get_unique_id, reg0, ":player_id"),
   (str_store_player_username, s0, ":player_id"),
   (dict_set_int, "$g_player_id_dict", "@{reg0}", ":player_id"),
-  (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{s0}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
+  (assign, reg1, 0),
+  (try_begin),
+    (player_is_admin, ":player_id"),
+    (assign, reg1, 1),
+  (try_end),
+  (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{s0}<{reg1}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
 ])
 
 player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on exit

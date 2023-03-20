@@ -389,6 +389,7 @@ admin_permissions = dict()
 authentication_time = "0"
 force_names = False
 kick_unmatched_name = 0
+exclude_admins = False
 player_count = 0
 banned_ips = list()
 command_perm = list()
@@ -560,7 +561,7 @@ def import_mails():
         seal = x[3]
         mails[code] = [name, post, seal]
 def import_names():
-    global force_names, kick_unmatched_name
+    global force_names, kick_unmatched_name, exclude_admins
     names.clear()
     with open("Data\\names.txt", "r", encoding = "utf-8") as file:
         data = file.read()
@@ -568,8 +569,9 @@ def import_names():
         with open("Data\\names.txt", "w", encoding = "utf-8") as file:
             file.write("Force Usernames : 0")
             file.write("Kick Unmatched : 0")
+            file.write("Exclude Admins : 0")
         return
-    force_names, kick_unmatched_name, *lines = data.split("\n")
+    force_names, kick_unmatched_name, exclude_admins, *lines = data.split("\n")
     if force_names.split(" : ")[1] in ["True", "true", "+", "1"]:
         force_names = True
     else:
@@ -578,6 +580,10 @@ def import_names():
         kick_unmatched_name = 1
     else:
         kick_unmatched_name = 0
+    if exclude_admins.split(" : ")[1] in ["True", "true", "+", "1"]:
+        exclude_admins = True
+    else:
+        exclude_admins = False
     for line in lines:
         unique_id, name = line.split(" : ")
         names[unique_id] = name
@@ -756,7 +762,8 @@ def main_request_handler(client, addr, port):
             #Faction<Troop
             unique_id = message[0]
             name = message[1]
-            if force_names and unique_id in names:
+            is_admin = message[2]
+            if force_names and unique_id in names and not(int(is_admin) and exclude_admins):
                 admin_queue_add_command("Change Name", names[unique_id], unique_id, kick_unmatched_name)
             else:
                 names[unique_id] = name
@@ -1035,6 +1042,17 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
                         else:
                             send_message_warband(client, message_type["Command"], command_type["Open Personal Inventory"], unique_id)
+                    elif command in ["isim", "name"] and unique_id in admin_permissions:
+                        if len(text) and text[0] == "help":
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], ".")
+                        elif len(text) >= 2:
+                            other_unique_id = text[0]
+                            name = text[1]
+                            names[other_unique_id] = name
+                            admin_queue_add_command("Change Name", names[other_unique_id], other_unique_id, 0)
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], "Changed {}'s name to {}".format(other_unique_id, names[other_unique_id]))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], ".")
                     elif command in ["anahtar", "key"] and extensions["Door Keys"] and unique_id in key_checkers:
                         if len(text) >= 2:
                             instance = text[1]
@@ -1428,7 +1446,12 @@ def main_request_handler(client, addr, port):
                 text = "\
 Force Usernames : {}\n\
 Kick Unmatched : {}\n\
-".format("1" if force_names else "0", str(kick_unmatched_name))
+Exclude Admins : {}\n\
+".format(
+    "1" if force_names else "0",
+    str(kick_unmatched_name),
+    "1" if exclude_admins else "0"
+                )
                 for unique_id in names.keys():
                     text += unique_id + " : "
                     text += names[unique_id] + "\n"

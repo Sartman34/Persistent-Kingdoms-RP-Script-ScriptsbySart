@@ -1,3 +1,4 @@
 Force Usernames : 0
 Kick Unmatched : 0
+Exclude Admins : 0
 3214304 : Sart
