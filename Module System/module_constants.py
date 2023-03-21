@@ -8,31 +8,43 @@
 #** Added by us.
 flood_log_limit = 100
 script_ip_address = "@http://127.0.0.1"
+is_battle_oriented = True
 personal_inventory_lenght = 12
 
 colors = {
-    "beyaz" : 0,
-    "koyu mavi shout": 1,
-    "koyu mavi": 2,
-    "acik kirmizi": 3,
-    "koyu kirmizi": 4,
-    "acik kahverengi": 5,
-    "koyu kahverengi": 6,
-    "discord pembe": 7,
-    "acik yesil": 8,
-    "koyu yesil": 9,
-    "gold" : 10,
-    "silver" : 11,
-    "bronze" : 12,
-    "soylenti" : 13,
-    "turuncu" : 14,
-    "mektup" : 15,
-    "local chat" : 16,
-    "local chat shout" : 17,
-    "commoners" : 18,
+  "beyaz" : 0,
+  "koyu mavi shout": 1,
+  "koyu mavi": 2,
+  "acik kirmizi": 3,
+  "koyu kirmizi": 4,
+  "acik kahverengi": 5,
+  "koyu kahverengi": 6,
+  "discord pembe": 7,
+  "acik yesil": 8,
+  "koyu yesil": 9,
+  "gold" : 10,
+  "silver" : 11,
+  "bronze" : 12,
+  "soylenti" : 13,
+  "turuncu" : 14,
+  "mektup" : 15,
+  "local chat" : 16,
+  "local chat shout" : 17,
+  "commoners" : 18,
 }
-
-is_battle_oriented = True
+storage_scene_props = [
+  "pw_item_chest_a",
+  "pw_item_chest_b",
+  "pw_cart_a",
+  "pw_cart_b",
+  "pw_wheelbarrow",
+  "pw_hand_cart",
+  "pw_back_basket",
+  "pw_back_box",
+  "pw_horse_pack",
+  "cm_civ_cart",
+  "cm_war_cart",
+]
 #
 
 ########################################################
@@ -136,6 +148,10 @@ slot_player_army_equipment_7          = 80
 slot_player_death_coord_x             = 81
 slot_player_death_coord_y             = 82
 slot_player_death_coord_z             = 83
+
+slot_player_loading_player            = 84
+slot_player_loading_admin             = 85
+slot_player_loading_gear              = 86
 
 ########################################################
 ##  AGENT SLOTS            #############################
@@ -297,6 +313,8 @@ slot_scene_prop_value                 = 59
 
 slot_scene_prop_is_cached             = 60#**
 slot_scene_prop_teleport_timer        = 61
+slot_scene_prop_loading               = 62
+slot_scene_prop_saving                = 63
 
 scene_prop_state_active               = 0
 scene_prop_state_destroyed            = 1

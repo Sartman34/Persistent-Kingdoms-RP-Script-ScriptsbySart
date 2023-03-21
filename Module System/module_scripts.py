@@ -35,6 +35,10 @@ scripts.extend([
       (str_equals, s0, "@save"),
       (call_script, "script_save_server"),
       (set_trigger_result, 1),
+    (else_try),
+      (str_equals, s0, "@update settings"),
+      (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_update_settings_fail"),
+      (set_trigger_result, 1),
     (try_end),
   ]),
 
@@ -187,26 +191,6 @@ scripts.extend([
     (call_script, "script_send_coloured_message", ":player_id", colors["gold"], 0),
    ]),
 
-  ("save_chests", [
-    (store_script_param, ":scene_prop_id", 1),
-    (try_for_prop_instances, ":instance_id", ":scene_prop_id"),
-      (prop_instance_get_variation_id_2, ":variation_id_2", ":instance_id"),
-      (gt, ":variation_id_2", 0),
-      (scene_prop_get_slot, ":len", ":instance_id", slot_scene_prop_inventory_count),
-      (store_add, ":end", ":len", slot_scene_prop_inventory_begin),
-      (assign, reg0, ":scene_prop_id"),
-      (assign, reg1, ":variation_id_2"),
-      (str_store_string, s0, "@{reg0}<{reg1}"),
-      (try_for_range, ":slot", slot_scene_prop_inventory_begin, ":end"),
-        (scene_prop_get_slot, ":item_id", ":instance_id", ":slot"),
-        (gt, ":item_id", 0),
-        (assign, reg2, ":item_id"),
-        (str_store_string, s0, "@{s0}<{reg2}"),
-      (try_end),
-      (send_message_to_url_advanced, script_ip_address + "/save_chest<{s0}", "@WSE2", "script_default_return", "script_default_fail"),
-    (try_end),
-  ]),
-
   ("cf_use_letter_item", [
     (store_script_param, ":agent_id", 1),
 
@@ -220,9 +204,7 @@ scripts.extend([
     (send_message_to_url_advanced, script_ip_address + "/read_letter<{reg0}<{reg1}", "@WSE2", "script_read_letter_return", "script_read_letter_fail"),
   ]),
 
-  ("read_letter_return", [
-    
-  ]),
+  ("read_letter_return", []),
 
   ("read_letter_fail", [ (display_message, "@read_letter request failed."), ]),
 
@@ -231,11 +213,17 @@ scripts.extend([
     (try_for_prop_instances, ":instance_id", ":scene_prop_id"),
       (prop_instance_get_variation_id_2, ":variation_id_2", ":instance_id"),
       (gt, ":variation_id_2", 0),
-      (assign, reg0, ":scene_prop_id"),
-      (assign, reg1, ":variation_id_2"),
-      (assign, reg2, ":instance_id"),
-      (send_message_to_url_advanced, script_ip_address + "/load_chest<{reg0}<{reg1}<0<{reg2}", "@WSE2", "script_load_chest_return", "script_load_chest_fail"),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_loading, 1),
+      (call_script, "script_load_chest", ":scene_prop_id", ":variation_id_2", ":instance_id"),
     (try_end),
+  ]),
+
+  ("load_chest", [
+    (store_script_param, reg0, 1), #scene_prop_id
+    (store_script_param, reg1, 2), #variation_id_2
+    (store_script_param, reg2, 3), #instance_id
+
+    (send_message_to_url_advanced, script_ip_address + "/load_chest<{reg0}<{reg1}<0<{reg2}", "@WSE2", "script_load_chest_return", "script_load_chest_fail"),
   ]),
   
   ("load_chest_return", [
@@ -256,30 +244,84 @@ scripts.extend([
       (assign, ":scene_prop_id", reg1),
 ##      (assign, ":variation_id_2", reg2),
 ##      (assign, ":index", reg3),
+      (assign, ":instance_id", reg4),
       (try_begin),
   ] + [elem for sublist in [[
         (eq, ":scene_prop_id", "spr_" + scene_prop),
         (str_store_string, s0, "@" + scene_prop),
       (else_try),
-  ] for i, scene_prop in enumerate([
-    "pw_item_chest_a",
-    "pw_item_chest_b",
-    "pw_cart_a",
-    "pw_cart_b",
-    "pw_wheelbarrow",
-    "pw_hand_cart",
-    "pw_back_basket",
-    "pw_back_box",
-    "pw_horse_pack",
-    "cm_civ_cart",
-    "cm_war_cart",
-  ])] for elem in sublist][:-1] + [
+  ] for i, scene_prop in enumerate(storage_scene_props)] for elem in sublist][:-1] + [
       (try_end),
       (display_message, "@Chest ({s0}, {reg2}) loaded with {reg3} items inside."),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_loading, 0),
     (try_end),
   ]),
   
   ("load_chest_fail", [ (display_message, "@load_chest request failed."), ]),
+
+  ("save_chests", [
+    (store_script_param, ":scene_prop_id", 1),
+    (try_for_prop_instances, ":instance_id", ":scene_prop_id"),
+      (prop_instance_get_variation_id_2, ":variation_id_2", ":instance_id"),
+      (gt, ":variation_id_2", 0),
+      (call_script, "script_cf_save_chest", ":scene_prop_id", ":variation_id_2", ":instance_id"),
+    (try_end),
+  ]),
+
+  ("cf_save_chest", [
+    (store_script_param, ":scene_prop_id", 1),
+    (store_script_param, ":variation_id_2", 2),
+    (store_script_param, ":instance_id", 3),
+
+    (scene_prop_slot_eq, ":instance_id", slot_scene_prop_loading, 0),
+    (scene_prop_set_slot, ":instance_id", slot_scene_prop_saving, 1),
+    (scene_prop_get_slot, ":len", ":instance_id", slot_scene_prop_inventory_count),
+    (store_add, ":end", ":len", slot_scene_prop_inventory_begin),
+    (assign, reg0, ":scene_prop_id"),
+    (assign, reg1, ":variation_id_2"),
+    (assign, reg2, ":instance_id"),
+    (str_store_string, s0, "@{reg0}<{reg1}<{reg2}"),
+    (try_for_range, ":slot", slot_scene_prop_inventory_begin, ":end"),
+      (scene_prop_get_slot, ":item_id", ":instance_id", ":slot"),
+      (gt, ":item_id", 0),
+      (assign, reg3, ":item_id"),
+      (str_store_string, s0, "@{s0}<{reg3}"),
+    (try_end),
+    (send_message_to_url_advanced, script_ip_address + "/save_chest<{s0}", "@WSE2", "script_save_chest_return", "script_save_chest_fail"),
+  ]),
+
+  ("save_chest_return", [
+    (assign, ":scene_prop_id", reg0),
+    (assign, ":variation_id_2", reg1),
+    (assign, ":lenght", reg2),
+    (assign, ":instance_id", reg3),
+    (try_begin),
+] + [elem for sublist in [[
+      (eq, ":scene_prop_id", "spr_" + scene_prop),
+      (str_store_string, s0, "@" + scene_prop),
+    (else_try),
+] for i, scene_prop in enumerate(storage_scene_props)] for elem in sublist][:-1] + [
+    (try_end),
+    (display_message, "@Chest ({s0}, {reg1}) saved with {reg2} items inside."),
+    (scene_prop_set_slot, ":instance_id", slot_scene_prop_saving, 0),
+  ]),
+
+  ("save_chest_fail", [ (display_message, "@save_chest request failed."), ]),
+
+  ("check_chests", [
+    (store_script_param, ":scene_prop_id", 1),
+    (try_for_prop_instances, ":instance_id", ":scene_prop_id"),
+      (prop_instance_get_variation_id_2, ":variation_id_2", ":instance_id"),
+      (gt, ":variation_id_2", 0),
+      (try_begin),
+        (scene_prop_slot_eq, ":instance_id", slot_scene_prop_loading, 1),
+        (call_script, "script_load_chest", ":scene_prop_id", ":variation_id_2", ":instance_id"),
+      (else_try),
+        (scene_prop_slot_eq, ":instance_id", slot_scene_prop_saving, 1),
+        (call_script, "script_cf_save_chest", ":scene_prop_id", ":variation_id_2", ":instance_id"),
+      (try_end),
+    (try_end),
+  ]),
 
   ("load_faction_return", [
 ##  (display_message, "@Chest ({s0}, {reg2}) loaded with {reg3} items inside."),
@@ -287,6 +329,19 @@ scripts.extend([
   
   ("load_faction_fail", [ (display_message, "@load_faction request failed."), ]),
 
+  ("load_player", [
+    (store_script_param, ":player_id", 1),
+    
+    (player_get_unique_id, reg0, ":player_id"),
+    (str_store_player_username, s0, ":player_id"),
+    (assign, reg1, 0),
+    (try_begin),
+      (player_is_admin, ":player_id"),
+      (assign, reg1, 1),
+    (try_end),
+    (send_message_to_url_advanced, script_ip_address + "/load_player<{reg0}<{s0}<{reg1}", "@WSE2", "script_load_player_return", "script_load_player_fail"),
+  ]),
+  
   ("load_player_return", [
     (assign, ":unique_id", reg0),
     (assign, ":faction_id", reg1),
@@ -345,13 +400,22 @@ scripts.extend([
       
       (try_begin),
         (player_is_admin, ":player_id"),
+        (player_set_slot, ":player_id", slot_player_loading_admin, 1),
         (player_get_unique_id, reg1, ":player_id"),
         (send_message_to_url_advanced, script_ip_address + "/load_admin<{reg1}", "@WSE2", "script_load_admin_return", "script_load_admin_fail"),
       (try_end),
+      (player_set_slot, ":player_id", slot_player_loading_player, 0),
     (try_end),
   ]),
 
   ("load_player_fail", [ (display_message, "@load_player request failed."), ]),
+
+  ("load_admin", [
+    (store_script_param, ":player_id", 1),
+    
+    (player_get_unique_id, reg0, ":player_id"),
+    (send_message_to_url_advanced, script_ip_address + "/load_admin<{reg0}", "@WSE2", "script_load_admin_return", "script_load_admin_fail"),
+  ]),
 
   ("load_admin_return", [
 ##    (assign, ":unique_id", reg0),
@@ -363,10 +427,18 @@ scripts.extend([
         (player_set_slot, ":player_id", slot_player_admin_no_spectate + i, reg1 + i),
         (multiplayer_send_3_int_to_player, ":player_id", server_event_player_set_slot, ":player_id", slot_player_admin_no_spectate + i, reg1 + i),
   ] for i in xrange(21)] for elem in sublist] + [
+      (player_set_slot, ":player_id", slot_player_loading_admin, 0),
     (try_end),
   ]),
 
   ("load_admin_fail", [ (display_message, "@load_admin request failed."), ]),
+
+  ("load_gear", [
+    (store_script_param, ":player_id", 1),
+    
+    (player_get_unique_id, reg0, ":player_id"),
+    (send_message_to_url_advanced, script_ip_address + "/load_gear<{reg0}", "@WSE2", "script_load_gear_return", "script_load_gear_fail"),
+  ]),
 
   ("load_gear_return", [
 ##    (assign, ":unique_id", reg0),
@@ -445,10 +517,72 @@ scripts.extend([
         (player_get_unique_id, reg0, ":player_id"),
         (send_message_to_url_advanced, script_ip_address + "/special_string<{reg0}<welcome<0", "@WSE2", "script_special_string_return", "script_special_string_fail"),
       (try_end),
+      (player_set_slot, ":player_id", slot_player_loading_gear, 0),
     (try_end),
   ]),
 
   ("load_gear_fail", [ (display_message, "@load_gear request failed."), ]),
+
+  ("cf_save_agent", [
+    (store_script_param, ":player_id", 1),
+
+    (player_slot_eq, ":player_id", slot_player_loading_gear, 0),
+    (player_get_agent_id, ":agent_id", ":player_id"),
+    (agent_is_active, ":agent_id"),
+    (agent_is_alive, ":agent_id"),
+
+    (player_get_unique_id, reg0, ":player_id"),
+    (store_agent_hit_points, reg1, ":agent_id", 0),
+    (agent_get_slot, reg2, ":agent_id", slot_agent_food_amount),
+
+    (player_get_slot, reg3, ":player_id", slot_player_equip_head),
+    (player_get_slot, reg4, ":player_id", slot_player_equip_body),
+    (player_get_slot, reg5, ":player_id", slot_player_equip_foot),
+    (player_get_slot, reg6, ":player_id", slot_player_equip_gloves),
+
+    (agent_get_item_slot, reg7, ":agent_id", 0),
+    (agent_get_item_slot, reg8, ":agent_id", 1),
+    (agent_get_item_slot, reg9, ":agent_id", 2),
+    (agent_get_item_slot, reg10, ":agent_id", 3),
+  
+    (try_begin),
+      (agent_get_horse, ":horse_agent_id", ":agent_id"),
+      (agent_is_active, ":horse_agent_id"),
+      (agent_is_alive, ":horse_agent_id"),
+      (agent_get_slot, ":owner_agent_id", ":horse_agent_id", slot_agent_owner_agent_id),
+      (this_or_next|eq, ":owner_agent_id", 0),
+      (eq, ":owner_agent_id", ":agent_id"),
+      (agent_get_item_id, reg11, ":horse_agent_id"),
+      (store_agent_hit_points, reg12, ":horse_agent_id", 0),
+      (agent_fade_out, ":horse_agent_id"),
+    (else_try),
+      (assign, reg11, -1),
+      (assign, reg12, 0),
+    (try_end),
+
+    (set_fixed_point_multiplier, 100),
+    (agent_get_position, pos1, ":agent_id"),
+    (position_get_x, reg13, pos1),
+    (position_get_y, reg14, pos1),
+    (position_get_z, reg15, pos1),
+
+    (send_message_to_url_advanced,
+      script_ip_address
+      + "/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}",
+      "@WSE2", "script_default_return", "script_default_fail"
+    ),
+  ]),
+
+  ("save_server", [
+    (display_message, "@Saving server..."),
+] + [elem for sublist in [[
+    (call_script, "script_save_chests", "spr_" + scene_prop),
+] for scene_prop in storage_scene_props] for elem in sublist] + [
+    (try_for_range, ":faction_id", castle_factions_begin, factions_end),
+      (faction_get_slot, ":banner_mesh_id", ":faction_id", slot_faction_banner_mesh),
+      (str_store_faction_name, s0, ":faction_id"),
+    (try_end),
+  ]),
 
   ("special_string_return", [
     (assign, ":action", reg0),
@@ -507,6 +641,7 @@ scripts.extend([
     "$g_is_knock_out_enabled",
     "$g_is_autosave_enabled",
     "$g_keep_equipment",
+    "$g_loading_settings",
   ])] for elem in sublist][:-1] + [
       (try_end),
     (else_try),
@@ -582,6 +717,8 @@ scripts.extend([
   ]),
   
   ("ping_tcp_fail", [ (display_message, "@ping_tcp request failed."), ]),
+
+  ("update_settings_fail", [ (display_message, "@update_settings request failed."), ]),
 
   ("message_sent_return", [
     (assign, ":action", reg0),
@@ -1294,78 +1431,6 @@ scripts.extend([
     (player_set_slot, ":player_id", slot_player_equip_body, ":body_item"),
     (call_script, "script_change_armor", ":agent_id", ":boot_item"),
     (player_set_slot, ":player_id", slot_player_equip_foot, ":boot_item"),
-  ]),
-
-  ("cf_save_agent", [
-    (store_script_param, ":player_id", 1),
-    
-    (player_get_agent_id, ":agent_id", ":player_id"),
-    (agent_is_active, ":agent_id"),
-    (agent_is_alive, ":agent_id"),
-
-    (player_get_unique_id, reg0, ":player_id"),
-    (store_agent_hit_points, reg1, ":agent_id", 0),
-    (agent_get_slot, reg2, ":agent_id", slot_agent_food_amount),
-
-    (player_get_slot, reg3, ":player_id", slot_player_equip_head),
-    (player_get_slot, reg4, ":player_id", slot_player_equip_body),
-    (player_get_slot, reg5, ":player_id", slot_player_equip_foot),
-    (player_get_slot, reg6, ":player_id", slot_player_equip_gloves),
-
-    (agent_get_item_slot, reg7, ":agent_id", 0),
-    (agent_get_item_slot, reg8, ":agent_id", 1),
-    (agent_get_item_slot, reg9, ":agent_id", 2),
-    (agent_get_item_slot, reg10, ":agent_id", 3),
-  
-    (try_begin),
-      (agent_get_horse, ":horse_agent_id", ":agent_id"),
-      (agent_is_active, ":horse_agent_id"),
-      (agent_is_alive, ":horse_agent_id"),
-      (agent_get_slot, ":owner_agent_id", ":horse_agent_id", slot_agent_owner_agent_id),
-      (this_or_next|eq, ":owner_agent_id", 0),
-      (eq, ":owner_agent_id", ":agent_id"),
-      (agent_get_item_id, reg11, ":horse_agent_id"),
-      (store_agent_hit_points, reg12, ":horse_agent_id", 0),
-      (agent_fade_out, ":horse_agent_id"),
-    (else_try),
-      (assign, reg11, -1),
-      (assign, reg12, 0),
-    (try_end),
-
-    (set_fixed_point_multiplier, 100),
-    (agent_get_position, pos1, ":agent_id"),
-    (position_get_x, reg13, pos1),
-    (position_get_y, reg14, pos1),
-    (position_get_z, reg15, pos1),
-
-    (send_message_to_url_advanced,
-      script_ip_address
-      + "/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}",
-      "@WSE2", "script_default_return", "script_default_fail"
-    ),
-  ]),
-
-  ("save_server", [
-] + [elem for sublist in [[
-    (call_script, "script_save_chests", "spr_" + scene_prop),
-] for scene_prop in [
-    "pw_item_chest_a",
-    "pw_item_chest_b",
-    "pw_cart_a",
-    "pw_cart_b",
-    "pw_wheelbarrow",
-    "pw_hand_cart",
-    "pw_back_basket",
-    "pw_back_box",
-    "pw_horse_pack",
-    "cm_civ_cart",
-    "cm_war_cart",
-]] for elem in sublist] + [
-    (try_for_range, ":faction_id", castle_factions_begin, factions_end),
-      (faction_get_slot, ":banner_mesh_id", ":faction_id", slot_faction_banner_mesh),
-      (str_store_faction_name, s0, ":faction_id"),
-    (try_end),
-    (display_message, "@Server got saved."),
   ]),
 
   ("faction_set_banner_mesh", [
@@ -4680,7 +4745,6 @@ scripts.extend([
 
   ("player_add_equipped_items", # server: when respawning and possibly changing troop, calculate the combination of usable previously equipped items and new default items
    [(store_script_param, ":player_id", 1), # must be valid
-    (store_script_param, ":troop_id", 2),
 
     (player_get_agent_id, ":agent_id", ":player_id"),
     (try_begin),
@@ -4788,8 +4852,6 @@ scripts.extend([
         (val_add, ":player_slot", 1),
       (try_end),
     (try_end),
-    (call_script, "script_player_add_default_troop_items", ":player_id", ":troop_id"),
-    (call_script, "script_player_add_default_troop_armor", ":player_id", ":troop_id"),
     ]),
 
   ("player_add_spawn_items", # server: add the previously calculated and stored equipment to the engine's list of items to spawn with
@@ -5096,8 +5158,7 @@ scripts.extend([
           (player_set_slot, ":player_id", slot_player_death_coord_z, ":z"),
         (try_end),
         (eq, "$g_keep_equipment", 1),
-        (agent_get_troop_id, ":troop_id", ":agent_id"),
-        (call_script, "script_player_add_equipped_items", ":player_id", ":troop_id"),
+        (call_script, "script_player_add_equipped_items", ":player_id"),
         (call_script, "script_player_add_spawn_items", ":player_id", 1),
 ##        (agent_get_horse, ":item_id", ":agent_id"),
 ##        (player_set_slot, ":player_id", slot_player_equip_horse, ":item_id"),
@@ -6767,7 +6828,9 @@ scripts.extend([
         (eq, ":old_leadership", 0),
         (player_set_slot, ":player_id", slot_player_non_lord_troop_id, "trp_man_at_arms"),
       (try_end),
-      (call_script, "script_player_add_equipped_items", ":player_id", ":troop_id"),
+      (call_script, "script_player_add_equipped_items", ":player_id"),
+      (call_script, "script_player_add_default_troop_items", ":player_id", ":troop_id"),
+      (call_script, "script_player_add_default_troop_armor", ":player_id", ":troop_id"),
       (call_script, "script_player_add_spawn_items", ":player_id", 1),
       (call_script, "script_player_respawn_in_place", ":player_id"),
       (call_script, "script_scene_prop_get_owning_faction", ":instance_id"),
@@ -14396,7 +14459,9 @@ scripts.extend([
       (try_end),
       (player_set_troop_id, ":admin_player_id", ":new_troop_id"),
       (agent_set_hit_points, ":admin_agent_id", 100, 0),
-      (call_script, "script_player_add_equipped_items", ":admin_player_id", ":new_troop_id"),
+      (call_script, "script_player_add_equipped_items", ":admin_player_id"),
+      (call_script, "script_player_add_default_troop_items", ":admin_player_id", ":troop_id"),
+      (call_script, "script_player_add_default_troop_armor", ":admin_player_id", ":troop_id"),
       (call_script, "script_player_add_spawn_items", ":admin_player_id", 1),
       (call_script, "script_player_respawn_in_place", ":admin_player_id"),
     (else_try),

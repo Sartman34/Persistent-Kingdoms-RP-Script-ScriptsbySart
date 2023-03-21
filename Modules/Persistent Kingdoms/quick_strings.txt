@@ -1,5 +1,8 @@
-106
+111
 qstr_save save
+qstr_update_settings update_settings
+qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
+qstr_WSE2 WSE2
 qstr_/debug /debug
 qstr_/hit /hit
 qstr_Hitler_tekrardan_akt Hitler_tekrardan_aktif!
@@ -10,14 +13,10 @@ qstr_/nlr /nlr
 qstr_NLR_Acildi! NLR_Acildi!
 qstr_NLR_Kapandi. NLR_Kapandi.
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
-qstr_WSE2 WSE2
 qstr_Hesabiniz_bos. Hesabiniz_bos.
 qstr_Hesabinizdan_{reg0}_ Hesabinizdan_{reg0}_dinar_cekildi._Hesabiniz:_{reg1}_dinar.
 qstr_Hesabiniza_aktaracak Hesabiniza_aktaracak_paraniz_kalmadi.
 qstr_Hesabiniza_{reg0}_di Hesabiniza_{reg0}_dinar_aktarildi._Hesabiniz:_{reg1}_dinar.
-qstr_{reg0}<{reg1} {reg0}<{reg1}
-qstr_{s0}<{reg2} {s0}<{reg2}
-qstr_http://127.0.0.1/sav http://127.0.0.1/save_chest<{s0}
 qstr_http://127.0.0.1/rea http://127.0.0.1/read_letter<{reg0}<{reg1}
 qstr_read_letter_request_ read_letter_request_failed.
 qstr_http://127.0.0.1/loa http://127.0.0.1/load_chest<{reg0}<{reg1}<0<{reg2}
@@ -35,13 +34,23 @@ qstr_cm_civ_cart cm_civ_cart
 qstr_cm_war_cart cm_war_cart
 qstr_Chest__{s0}_{reg2}__ Chest_({s0},_{reg2})_loaded_with_{reg3}_items_inside.
 qstr_load_chest_request_f load_chest_request_failed.
+qstr_{reg0}<{reg1}<{reg2} {reg0}<{reg1}<{reg2}
+qstr_{s0}<{reg3} {s0}<{reg3}
+qstr_http://127.0.0.1/sav http://127.0.0.1/save_chest<{s0}
+qstr_Chest__{s0}_{reg1}__ Chest_({s0},_{reg1})_saved_with_{reg2}_items_inside.
+qstr_save_chest_request_f save_chest_request_failed.
 qstr_load_faction_request load_faction_request_failed.
+qstr_http://127.0.0.1/load_ http://127.0.0.1/load_player<{reg0}<{s0}<{reg1}
 qstr_{reg0} {reg0}
-qstr_http://127.0.0.1/load_ http://127.0.0.1/load_admin<{reg1}
+qstr_http://127.0.0.1/load_a http://127.0.0.1/load_admin<{reg1}
 qstr_load_player_request_ load_player_request_failed.
+qstr_http://127.0.0.1/load_ad http://127.0.0.1/load_admin<{reg0}
 qstr_load_admin_request_f load_admin_request_failed.
+qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}
 qstr_http://127.0.0.1/spe http://127.0.0.1/special_string<{reg0}<welcome<0
 qstr_load_gear_request_fa load_gear_request_failed.
+qstr_http://127.0.0.1/save http://127.0.0.1/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}
+qstr_Saving_server... Saving_server...
 qstr_{reg1} {reg1}
 qstr_http://127.0.0.1/spec http://127.0.0.1/special_string<{reg1}<{s1}<{reg2}
 qstr_special_string_reque special_string_request_failed.
@@ -50,6 +59,7 @@ qstr_Your_registered_name Your_registered_name_is:_{s1}
 qstr_Cok_Aciktin! Cok_Aciktin!
 qstr_http://127.0.0.1/pin http://127.0.0.1/ping_tcp
 qstr_ping_tcp_request_fai ping_tcp_request_failed.
+qstr_update_settings_requ update_settings_request_failed.
 qstr_{reg2} {reg2}
 qstr_No_training_center_n No_training_center_nearby.
 qstr_Army_relation_to_com Army_relation_to_commoners_is_set_to_passive.
@@ -70,8 +80,6 @@ qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.
 qstr_Kapi_ID:__{reg0}_. Kapi_ID:_({reg0}).
 qstr_check_door_key_reque check_door_key_request_failed.
 qstr_default_request_fail default_request_failed.
-qstr_http://127.0.0.1/save http://127.0.0.1/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}
-qstr_Server_got_saved. Server_got_saved.
 qstr_fist fist
 qstr_{s0}^Ironflesh:_{reg {s0}^Ironflesh:_{reg10}
 qstr_{s0}^Power_strike:_{ {s0}^Power_strike:_{reg10}
@@ -94,14 +102,11 @@ qstr_http://127.0.0.1/chec http://127.0.0.1/check_door_key<{reg0}<{reg1}<{reg2}
 qstr_http://127.0.0.1/ban http://127.0.0.1/ban_player<{reg0}<0<1
 qstr_http://127.0.0.1/ban_ http://127.0.0.1/ban_player<{reg0}<1<1
 qstr_[E]_Could_not_get_on [E]_Could_not_get_one_or_more_skybox_prop_instances!
-qstr_^Initializing_script ^Initializing_scripts...
-qstr_Connecting_to_script Connecting_to_script_server.
-qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
-qstr_http://127.0.0.1/load_p http://127.0.0.1/load_player<{reg0}<{s0}<{reg1}
+qstr_^__Initializing_scri ^-_Initializing_scripts...
+qstr_^__Connecting_to_scr ^-_Connecting_to_script_server.
 qstr_http://127.0.0.1/save_ http://127.0.0.1/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}
 qstr_http://127.0.0.1/save_e http://127.0.0.1/save_equipment<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}
 qstr_http://127.0.0.1/str http://127.0.0.1/strip_agent<{reg0}
 qstr_http://127.0.0.1/save_i http://127.0.0.1/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}
-qstr_http://127.0.0.1/load_g http://127.0.0.1/load_gear<{reg0}
 qstr_Dogrulanmadan_agresi Dogrulanmadan_agresif_yapamazsiniz.
 qstr_Dogrulanmamis_oyuncu Dogrulanmamis_oyunculara_agresif_yapamazsiniz.

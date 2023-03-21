@@ -72,7 +72,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 5, 2)#y, m, d
+    date = datetime.datetime(2023, 5, 10)#y, m, d
     version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
@@ -83,10 +83,15 @@ class LicenseInfo():
     text[1] = text[1].ljust(message_lenght)
     text = "".join(text)
 
-current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
-##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
-if current_date > LicenseInfo.date:
-    print_("License date is over.")
+try:
+    current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
+    ##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
+    if current_date > LicenseInfo.date:
+        print_("License date is over.")
+        input()
+        sys.exit()
+except:
+    print_("Cannot connect to the license server.")
     input()
     sys.exit()
 
@@ -466,6 +471,7 @@ setting_types = {
     "Knock Out" : 5,
     "Autosave" : 6,
     "Keep Equipment" : 7,
+    "Settings End" : 8,
 }
 message_type = {
     "Local Chat": 1,
@@ -663,7 +669,7 @@ def send_message(client, message, lenght = 128):
     client.send(text.encode())
 
 def serialize(*args):
-    return ("{}|" * len(args))[:-1].format(*args)
+    return ("{}|" * len(args)).format(*args)
 
 def send_message_warband(client, *message):
     text = "HTTP/1.1 200 OK\r\nContent-Lenght: {}\r\n\r\n{}\r\n".format(128, serialize(*message))
@@ -678,8 +684,8 @@ def send_message_special(client, unique_id, message_id):
 def admin_queue_add_command(command, *args):
     admin_q.append(serialize(admin_queue_commands[command], *args))
     
-def admin_queue_add_setting(setting_type, *args):
-    settings.append(serialize(admin_queue_commands["Settings"], setting_types[setting_type], *args))
+def admin_queue_add_setting(setting_type, value):
+    settings.append(serialize(admin_queue_commands["Settings"], setting_types[setting_type], value))
     
 def ban_player(unique_id, permanently = True, hours = 1, reason = "Not specified."):
     banned_players[unique_id] = ("1" if permanently else "0", datetime.datetime.now() + datetime.timedelta(hours = hours), reason)
@@ -755,7 +761,7 @@ def main_request_handler(client, addr, port):
     message = message[1][1:].split("%3C")
     action = message[0].replace("%20", "_")
     message = message[1:]
-    if (not action in ["special_string", "save_to_db", "ping_tcp", "save_chest", "load_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
+    if (not action in ["special_string", "save_to_db", "ping_tcp", "load_chest", "save_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
         print_("Got: ", action, message, port)
     try:
         if action == "load_player":
@@ -1238,6 +1244,7 @@ def main_request_handler(client, addr, port):
         elif action == "update_settings":
             for setting in settings:
                 admin_q.append(setting)
+            admin_q.append(serialize(admin_queue_commands["Settings"], setting_types["Settings End"], 0))
             if len(admin_q):
                 response = admin_q.pop()
             else:
@@ -1331,12 +1338,13 @@ def main_request_handler(client, addr, port):
         elif action == "save_chest":
             scene_prop = message[0]
             variation_id = message[1]
-            data = message[2:]
-            variation_id = (scene_prop, variation_id)
-            chests[variation_id] = []
+            instance_id = message[2]
+            data = message[3:]
+            variation = (scene_prop, variation_id)
+            chests[variation] = []
             for item in data:
-                chests[variation_id].append(item)
-            send_message(client, "0")
+                chests[variation].append(item)
+            send_message_warband(client, scene_prop, variation_id, len(data), instance_id)
         elif action == "load_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1348,7 +1356,7 @@ def main_request_handler(client, addr, port):
             if int(index) < len(chests[variation_id_tuple]):
                 send_message_warband(client, 1, scene_prop, variation_id, index, instance_id, chests[variation_id_tuple][int(index)])
             else:
-                send_message_warband(client, 2, scene_prop, variation_id, index)
+                send_message_warband(client, 2, scene_prop, variation_id, index, instance_id)
         elif action == "save_inventory":
             unique_id = message[0]
             data = message[1:]
