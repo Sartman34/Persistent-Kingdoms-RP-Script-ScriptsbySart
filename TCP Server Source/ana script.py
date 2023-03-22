@@ -1040,7 +1040,7 @@ def main_request_handler(client, addr, port):
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/mektup help"])
-                    elif command in ["envanter", "inventory"] and extensions["Inventory"]:
+                    elif command in ["e", "envanter", "inventory"] and extensions["Inventory"]:
                         if len(text):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/envanter help"])
@@ -1309,14 +1309,14 @@ def main_request_handler(client, addr, port):
             if extensions["Play Times"]:
                 play_times[unique_id] = message.pop(0)
             player_count -= 1
-            send_message(client, "0")
+            send_message_warband(client, unique_id),
         elif action == "save_agent":
             unique_id = message.pop(0)
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
             for i in range(data_id["Health"], data_id["Z"] + 1):
                 players[unique_id][i] = message.pop(0)
-            send_message(client, "0")
+            send_message_warband(client, unique_id),
         elif action == "save_equipment":
             unique_id = message.pop(0)
             if not unique_id in players:
@@ -1327,14 +1327,14 @@ def main_request_handler(client, addr, port):
                 players[unique_id][i] = message.pop(0)
             for i in range(data_id["Head"], data_id["Gloves"] + 1):
                 players[unique_id][i] = message.pop(0)
-            send_message(client, "0")
+            send_message_warband(client, unique_id),
         elif action == "strip_agent":
             unique_id = message.pop(0)
             if not unique_id in players:
                 players[unique_id] = base_items.copy()
             for i in range(data_id["Health"], data_id["Z"] + 1):
                 players[unique_id][i] = base_items[i]
-            send_message(client, "0")
+            send_message_warband(client, unique_id),
         elif action == "save_chest":
             scene_prop = message[0]
             variation_id = message[1]
@@ -1361,7 +1361,7 @@ def main_request_handler(client, addr, port):
             unique_id = message[0]
             data = message[1:]
             inventories[unique_id] = data
-            send_message(client, "0")
+            send_message_warband(client, unique_id),
         elif action == "ban_player":
             unique_id = message[0]
             permanently = message[1]

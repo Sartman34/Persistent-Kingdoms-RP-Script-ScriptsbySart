@@ -149,9 +149,12 @@ slot_player_death_coord_x             = 81
 slot_player_death_coord_y             = 82
 slot_player_death_coord_z             = 83
 
-slot_player_loading_player            = 84
-slot_player_loading_admin             = 85
-slot_player_loading_gear              = 86
+slot_player_has_loaded_player         = 84
+slot_player_has_loaded_admin          = 85
+slot_player_has_loaded_gear           = 86
+slot_player_saving_player             = 87
+slot_player_saving_inventory          = 88
+slot_player_saving_gear               = 89
 
 ########################################################
 ##  AGENT SLOTS            #############################

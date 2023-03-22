@@ -123,6 +123,12 @@ scripts.extend([
         (try_end),
       (try_end),
     (else_try),
+      (str_equals, s0, "@/save"),
+      (str_store_string, s0, "@Saving..."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
+      (call_script, "script_cf_save_player", ":player_id"),
+      (call_script, "script_cf_save_gear", ":player_id", 0),
+    (else_try),
       (neg|str_is_empty, s0),#** Chat Bug Fix
       (neg|str_contains, s0, "str_enter"),
       (neg|str_contains, s0, "str_invalid_token"),
@@ -292,8 +298,8 @@ scripts.extend([
 
   ("save_chest_return", [
     (assign, ":scene_prop_id", reg0),
-    (assign, ":variation_id_2", reg1),
-    (assign, ":lenght", reg2),
+##    (assign, ":variation_id_2", reg1),
+##    (assign, ":lenght", reg2),
     (assign, ":instance_id", reg3),
     (try_begin),
 ] + [elem for sublist in [[
@@ -302,7 +308,7 @@ scripts.extend([
     (else_try),
 ] for i, scene_prop in enumerate(storage_scene_props)] for elem in sublist][:-1] + [
     (try_end),
-    (display_message, "@Chest ({s0}, {reg1}) saved with {reg2} items inside."),
+##    (display_message, "@Chest ({s0}, {reg1}) saved with {reg2} items inside."),
     (scene_prop_set_slot, ":instance_id", slot_scene_prop_saving, 0),
   ]),
 
@@ -400,11 +406,12 @@ scripts.extend([
       
       (try_begin),
         (player_is_admin, ":player_id"),
-        (player_set_slot, ":player_id", slot_player_loading_admin, 1),
         (player_get_unique_id, reg1, ":player_id"),
         (send_message_to_url_advanced, script_ip_address + "/load_admin<{reg1}", "@WSE2", "script_load_admin_return", "script_load_admin_fail"),
+      (else_try),
+        (player_set_slot, ":player_id", slot_player_has_loaded_admin, 1),
       (try_end),
-      (player_set_slot, ":player_id", slot_player_loading_player, 0),
+      (player_set_slot, ":player_id", slot_player_has_loaded_player, 1),
     (try_end),
   ]),
 
@@ -427,11 +434,71 @@ scripts.extend([
         (player_set_slot, ":player_id", slot_player_admin_no_spectate + i, reg1 + i),
         (multiplayer_send_3_int_to_player, ":player_id", server_event_player_set_slot, ":player_id", slot_player_admin_no_spectate + i, reg1 + i),
   ] for i in xrange(21)] for elem in sublist] + [
-      (player_set_slot, ":player_id", slot_player_loading_admin, 0),
+      (player_set_slot, ":player_id", slot_player_has_loaded_admin, 1),
     (try_end),
   ]),
 
   ("load_admin_fail", [ (display_message, "@load_admin request failed."), ]),
+
+  ("cf_save_player", [
+    (store_script_param, ":player_id", 1),
+    
+    (player_slot_eq, ":player_id", slot_player_has_loaded_player, 1),
+    
+    (player_set_slot, ":player_id", slot_player_saving_player, 1),
+    (player_get_unique_id, reg0, ":player_id"),
+    (player_get_slot, reg1, ":player_id", slot_player_faction_id),
+    (player_get_troop_id, reg2, ":player_id"),
+    (player_get_gold, reg3, ":player_id"),
+    (player_get_slot, reg4, ":player_id", slot_player_bank),
+    (player_get_slot, reg5, ":player_id", slot_player_time),
+    (send_message_to_url_advanced, script_ip_address + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}", "@WSE2", "script_save_player_return", "script_save_player_fail"),
+    (try_begin),
+      (troop_get_slot, ":instance_id", "trp_personal_inventories", ":player_id"), #save inventory
+      (prop_instance_is_valid, ":instance_id"),
+      (player_set_slot, ":player_id", slot_player_saving_inventory, 1),
+] + [elem for sublist in [[
+      (scene_prop_get_slot, reg1 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
+      (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
+] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
+      (player_get_unique_id, reg0, ":player_id"),
+      (send_message_to_url_advanced,
+        script_ip_address
+        + "/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}",
+        "@WSE2", "script_save_inventory_return", "script_save_inventory_fail"
+      ),
+    (try_end),
+  ]),
+
+  ("save_player_return", [
+##    (assign, ":unique_id", reg0),
+
+    (try_begin),
+      (dict_has_key, "$g_player_id_dict", "@{reg0}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg0}"),
+
+      (player_set_slot, ":player_id", slot_player_saving_player, 0),
+      (str_store_string, s0, "@Saved player."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
+    (try_end),
+  ]),
+
+  ("save_player_fail", [ (display_message, "@save_player request failed."), ]),
+
+  ("save_inventory_return", [
+##    (assign, ":unique_id", reg0),
+
+    (try_begin),
+      (dict_has_key, "$g_player_id_dict", "@{reg0}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg0}"),
+
+      (player_set_slot, ":player_id", slot_player_saving_inventory, 0),
+      (str_store_string, s0, "@Saved inventory."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
+    (try_end),
+  ]),
+
+  ("save_inventory_fail", [ (display_message, "@save_inventory request failed."), ]),
 
   ("load_gear", [
     (store_script_param, ":player_id", 1),
@@ -517,7 +584,7 @@ scripts.extend([
         (player_get_unique_id, reg0, ":player_id"),
         (send_message_to_url_advanced, script_ip_address + "/special_string<{reg0}<welcome<0", "@WSE2", "script_special_string_return", "script_special_string_fail"),
       (try_end),
-      (player_set_slot, ":player_id", slot_player_loading_gear, 0),
+      (player_set_slot, ":player_id", slot_player_has_loaded_gear, 1),
     (try_end),
   ]),
 
@@ -526,7 +593,6 @@ scripts.extend([
   ("cf_save_agent", [
     (store_script_param, ":player_id", 1),
 
-    (player_slot_eq, ":player_id", slot_player_loading_gear, 0),
     (player_get_agent_id, ":agent_id", ":player_id"),
     (agent_is_active, ":agent_id"),
     (agent_is_alive, ":agent_id"),
@@ -569,18 +635,66 @@ scripts.extend([
     (send_message_to_url_advanced,
       script_ip_address
       + "/save_agent<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}<{reg13}<{reg14}<{reg15}",
-      "@WSE2", "script_default_return", "script_default_fail"
+      "@WSE2", "script_save_gear_return", "script_save_gear_fail"
     ),
   ]),
+  
+  ("cf_save_gear", [
+    (store_script_param, ":player_id", 1),
+    (store_script_param, ":spectate", 2),
+    
+    (player_slot_eq, ":player_id", slot_player_has_loaded_gear, 1),
+    (try_begin),
+      (player_get_team_no, ":team_id", ":player_id"),
+      (eq, ":team_id", team_spectators),
+    (else_try),
+      (val_add, ":spectate", 1),
+      (player_set_slot, ":player_id", slot_player_saving_gear, ":spectate"),
+      (call_script, "script_cf_save_agent", ":player_id"),
+    (else_try),
+      (eq, "$g_keep_equipment", 1),
+      (player_get_unique_id, reg0, ":player_id"),
+] + [elem for sublist in [[
+      (player_get_slot, reg1 + i, ":player_id", slot_player_equip_item_0 + i),
+] for i in xrange(8)] for elem in sublist] + [
+      (send_message_to_url_advanced, script_ip_address + "/save_equipment<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}", "@WSE2", "script_save_gear_return", "script_save_gear_fail"),
+    (else_try),
+      (send_message_to_url_advanced, script_ip_address + "/strip_agent<{reg0}", "@WSE2", "script_save_gear_return", "script_save_gear_fail"),
+    (try_end),
+  ]),
 
+  ("save_gear_return", [
+##    (assign, ":unique_id", reg0),
+
+    (try_begin),
+      (dict_has_key, "$g_player_id_dict", "@{reg0}"),
+      (dict_get_int, ":player_id", "$g_player_id_dict", "@{reg0}"),
+
+      (player_get_slot, ":spectate", ":player_id", slot_player_saving_gear),
+      (player_set_slot, ":player_id", slot_player_saving_gear, 0),
+      (str_store_string, s0, "@Saved gear."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
+      (eq, ":spectate", 2),
+      (player_set_team_no, ":player_id", team_spectators),
+    (try_end),
+  ]),
+
+  ("save_gear_fail", [ (display_message, "@save_gear request failed."), ]),
+    
   ("save_server", [
     (display_message, "@Saving server..."),
 ] + [elem for sublist in [[
     (call_script, "script_save_chests", "spr_" + scene_prop),
 ] for scene_prop in storage_scene_props] for elem in sublist] + [
     (try_for_range, ":faction_id", castle_factions_begin, factions_end),
-      (faction_get_slot, ":banner_mesh_id", ":faction_id", slot_faction_banner_mesh),
+##      (faction_get_slot, ":banner_mesh_id", ":faction_id", slot_faction_banner_mesh),
       (str_store_faction_name, s0, ":faction_id"),
+    (try_end),
+    (try_for_players, ":player_id", 1),
+      (str_store_string, s0, "@Saving..."),
+      (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
+      (call_script, "script_cf_save_player", ":player_id"),
+      (call_script, "script_cf_save_gear", ":player_id", 0),
     (try_end),
   ]),
 
@@ -1764,10 +1878,9 @@ scripts.extend([
           (server_get_ghost_mode, ":spectator_is_enabled"),
           (this_or_next | le, ":spectator_is_enabled", 1),
           (eq, ":display_as_admin", 1),
-          (try_begin),
-            (call_script, "script_cf_save_agent", ":sender_player_id"),
-          (try_end),
-          (player_set_team_no, ":sender_player_id", team_spectators),
+          (str_store_string, s0, "@Saving..."),
+          (call_script, "script_send_coloured_message", ":sender_player_id", colors["beyaz"], 0),
+          (call_script, "script_cf_save_gear", ":sender_player_id", 1),
         (try_end),
       (try_end),
     (else_try), # reply with game rules
@@ -5016,7 +5129,8 @@ scripts.extend([
       (player_get_team_no, ":team_no", ":player_id"),
       (try_begin),
         (this_or_next|eq, ":team_no", team_spectators),
-        (player_slot_eq, ":player_id", slot_player_requested_spawn_point, -1), # has not selected to join the game yet after client connection
+        (this_or_next|player_slot_eq, ":player_id", slot_player_requested_spawn_point, -1), # has not selected to join the game yet after client connection
+        (player_slot_eq, ":player_id", slot_player_has_loaded_player, 0),
       (else_try),
         (player_get_agent_id, ":agent_id", ":player_id"),
         (neg|agent_is_active, ":agent_id"),

@@ -109,14 +109,6 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
     (multiplayer_is_server),
     (call_script, "script_skybox_spawn_all"),
   (try_end),
-  (display_message, "@^- Connecting to script server."),
-
-  (assign, "$g_loading_settings", 1),
-  (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_update_settings_fail"),
-
-] + [elem for sublist in [[
-  (call_script, "script_load_chests", "spr_" + scene_prop),
-] for scene_prop in storage_scene_props] for elem in sublist] + [
 
   (try_for_prop_instances, ":instance_id", "spr_arena_spectator_c"),
     (prop_instance_get_position, pos0, ":instance_id"),
@@ -178,6 +170,15 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
     (eq, ":var1", 1),
     (prop_instance_set_position, ":instance_id", pos0),
   (try_end),
+  
+  (display_message, "@^- Connecting to script server."),
+
+  (assign, "$g_loading_settings", 1),
+  (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_update_settings_fail"),
+
+] + [elem for sublist in [[
+  (call_script, "script_load_chests", "spr_" + scene_prop),
+] for scene_prop in storage_scene_props] for elem in sublist] + [
 ])
 
 player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connecting players
@@ -189,7 +190,8 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
   (player_get_unique_id, reg0, ":player_id"),
   (dict_set_int, "$g_player_id_dict", "@{reg0}", ":player_id"),
 
-  (player_set_slot, ":player_id", slot_player_loading_player, 1),
+  (str_store_string, s0, "@Loading..."),
+  (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
   (call_script, "script_load_player", ":player_id"),
 ])
 
@@ -199,53 +201,19 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
   (player_get_unique_id, reg0, ":player_id"),
   (dict_erase, "$g_player_id_dict", "@{reg0}"),
 
-  (try_begin), #save player
-    (player_slot_eq, ":player_id", slot_player_loading_player, 0),
-    (player_get_unique_id, reg0, ":player_id"),
-    (player_get_slot, reg1, ":player_id", slot_player_faction_id),
-    (player_get_troop_id, reg2, ":player_id"),
-    (player_get_gold, reg3, ":player_id"),
-    (player_get_slot, reg4, ":player_id", slot_player_bank),
-    (player_get_slot, reg5, ":player_id", slot_player_time),
-    (send_message_to_url_advanced, script_ip_address + "/save_player<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}", "@WSE2", "script_default_return", "script_default_fail"),
-  (else_try),
-    (player_set_slot, ":player_id", slot_player_loading_player, 0),
+  (try_begin),
+     (call_script, "script_cf_save_player", ":player_id"),
+     (call_script, "script_cf_save_gear", ":player_id", 0),
   (try_end),
-  
-  (try_begin), #save gear
-    (player_slot_eq, ":player_id", slot_player_loading_gear, 1),
-    (player_set_slot, ":player_id", slot_player_loading_gear, 0),
-  (else_try),
-    (call_script, "script_cf_save_agent", ":player_id"),
-  (else_try),
-    (player_get_team_no, ":team_id", ":player_id"),
-    (eq, ":team_id", team_spectators),
-  (else_try),
-    (eq, "$g_keep_equipment", 1),
-    (player_get_unique_id, reg0, ":player_id"),
-] + [elem for sublist in [[
-    (player_get_slot, reg1 + i, ":player_id", slot_player_equip_item_0 + i),
-] for i in xrange(8)] for elem in sublist] + [
-    (send_message_to_url_advanced, script_ip_address + "/save_equipment<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}", "@WSE2", "script_default_return", "script_default_fail"),
-  (else_try),
-    (send_message_to_url_advanced, script_ip_address + "/strip_agent<{reg0}", "@WSE2", "script_default_return", "script_default_fail"),
+
+  (try_for_agents, ":agent_id"),
+    (agent_is_human, ":agent_id"),
+    (agent_is_non_player, ":agent_id"),
+    (agent_get_group, ":group_id", ":agent_id"),
+    (eq, ":group_id", ":player_id"),
+    (agent_fade_out, ":agent_id"),
   (try_end),
-    
-  (try_begin), #save inventory
-    (troop_get_slot, ":instance_id", "trp_personal_inventories", ":player_id"),
-    (prop_instance_is_valid, ":instance_id"),
-] + [elem for sublist in [[
-    (scene_prop_get_slot, reg1 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
-    (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
-] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
-    (player_get_unique_id, reg0, ":player_id"),
-    (send_message_to_url_advanced,
-      script_ip_address
-      + "/save_inventory<{reg0}<{reg1}<{reg2}<{reg3}<{reg4}<{reg5}<{reg6}<{reg7}<{reg8}<{reg9}<{reg10}<{reg11}<{reg12}",
-      "@WSE2", "script_default_return", "script_default_fail"
-    ),
-  (try_end),
-    
+
 ##    (try_begin),
 ##      (player_get_slot, reg6, ":player_id", slot_player_equip_head),
 ##      (player_get_slot, reg7, ":player_id", slot_player_equip_body),
@@ -288,16 +256,6 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 ##        (agent_equip_item, ":agent_id", reg13),
 ##      (try_end),
 ##    (try_end),
-    
-  (try_for_agents, ":agent_id"),
-    (agent_is_human, ":agent_id"),
-    (agent_is_non_player, ":agent_id"),
-    (agent_get_group, ":group_id", ":agent_id"),
-    (eq, ":group_id", ":player_id"),
-    (agent_fade_out, ":agent_id"),
-  (try_end),
-
-  (player_set_slot, ":player_id", slot_player_loading_admin, 0),
 ])
 
 
@@ -314,7 +272,6 @@ agent_spawn = (ti_on_agent_spawn, 0, 0, [(multiplayer_is_server),], [ # server: 
       (player_slot_eq, ":player_id", slot_player_spawn_state, player_spawn_state_dead),
       (try_begin),
         (player_slot_eq, ":player_id", slot_player_first_spawn_occured, 0),
-        (player_set_slot, ":player_id", slot_player_loading_gear, 1),
         (call_script, "script_load_gear", ":player_id"),
       (else_try),
         (assign, ":is_naked", 1),
@@ -1161,7 +1118,7 @@ ping_tcp_server = (10, 0, 0, [
   (send_message_to_url_advanced, script_ip_address + "/ping_tcp", "@WSE2", "script_ping_tcp_return", "script_ping_tcp_fail"),
 ], [])
 
-autosave = (120, 0, 0, [
+autosave = (900, 0, 0, [
   (multiplayer_is_server),
   (eq, "$g_is_autosave_enabled", 1),
 ], [
@@ -1189,18 +1146,25 @@ rot_update = (120, 0, 0, [
 load_fail_update = (5, 0, 0, [
   (try_for_players, ":player_id", 1),
     (try_begin),
-      (player_slot_eq, ":player_id", slot_player_loading_player, 1),
+      (player_slot_eq, ":player_id", slot_player_has_loaded_player, 0),
       (call_script, "script_load_player", ":player_id"),
     (else_try),
       (player_is_admin, ":player_id"),
-      (player_slot_eq, ":player_id", slot_player_loading_admin, 1),
+      (player_slot_eq, ":player_id", slot_player_has_loaded_admin, 0),
       (call_script, "script_load_admin", ":player_id"),
     (else_try),
       (player_get_agent_id, ":agent_id", ":player_id"),
       (agent_is_active, ":agent_id"),
       (agent_is_alive, ":agent_id"),
-      (player_slot_eq, ":player_id", slot_player_loading_gear, 1),
+      (player_slot_eq, ":player_id", slot_player_has_loaded_gear, 0),
       (call_script, "script_load_gear", ":player_id"),
+    (else_try),
+      (this_or_next|player_slot_eq, ":player_id", slot_player_saving_player, 1),
+      (player_slot_eq, ":player_id", slot_player_saving_inventory, 1),
+      (call_script, "script_cf_save_player", ":player_id"),
+    (else_try),
+      (player_slot_eq, ":player_id", slot_player_saving_gear, 1),
+      (call_script, "script_cf_save_gear", ":player_id", 0),
     (try_end),
   (try_end),
 
