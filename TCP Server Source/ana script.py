@@ -2,6 +2,7 @@
 import socket
 import time
 import os
+import shutil
 import string
 import random
 import threading
@@ -1403,10 +1404,6 @@ def main_request_handler(client, addr, port):
                 _print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         elif action == "save_to_db":
             try:
-                os.remove("Data\\database_backup_02.txt")
-                os.rename("Data\\database_backup_01.txt", "Data\\database_backup_02.txt")
-                os.rename("Data\\database_backup_00.txt", "Data\\database_backup_01.txt")
-                os.rename("Data\\database.txt", "Data\\database_backup_00.txt")
                 text = ""
                 for unique_id in players.keys():
                     try:
@@ -1694,6 +1691,13 @@ def warband_listener(port, ip_adress):
         threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
 
 try:
+    directories.rollback.format(filename = "database", strftime = datetime.datetime.now().strftime("%Y_%m_%d"))
+    shutil.copyfile("Data\\database.txt", directories.rollback)
+    directories.rollback.format(filename = "chests")
+    shutil.copyfile("Data\\chests.txt", directories.rollback)
+    directories.rollback.format(filename = "inventories")
+    shutil.copyfile("Data\\inventories.txt", directories.rollback)
+    
     file = open("Data\\database.txt", "r+")
     database = file.read().split("\n")
     file.close()

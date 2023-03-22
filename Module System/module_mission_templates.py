@@ -206,6 +206,20 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
      (call_script, "script_cf_save_gear", ":player_id", 0),
   (try_end),
 
+  (player_set_slot, ":player_id", slot_player_has_loaded_player, 0),
+  (player_set_slot, ":player_id", slot_player_has_loaded_admin, 0),
+  (player_set_slot, ":player_id", slot_player_has_loaded_gear, 0),
+  (player_set_slot, ":player_id", slot_player_saving_player, 0),
+  (player_set_slot, ":player_id", slot_player_saving_inventory, 0),
+  (player_set_slot, ":player_id", slot_player_saving_gear, 0),
+  (try_begin),
+    (troop_get_slot, ":instance_id", "trp_personal_inventories", ":player_id"),
+    (prop_instance_is_valid, ":instance_id"),
+] + [elem for sublist in [[
+    (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
+] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
+  (try_end),
+
   (try_for_agents, ":agent_id"),
     (agent_is_human, ":agent_id"),
     (agent_is_non_player, ":agent_id"),

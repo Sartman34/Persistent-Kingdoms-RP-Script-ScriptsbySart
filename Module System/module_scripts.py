@@ -459,7 +459,6 @@ scripts.extend([
       (player_set_slot, ":player_id", slot_player_saving_inventory, 1),
 ] + [elem for sublist in [[
       (scene_prop_get_slot, reg1 + i, ":instance_id", slot_scene_prop_inventory_begin + i),
-      (scene_prop_set_slot, ":instance_id", slot_scene_prop_inventory_begin + i, 0),
 ] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
       (player_get_unique_id, reg0, ":player_id"),
       (send_message_to_url_advanced,
