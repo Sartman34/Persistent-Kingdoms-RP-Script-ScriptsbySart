@@ -220,6 +220,16 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 ] for i in xrange(personal_inventory_lenght)] for elem in sublist] + [
   (try_end),
 
+  (try_begin),
+    (player_get_agent_id, ":agent_id", ":player_id"),
+    (agent_is_active, ":agent_id"),
+    (agent_is_alive, ":agent_id"),
+    (agent_get_horse, ":horse_agent_id", ":agent_id"),
+    (agent_is_active, ":horse_agent_id"),
+    (agent_is_alive, ":horse_agent_id"),
+    (agent_fade_out, ":horse_agent_id"),
+  (try_end),
+
   (try_for_agents, ":agent_id"),
     (agent_is_human, ":agent_id"),
     (agent_is_non_player, ":agent_id"),

@@ -619,7 +619,6 @@ scripts.extend([
       (eq, ":owner_agent_id", ":agent_id"),
       (agent_get_item_id, reg11, ":horse_agent_id"),
       (store_agent_hit_points, reg12, ":horse_agent_id", 0),
-      (agent_fade_out, ":horse_agent_id"),
     (else_try),
       (assign, reg11, -1),
       (assign, reg12, 0),
@@ -675,6 +674,7 @@ scripts.extend([
       (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
       (eq, ":spectate", 2),
       (player_set_team_no, ":player_id", team_spectators),
+      (player_set_slot, ":player_id", slot_player_has_loaded_gear, 0),
     (try_end),
   ]),
 
