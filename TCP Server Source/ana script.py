@@ -897,7 +897,7 @@ def main_request_handler(client, addr, port):
                             if text[0] == "help":
                                 send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/me help"])
                             else:
-                                colour = (colors["acik kahverengi"], colors["koyu kahverengi"])
+                                colour = (colors["discord pembe"], colors["discord pembe"])
                                 send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colour[event_type],
                                     "\"{} ".format(names[unique_id]) + " ".join(text) + "\""
                                 )
