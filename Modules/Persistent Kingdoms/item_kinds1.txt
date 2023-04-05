@@ -2360,7 +2360,7 @@ itemsfile version 3
  0
 0
 
- itm_dog Dog Dog 1  pk_dog 0  1 0 859 0 0.000000 100 0 20 0 9 70 70 60 50 0 0 0
+ itm_dog Dog Dog 1  pk_dog 0  1 0 859 0 0.000000 100 0 20 0 1 70 70 60 50 0 0 0
  0
 0
 
