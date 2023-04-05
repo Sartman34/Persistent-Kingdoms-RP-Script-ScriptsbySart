@@ -1244,7 +1244,7 @@ items = [
 ["calf", "Calf", [("pw_cow",0)], itp_type_horse, 0,
  723, hit_points(45)|body_armor(8)|difficulty(11)|horse_speed(37)|horse_maneuver(60)|horse_charge(30)|horse_scale(60), imodbits_none],
 ["dog", "Dog", [("pk_dog",0)], itp_type_horse, 0,
- 859, hit_points(70)|body_armor(20)|difficulty(10)|horse_speed(60)|horse_maneuver(70)|horse_scale(50), imodbits_none],
+ 859, hit_points(70)|body_armor(20)|difficulty(9)|horse_speed(60)|horse_maneuver(70)|horse_scale(50), imodbits_none],
 ["pig", "Pig", [("pk_pig",0)], itp_type_horse, 0,
  859, hit_points(70)|body_armor(20)|difficulty(11)|horse_speed(30)|horse_maneuver(70)|horse_charge(50)|horse_scale(70), imodbits_none,
  itm_herd_animal(child_item="itm_piglet", grow_age=12, max_in_herd=6, attack_reaction=animal_reaction_charge, meat=6, hide=0, wildness=1, death_sound="snd_pig_slaughter")],
