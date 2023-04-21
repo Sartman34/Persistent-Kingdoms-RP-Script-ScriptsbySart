@@ -965,9 +965,22 @@ def main_request_handler(client, addr, port):
                         if len(text):
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/kart help"])
                         elif unique_id in command_perm[perm_id["Cards"]]:
-                            card_colors = [("koyu mavi", "Blue"), ("koyu kirmizi", "Red"), ("koyu yesil", "Green"), ("turuncu", "Orange"), ("altın", "Yellow"), ("discord pembe", "Pink")]
+                            card_colors = [("koyu mavi", "Blue"), ("koyu kirmizi", "Red"), ("koyu yesil", "Green"), ("altın", "Yellow")]
                             rand_color = card_colors[random.randrange(0, len(card_colors))]
                             send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colors[rand_color[0]], "{} drew a card coloured '{}'!".format(names[unique_id], rand_color[1]))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Cards"))
+                    elif command in ["bj"] and extensions["Custom Announcement"]:
+                        if len(text) and text[0] == "help":
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/bj help"])
+                        elif unique_id in command_perm[perm_id["Cards"]]:
+                            if len(text) and text[0].isnumeric():
+                                roll = random.randint(1, int(text[0]))
+                            else:
+                                roll = random.randint(1, 10)
+                            send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colors["mektup"],
+                                "{} drew the card '{}'!".format(names[unique_id], roll)
+                            )
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Cards"))
                     elif command in ["w", "whisper", "fısılda", "fisilda"]:
