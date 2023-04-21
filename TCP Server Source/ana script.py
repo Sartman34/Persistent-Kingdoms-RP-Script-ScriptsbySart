@@ -311,6 +311,7 @@ colors = {
     "local chat shout" : 17,
     "commoners" : 18,
 }
+
 special_strings = {
     "welcome" : [
         ("Merhabalar. {} sunucusuna hoşgeldiniz.".format(server_name), colors["koyu yesil"]),
@@ -330,6 +331,7 @@ special_strings = {
         ("/b (mesaj)", colors["koyu mavi"]),
         ("/me (mesaj)", colors["acik kahverengi"]),
         ("/do (mesaj)", colors["acik yesil"]),
+        ("/w (mesaj), /l (mesaj)", colors["turuncu"]),
     ],
     "/ordu_komutlar": [
         ("Groups:^1 - Soldiers^2 - Missiles^3 - Cavalry^0 - Everyone", colors["beyaz"]),
@@ -342,8 +344,9 @@ special_strings = {
 if extensions["Custom Announcement"]:
     special_strings["yardim"].extend([
         ("Roleplay komutları:", colors["beyaz"]),
-        ("/duyuru (mesaj)", colors["beyaz"]),
+        ("/duyuru (mesaj)", colors["commoners"]),
         ("/söylenti (mesaj)", colors["söylenti"]),
+        ("/kart", colors["koyu yesil"]),
     ])
 if extensions["Letter"]:
     special_strings["yardim"].extend([
@@ -405,7 +408,8 @@ settings = list()
 command_perm = list()
 perm_id = {
     "Duyuru": 0,
-    "Soylenti": 1
+    "Soylenti": 1,
+    "Cards": 2,
 }
 data_id = {
     "Faction": 0,
@@ -957,6 +961,15 @@ def main_request_handler(client, addr, port):
                                     send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Soylenti"))
                         else:
                             send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/{} ek mesaj beklenir"].format("soylenti"))
+                    elif command in ["kart", "card"] and extensions["Custom Announcement"]:
+                        if len(text):
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["/kart help"])
+                        elif unique_id in command_perm[perm_id["Cards"]]:
+                            card_colors = [("koyu mavi", "Blue"), ("koyu kirmizi", "Red"), ("koyu yesil", "Green"), ("turuncu", "Orange"), ("altın", "Yellow"), ("discord pembe", "Pink")]
+                            rand_color = card_colors[random.randrange(0, len(card_colors))]
+                            send_message_warband(client, message_type["Local Chat"], unique_id, event_type, colors[rand_color[0]], "{} drew a card coloured '{}'!".format(names[unique_id], rand_color[1]))
+                        else:
+                            send_message_warband(client, message_type["Message"], unique_id, colors["beyaz"], strings["no permisson to use {}"].format("Cards"))
                     elif command in ["w", "whisper", "fısılda", "fisilda"]:
                         if len(text):
                             if text[0] == "help":
