@@ -58,7 +58,7 @@ try:
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Knock-Out" : 1,
+        "Knock-Out" : 0,
         "Inventory" : 1,
         "Horse Keeper" : 1,
         "Play Times" : 1,
