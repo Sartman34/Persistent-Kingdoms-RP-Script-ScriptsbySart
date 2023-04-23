@@ -8,7 +8,7 @@
 #** Added by us.
 flood_log_limit = 100
 script_ip_address = "@http://127.0.0.1"
-is_battle_oriented = True
+is_battle_oriented = False
 personal_inventory_lenght = 12
 
 colors = {
