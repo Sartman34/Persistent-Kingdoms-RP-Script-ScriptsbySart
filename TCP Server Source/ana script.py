@@ -58,7 +58,7 @@ try:
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Knock-Out" : 0,
+        "Knock-Out" : 1,
         "Inventory" : 1,
         "Horse Keeper" : 1,
         "Play Times" : 1,
@@ -72,7 +72,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 5, 2)#y, m, d
+    date = datetime.datetime(2023, 5, 18)#y, m, d
     version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))

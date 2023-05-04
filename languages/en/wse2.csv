@@ -16,8 +16,9 @@ ui_multiplayer_options|Multiplayer
 ui_video_options|Graphics
 ui_sound_options|Sound
 ui_input_options|Input
+ui_edit_mode_options|Edit Mode
 ui_maximum_framerate|Max Frame-rate
-ui_show_framerate|Show Frame-rate
+ui_show_framerate_wse2|Show Frame-rate
 ui_estimated_performance|Performance = %d%%
 ui_change_reflections_explanation|Full reflections are performance heavy. Disable them if you are experiencing low frame rates.
 ui_report_proficiency|Report Proficiency
@@ -99,6 +100,23 @@ ui_fxaa_tooltip|Smooths out jagged edges, significantly blurs the screen\n\nPerf
 ui_anisotropic_filtering_tooltip|Reduces blur on distant surfaces\n\nPerformance Cost: <c=0xFFAA00>Medium</c>
 ui_sound_occlusion_tooltip|Imitates how sounds are perceived in "closed" environments, closed meaning that there are barriers close to the sound source or listener\n\nPerformance Cost: <c=0xFF0000>High</c>
 ui_update_wse2_version|Please update your WSE2 version or you will be kicked from this server.
+ui_enable_cheats_wse2|Enable Cheats
+ui_enable_edit_mode_wse2|Enable Edit Mode (Be warned, this slows down the game.)
+ui_language_wse2|Language:
+ui_ondemand_textures_wse2|Load Textures On Demand
+ui_map_editor|Map editor
+ui_terrain_editor|Terrain editor
+ui_debug|Debug
+ui_restore_module_data|Restore module data
+ui_reload_ui_variables|Reload UI variables
+ui_set_lod_quality|Set lod quality
+ui_auto|Auto
+ui_freeze|Freeze
+ui_create_language_template|Create Language Template
+ui_mark_nontranslated_lines|Mark Non-translated Lines
+ui_create_language_template_required_game|Create a new game or restore a game before using this function!
+ui_create_language_template_generated|Language Template Files Generated Under new_language directory!
+ui_create_language_template_generated_marked|Language Template Files Generated Under new_language directory! Non-translated texts are marked with a {***} sign. You can use this as the search keyword.
 ui_custom_key_1|
 ui_custom_key_2|
 ui_custom_key_3|
