@@ -62,7 +62,7 @@ try:
         "Inventory" : 1,
         "Horse Keeper" : 1,
         "Play Times" : 1,
-        "Army" : 0,
+        "Army" : 1,
     }
 except:
     print_(traceback.format_exc())
