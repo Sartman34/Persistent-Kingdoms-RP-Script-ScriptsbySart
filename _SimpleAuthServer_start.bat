@@ -1,0 +1,1 @@
+python3 -m _SimpleAuthServer 8000 admin:httpadminwarlords2200
