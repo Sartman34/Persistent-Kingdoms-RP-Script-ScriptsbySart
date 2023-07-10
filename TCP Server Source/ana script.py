@@ -1780,7 +1780,7 @@ try:
     print_("Admin log pass is: {}".format(admin_pass))
 
     threading.Thread(target = refresh_admin).start()
-    threading.Thread(target = warband_listener, args = (80, "127.0.0.1")).start()
+    threading.Thread(target = warband_listener, args = (80, "0.0.0.0")).start()
 
 except:
     print_(traceback.format_exc())
