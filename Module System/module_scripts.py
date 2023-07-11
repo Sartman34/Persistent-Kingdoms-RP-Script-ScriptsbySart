@@ -1610,8 +1610,6 @@ scripts.extend([
         (neg^str_contains, s0, "@  "),
         (assign, ":can_go", 0),
       (try_end),
-      (eq, ":can_go", 0),
-      (str_sanitize, s0),
     (try_end),
     (try_begin),
       (eq, ":can_go", 0),
