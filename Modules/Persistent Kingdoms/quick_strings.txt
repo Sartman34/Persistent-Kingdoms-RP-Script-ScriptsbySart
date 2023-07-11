@@ -1,4 +1,4 @@
-119
+122
 qstr_save save
 qstr_update_settings update_settings
 qstr_http://188.132.197.2 http://188.132.197.243/update_settings
@@ -91,6 +91,9 @@ qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.
 qstr_Kapi_ID:__{reg0}_. Kapi_ID:_({reg0}).
 qstr_check_door_key_reque check_door_key_request_failed.
 qstr_default_request_fail default_request_failed.
+qstr_^ ^
+qstr_INVALID_TOKEN INVALID_TOKEN
+qstr___ __
 qstr_fist fist
 qstr_{s0}^Ironflesh:_{reg {s0}^Ironflesh:_{reg10}
 qstr_{s0}^Power_strike:_{ {s0}^Power_strike:_{reg10}
