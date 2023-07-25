@@ -51,8 +51,8 @@ try:
     idle_income = database.pop(0).split(" : ")[1]
     license_name = database.pop(0).split(" : ")[1]
     is_high_rpg = database.pop(0).split(" : ")[1]
-    autosave = database.pop(0).split(" : ")[1]
-    keep_inventory = database.pop(0).split(" : ")[1]
+    autosave = int(database.pop(0).split(" : ")[1])
+    keep_inventory = int(database.pop(0).split(" : ")[1])
     print_("""
 Server Name:   {server_name}\n\
 Discord ID:    {discord_id}\n\
@@ -82,9 +82,9 @@ Keep Inv.:     {keep_inventory}\
     whitelist_enabled = bool(whitelist_enabled).__repr__(),
     idle_income = idle_income,
     license_name = license_name,
-    is_high_rpg = bool(is_high_rpg).__repr__(),
+    is_high_rpg = (is_high_rpg in ["True", "true", "1"]).__repr__(),
     autosave = bool(autosave).__repr__(),
-    keep_inventory = bool(keep_inventory).__repr__()
+    keep_inventory = bool(keep_inventory).__repr__(),
 ))
 
     extensions = {
@@ -92,7 +92,7 @@ Keep Inv.:     {keep_inventory}\
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Knock-Out" : 1,
+        "Knock-Out" : 0,
         "Inventory" : 1,
         "Horse Keeper" : 1,
         "Play Times" : 1,
