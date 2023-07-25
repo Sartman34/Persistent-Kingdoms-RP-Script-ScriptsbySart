@@ -858,7 +858,7 @@ def main_request_handler(client, addr, port):
                     response = "You have been banned {}!^Reason: {}.^Your GUID: {}".format("permanently" if permanently else "temporarily", reason, unique_id)
                 else:
                     banned_players.pop(unique_id)
-            if not unique_id in whitelist and whitelist_enabled:
+            if whitelist_enabled and unique_id not in whitelist:
                 kick = "1"
                 response = "You are not whitelisted.^Your GUID: {}".format(unique_id)
             if not LicenseInfo.is_licensed and player_count > 10:
