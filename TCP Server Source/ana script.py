@@ -37,6 +37,7 @@ try:
     file = open("Data\\basic_settings.txt", "r+")
     database = file.read().split("\n")
     file.close()
+    print_("Loading basic settings...")
     server_name = database.pop(0).split(" : ")[1]
     discord_id = database.pop(0).split(" : ")[1]
     base_hunger = database.pop(0).split(" : ")[1]
@@ -52,6 +53,39 @@ try:
     is_high_rpg = database.pop(0).split(" : ")[1]
     autosave = database.pop(0).split(" : ")[1]
     keep_inventory = database.pop(0).split(" : ")[1]
+    print_("""
+Server Name:   {server_name}\n\
+Discord ID:    {discord_id}\n\
+Base Hunger:   {base_hunger}\n\
+Start Hunger:  {start_hunger}\n\
+Start Bank:    {start_bank}\n\
+Start Money:   {start_money}\n\
+Start Troop:   {start_troop}\n\
+Base Health:   {base_health}\n\
+Log Loc.:      {log_file_location}\n\
+Whitelist:     {whitelist_enabled}\n\
+Idle Income:   {idle_income}\n\
+License Name:  {license_name}\n\
+HRPG:          {is_high_rpg}\n\
+Autosave:      {autosave}\n\
+Keep Inv.:     {keep_inventory}\
+""".format(
+    server_name = server_name,
+    discord_id = discord_id,
+    base_hunger = base_hunger,
+    start_hunger = start_hunger,
+    start_bank = start_bank,
+    start_money = start_money,
+    start_troop = start_troop,
+    base_health = base_health,
+    log_file_location = log_file_location,
+    whitelist_enabled = bool(whitelist_enabled).__repr__(),
+    idle_income = idle_income,
+    license_name = license_name,
+    is_high_rpg = bool(is_high_rpg).__repr__(),
+    autosave = bool(autosave).__repr__(),
+    keep_inventory = bool(keep_inventory).__repr__()
+))
 
     extensions = {
         "Custom Announcement" : 1,
