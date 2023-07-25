@@ -1573,6 +1573,7 @@ scripts.extend([
     (store_script_param, ":sender_player_id", 1),
     (store_script_param, ":event_type", 2),
 
+    (str_sanitize, s0),
     (assign, ":can_go", 1),#** Flood Log codes prevents lag attacks made with client-side scripts.
     (try_begin),
       (player_is_active, ":sender_player_id"),

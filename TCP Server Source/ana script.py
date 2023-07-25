@@ -881,7 +881,7 @@ def main_request_handler(client, addr, port):
             unique_id = message[2]
             string0 = message[3]
             faction_colour = message[4]
-            string0 = string0.replace("%20", " ")
+            string0 = string0.replace("%20", " ").replace("%5B", "[").replace("%5D", "]")
             string0 = string0.replace("%C5%9F", "ş").replace("%C3%A7", "ç").replace("%C4%B1", "ı").replace("%C3%B6", "ö").replace("%C4%9F", "ğ").replace("%C3%BC", "ü")
             string0 = string0.replace("%C5%9E", "Ş").replace("%C3%87", "Ç").replace("%C4%B0", "İ").replace("%C3%96", "Ö").replace("%C4%9E", "Ğ").replace("%C3%9C", "Ü")
             string1 = ""
@@ -1744,7 +1744,7 @@ def warband_listener(port, ip_adress):
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print_(ip_adress)
     server.bind((ip_adress, port))
-    server.listen(20)
+    server.listen(5)
     while True:
         client, addr = server.accept()
         threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
