@@ -106,7 +106,7 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 7, 30)#y, m, d
+    date = datetime.datetime(2023, 10, 1)#y, m, d
     version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
@@ -1421,7 +1421,7 @@ def main_request_handler(client, addr, port):
             unique_id = message[0]
             data = message[1:]
             inventories[unique_id] = data
-            send_message_warband(client, unique_id),
+            send_message_warband(client, unique_id)
         elif action == "ban_player":
             unique_id = message[0]
             permanently = message[1]
