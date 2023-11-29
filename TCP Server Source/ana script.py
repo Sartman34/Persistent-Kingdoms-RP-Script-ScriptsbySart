@@ -92,7 +92,7 @@ Keep Inv.:     {keep_inventory}\
         "Hunger" : 0,#bozuk
         "Door Keys" : 1,
         "Letter" : 0,#bozuk
-        "Knock-Out" : 0,
+        "Knock-Out" : 0, #make it 1 to activate knock out script
         "Inventory" : 1,
         "Horse Keeper" : 1,
         "Play Times" : 1,
@@ -106,30 +106,32 @@ message_lenght = 80
 
 class LicenseInfo():
     is_licensed = True
-    date = datetime.datetime(2023, 10, 1)#y, m, d
+##    date = datetime.datetime(2023, 10, 1)#y, m, d
     version = "2.4.7"
     text = []
     text.append("Scripts by Sart. Version: {}, License: {}".format(version, license_name if is_licensed else "Free Version"))
     text[0] = text[0].ljust(message_lenght)
-    text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
+##    text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
     if not is_licensed:
         text.append("Sunucunun lisansı bedava deneme sürümüdür.")
     text[1] = text[1].ljust(message_lenght)
     text = "".join(text)
 
-try:
-    current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
-    ##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
-    if current_date > LicenseInfo.date:
-        print_("License date is over.")
-        input()
-        sys.exit()
-except:
-    print_("Cannot connect to the license server.")
-    input()
-    sys.exit()
+## Old Licensing Code
+##try:
+##    current_date = datetime.datetime.strptime(urlopen('http://just-the-time.appspot.com/').read().strip().decode(), "%Y-%m-%d %H:%M:%S")
+##    ##current_date = datetime.datetime.fromtimestamp(ntplib.NTPClient().request('pool.ntp.org').tx_time)
+##    if current_date > LicenseInfo.date:
+##        print_("License date is over.")
+##        input()
+##        sys.exit()
+##except:
+##    print_("Cannot connect to the license server.")
+##    input()
+##    sys.exit()
 
-print_("Version: {}, Date: {}".format(LicenseInfo.version, LicenseInfo.date.strftime("%Y.%m.%d")))
+##print_("Version: {}, Date: {}".format(LicenseInfo.version, LicenseInfo.date.strftime("%Y.%m.%d")))
+print_("Version: {}".format(LicenseInfo.version))
 
 if not LicenseInfo.is_licensed:
     extensions = {
