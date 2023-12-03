@@ -114,7 +114,7 @@ class LicenseInfo():
 ##    text.append("Sunucunun lisansı {} tarihine kadardır.".format(date.strftime("%Y.%m.%d")))
     if not is_licensed:
         text.append("Sunucunun lisansı bedava deneme sürümüdür.")
-    text[1] = text[1].ljust(message_lenght)
+    text[-1] = text[-1].ljust(message_lenght)
     text = "".join(text)
 
 ## Old Licensing Code
