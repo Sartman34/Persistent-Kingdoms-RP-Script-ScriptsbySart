@@ -2,3 +2,5 @@ TCP Server/Data/Logs/
 TCP Server/Data/Rollbacks/
 Logs/
 Releases/
+*.wseprfb
+rgl_log.txt

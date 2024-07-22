@@ -7,7 +7,7 @@ import string
 import random
 import threading
 import datetime
-from urllib.request import urlopen
+##from urllib.request import urlopen
 import sys
 import traceback
 #import ntplib
