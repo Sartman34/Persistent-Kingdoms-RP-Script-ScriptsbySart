@@ -1,4 +1,4 @@
-122
+124
 qstr_save save
 qstr_update_settings update_settings
 qstr_http://127.0.0.1/upd http://127.0.0.1/update_settings
@@ -14,6 +14,7 @@ qstr_NLR_Acildi! NLR_Acildi!
 qstr_NLR_Kapandi. NLR_Kapandi.
 qstr_/save /save
 qstr_Saving... Saving...
+qstr_/clear_ /clear_
 qstr_http://127.0.0.1/mes http://127.0.0.1/message_sent<{reg10}<{reg11}<{reg12}<{s0}<{reg13}
 qstr_Hesabiniz_bos. Hesabiniz_bos.
 qstr_Hesabinizdan_{reg0}_ Hesabinizdan_{reg0}_dinar_cekildi._Hesabiniz:_{reg1}_dinar.
@@ -88,8 +89,9 @@ qstr_Applied_your_equipme Applied_your_equipment_to_the_troop_{s0}._Cost_of_recr
 qstr_set_equipment_reques set_equipment_request_failed.
 qstr_Bu_kapi_sana_ait. Bu_kapi_sana_ait.
 qstr_Bu_kapinin_anahtarin Bu_kapinin_anahtarina_sahip_degilsin.
-qstr_Kapi_ID:__{reg0}_. Kapi_ID:_({reg0}).
+qstr_Kilit_ID:__{reg0}_. Kilit_ID:_({reg0}).
 qstr_check_door_key_reque check_door_key_request_failed.
+qstr_Kapi_ID:__{reg0}_. Kapi_ID:_({reg0}).
 qstr_default_request_fail default_request_failed.
 qstr_^ ^
 qstr_INVALID_TOKEN INVALID_TOKEN
