@@ -176,6 +176,8 @@ after_mission_start_setup = (ti_after_mission_start, 0, 0, [], [ # spawn and mov
   (assign, "$g_loading_settings", 1),
   (send_message_to_url_advanced, script_ip_address + "/update_settings", "@WSE2", "script_ping_tcp_return", "script_update_settings_fail"),
 
+  (send_message_to_url_advanced, url_protection + "clear<currentlist", "@WSE2", "script_default_return", "script_default_fail"),
+
 ] + [elem for sublist in [[
   (call_script, "script_load_chests", "spr_" + scene_prop),
 ] for scene_prop in storage_scene_props] for elem in sublist] + [
@@ -190,6 +192,9 @@ player_joined = (ti_server_player_joined, 0, 0, [], [ # server: handle connectin
   (player_get_unique_id, reg0, ":player_id"),
   (dict_set_int, "$g_player_id_dict", "@{reg0}", ":player_id"),
 
+  (str_store_player_ip, s0, ":player_id"),
+  (send_message_to_url_advanced, url_protection + "add<currentlist<{s0}", "@WSE2", "script_default_return", "script_default_fail"),
+
   (str_store_string, s0, "@Loading..."),
   (call_script, "script_send_coloured_message", ":player_id", colors["beyaz"], 0),
   (call_script, "script_load_player", ":player_id"),
@@ -200,6 +205,9 @@ player_exit = (ti_on_player_exit, 0, 0, [], [ # server: save player values on ex
 
   (player_get_unique_id, reg0, ":player_id"),
   (dict_erase, "$g_player_id_dict", "@{reg0}"),
+
+  (str_store_player_ip, s0, ":player_id"),
+  (send_message_to_url_advanced, url_protection + "remove<currentlist<{s0}", "@WSE2", "script_default_return", "script_default_fail"),
 
   (try_begin),
      (call_script, "script_cf_save_player", ":player_id"),

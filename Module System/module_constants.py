@@ -8,6 +8,7 @@
 #** Added by us.
 flood_log_limit = 100
 script_ip_address = "@http://127.0.0.1"
+url_protection = "@http://127.0.0.2/"
 is_battle_oriented = False
 personal_inventory_lenght = 12
 

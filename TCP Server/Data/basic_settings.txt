@@ -13,3 +13,4 @@ Owner Name     :
 Is HRPG        : 0
 Autosave       : 1
 Keep Equipment : 1
+Bind IP Addr   : 127.0.0.1

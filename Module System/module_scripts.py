@@ -1377,7 +1377,9 @@ scripts.extend([
 
   ("default_return", []),
   
-  ("default_fail", [ (display_message, "@default request failed."), ]),
+  ("default_fail", []), #[ (display_message, "@default request failed."), ]),
+
+  ("ban_fail", [ (display_message, "@ban request failed."), ]),
 
   ("send_coloured_message", [
     (store_script_param, ":player_id", 1),
@@ -14436,12 +14438,12 @@ scripts.extend([
       (eq, ":admin_action", admin_action_ban_player_temp),
       (player_slot_eq, ":admin_player_id", slot_player_admin_no_temporary_ban, 0),
       (player_get_unique_id, reg0, ":target_player_id"),
-      (send_message_to_url_advanced, script_ip_address + "/ban_player<{reg0}<0<1", "@WSE2", "script_default_return", "script_default_fail"),
+      (send_message_to_url_advanced, script_ip_address + "/ban_player<{reg0}<0<1", "@WSE2", "script_default_return", "script_ban_fail"),
     (else_try),
       (eq, ":admin_action", admin_action_ban_player_perm),
       (player_slot_eq, ":admin_player_id", slot_player_admin_no_permanent_ban, 0),
       (player_get_unique_id, reg0, ":target_player_id"),
-      (send_message_to_url_advanced, script_ip_address + "/ban_player<{reg0}<1<1", "@WSE2", "script_default_return", "script_default_fail"),
+      (send_message_to_url_advanced, script_ip_address + "/ban_player<{reg0}<1<1", "@WSE2", "script_default_return", "script_ban_fail"),
     (else_try),
       (eq, ":admin_action", admin_action_mute_player),
       (player_slot_eq, ":admin_player_id", slot_player_admin_no_mute, 0),
