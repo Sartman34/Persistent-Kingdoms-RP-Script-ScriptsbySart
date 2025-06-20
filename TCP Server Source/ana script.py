@@ -53,6 +53,7 @@ try:
     is_high_rpg = database.pop(0).split(" : ")[1]
     autosave = int(database.pop(0).split(" : ")[1])
     keep_inventory = int(database.pop(0).split(" : ")[1])
+    bind_ip_addr = database.pop(0).split(" : ")[1]
     print_("""
 Server Name:   {server_name}\n\
 Discord ID:    {discord_id}\n\
@@ -1816,7 +1817,7 @@ try:
     print_("Admin log pass is: {}".format(admin_pass))
 
     threading.Thread(target = refresh_admin).start()
-    threading.Thread(target = warband_listener, args = (80, "0.0.0.0")).start()
+    threading.Thread(target = warband_listener, args = (80, bind_ip_addr)).start()
 
 except:
     print_(traceback.format_exc())
