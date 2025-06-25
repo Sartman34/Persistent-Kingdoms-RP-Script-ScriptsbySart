@@ -551,8 +551,6 @@ def import_custom_announcement():
     file = open(directories.permissions, "r+")
     database = file.read().splitlines()
     file.close()
-    if not database[0]:
-        return
     for permission in database:
         command_perm.append(permission.split("%"))
 def import_door_keys():
@@ -562,8 +560,6 @@ def import_door_keys():
     file = open(directories.door_keys, "r+")
     database = file.read().splitlines()
     file.close()
-    if not database[0]:
-        return
     key_checkers.clear()
     key_checkers.extend(database.pop(0).split("%"))
     for x in database:
@@ -597,8 +593,6 @@ def import_mails():
     file = open(directories.mails, "r", encoding = "utf-8")
     database = file.read().splitlines()
     file.close()
-    if not database[0]:
-        return
     for x in database:
         x = x.split("%")
         code = x[0]
@@ -675,8 +669,6 @@ def import_chests():
     database = file.read().splitlines()
     file.close()
     chests.clear()
-    if not database[0]:
-        return
     for x in database:
         x = x.split("%")
         scene_prop = x[0]
