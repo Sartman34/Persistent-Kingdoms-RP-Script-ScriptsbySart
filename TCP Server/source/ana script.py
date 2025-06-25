@@ -12,9 +12,9 @@ import sys
 import traceback
 #import ntplib
 
-from module_items import warband_items
-from module_troops import warband_troops
-from module_directories import directories
+from modules.module_items import warband_items
+from modules.module_troops import warband_troops
+from modules.directories import directories
 
 def check_file(directory):
     try:

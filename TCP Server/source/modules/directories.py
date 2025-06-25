@@ -1,4 +1,4 @@
-from header_directories import *
+from modules.header_directories import Directory_Manager
 
 directories = Directory_Manager(
     data = [".", "data"],
