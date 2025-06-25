@@ -1,3 +1,0 @@
-base_footman%helmet_with_neckguard%haubergeon%splinted_leather_greaves%mail_mittens%sword_medieval_a%tab_shield_heater_d%spear%0
-base_archer%nordic_veteran_archer_helmet%padded_leather%leather_boots%leather_gauntlet%bow_f_longbow_1%arrows%sword_medieval_b_small%0
-base_lancer%leather_jerkin%ankle_boots%leather_gloves%light_lance%tab_shield_kite_cav_b%sword_medieval_c_long%0%0
