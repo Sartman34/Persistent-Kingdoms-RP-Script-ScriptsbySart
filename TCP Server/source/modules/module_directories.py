@@ -17,6 +17,7 @@ directories = Directory_Manager(
     coins = [".data", "coins.txt"],
     database = [".data", "database.txt"],
     door_keys = [".data", "door_keys.txt"],
+    hosts = [".data", "hosts.txt"],
     hunger = [".data", "hunger.txt"],
     inventories = [".data", "inventories.txt"],
     mails = [".data", "mails.txt"],

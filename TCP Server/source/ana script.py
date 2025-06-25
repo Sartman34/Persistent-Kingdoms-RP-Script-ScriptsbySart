@@ -46,14 +46,13 @@ try:
     start_money = database.pop(0).split(" : ")[1]
     start_troop = str(warband_troops.index(database.pop(0).split(" : ")[1].strip().lower().replace(" ", "_")))
     base_health = database.pop(0).split(" : ")[1]
-    log_file_location = database.pop(0).split(" : ")[1]
+#    log_file_location = database.pop(0).split(" : ")[1]
     whitelist_enabled = int(database.pop(0).split(" : ")[1])
     idle_income = database.pop(0).split(" : ")[1]
     license_name = database.pop(0).split(" : ")[1]
     is_high_rpg = database.pop(0).split(" : ")[1]
     autosave = int(database.pop(0).split(" : ")[1])
     keep_inventory = int(database.pop(0).split(" : ")[1])
-    bind_ip_addr = database.pop(0).split(" : ")[1]
     print_("""
 Server Name:   {server_name}\n\
 Discord ID:    {discord_id}\n\
@@ -63,7 +62,6 @@ Start Bank:    {start_bank}\n\
 Start Money:   {start_money}\n\
 Start Troop:   {start_troop}\n\
 Base Health:   {base_health}\n\
-Log Loc.:      {log_file_location}\n\
 Whitelist:     {whitelist_enabled}\n\
 Idle Income:   {idle_income}\n\
 License Name:  {license_name}\n\
@@ -79,7 +77,7 @@ Keep Inv.:     {keep_inventory}\
     start_money = start_money,
     start_troop = start_troop,
     base_health = base_health,
-    log_file_location = log_file_location,
+##    log_file_location = log_file_location, #Log Loc.:      {log_file_location}\n\
     whitelist_enabled = bool(whitelist_enabled).__repr__(),
     idle_income = idle_income,
     license_name = license_name,
@@ -443,6 +441,7 @@ t_chat_users = list()
 key_checkers = list()
 settings = list()
 command_perm = list()
+hosts = list()
 perm_id = {
     "Duyuru": 0,
     "Soylenti": 1,
@@ -698,6 +697,13 @@ def import_play_times():
         unique_id = data.pop(0)
         play_time = data.pop(0)
         play_times[unique_id] = play_time
+def import_hosts():
+    hosts.clear()
+    with open(directories.hosts, "r") as f:
+        data = f.read().splitlines()
+    for line in data:
+        ip_address, port = line.strip().replace(" ", "").split(":")
+        hosts.append((ip_address, port))
 
 def get_random_string(length):
     random_list = []
@@ -762,7 +768,7 @@ def refresh_admin():
                 admin_client.close()
                 admin_client = None
     
-def main_request_handler(client, addr, port):
+def main_request_handler(client, addr):
     global admin_client, admin_addr, ddos_timer, player_count
     if addr[0] in banned_ips:
         if admin_client:
@@ -803,7 +809,7 @@ def main_request_handler(client, addr, port):
     action = message[0].replace("%20", "_")
     message = message[1:]
     if (not action in ["special_string", "save_to_db", "ping_tcp", "load_chest", "save_chest"]) and not (action == "admin_connect" and admin_addr == addr[0]):
-        print_("Got: ", action, message, port)
+        print_("Got: ", action, message)
     try:
         if action == "load_player":
             #Faction<Troop
@@ -1659,18 +1665,18 @@ Exclude Admins : {}\n\
             file.write(text)
             file.close()
             client.send(b"Banned IP's saved")
-        elif action == "get_log":
-            log_file = message[0]
-            try:
-                file = open(log_file_location + "\\" + log_file, 'rb')
-                client.send(b"recv_file")
-                l = file.read(1024)
-                while (l):
-                   client.send(l)
-                   l = file.read(1024)
-                file.close()
-            except IOError:
-                client.send(b"message%Istenen log dosyasi bulunamadi")
+##        elif action == "get_log":
+##            log_file = message[0]
+##            try:
+##                file = open(log_file_location + "\\" + log_file, 'rb')
+##                client.send(b"recv_file")
+##                l = file.read(1024)
+##                while (l):
+##                   client.send(l)
+##                   l = file.read(1024)
+##                file.close()
+##            except IOError:
+##                client.send(b"message%Istenen log dosyasi bulunamadi")
 ##        elif action == "get_file":
 ##            sent_admin_pass = message[0]
 ##            requested_file = message[1]
@@ -1685,17 +1691,17 @@ Exclude Admins : {}\n\
 ##                    file.close()
 ##                except IOError:
 ##                    client.send(b"message%Istenen dosya bulunamadi")
-            else:
-                client.send(b"message%Hatali sifre.")
-                log = "Hatali admin pass ile dosya istedi."
-                while True:
-                    code = get_random_string(5)
-                    if code not in bad_ips:
-                        bad_ips[code] = addr[0]
-                        break
-                if admin_client:
-                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+##            else:
+##                client.send(b"message%Hatali sifre.")
+##                log = "Hatali admin pass ile dosya istedi."
+##                while True:
+##                    code = get_random_string(5)
+##                    if code not in bad_ips:
+##                        bad_ips[code] = addr[0]
+##                        break
+##                if admin_client:
+##                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
+##                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
 ##        elif action == "set_file":
 ##            sent_admin_pass = message[0]
 ##            sent_file = message[1]
@@ -1742,15 +1748,15 @@ Exclude Admins : {}\n\
             client.close()
         return
 
-def warband_listener(port, ip_adress):
+def warband_listener(addr):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print_(ip_adress)
-    server.bind((ip_adress, port))
+    print_(f"Listening on {addr}")
+    server.bind(addr)
     server.listen(5)
     while True:
         client, addr = server.accept()
-        threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
+        threading.Thread(target = main_request_handler, args = (client, addr)).start()
 
 try:
     directories.rollback.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
@@ -1794,6 +1800,7 @@ try:
     import_armies()
     import_chests()
     import_play_times()
+    import_hosts()
 
     admin_queue_add_setting("Base Health", base_health)
     admin_queue_add_setting("Base Hunger", base_hunger)
@@ -1815,7 +1822,8 @@ try:
     print_("Admin log pass is: {}".format(admin_pass))
 
     threading.Thread(target = refresh_admin).start()
-    threading.Thread(target = warband_listener, args = (80, bind_ip_addr)).start()
+    for addr in hosts:
+        threading.Thread(target = warband_listener, args = (addr)).start()
 
 except:
     print_(traceback.format_exc())
