@@ -6,7 +6,7 @@ directories = Directory_Manager(
     logs = [".data", "logs"],
     log = [".logs", "log_{strftime}.txt"],
     rollbacks = [".data", "rollbacks"],
-    rollback = [".rollbacks", "{filename}_{strftime}.txt"],
+    rollback = [".rollbacks", "{strftime}_{filename}.txt"],
     
     admin_permissions = [".data", "admin_permissions.txt"],
     armies = [".data", "armies.txt"],
