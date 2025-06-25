@@ -1823,7 +1823,7 @@ try:
 
     threading.Thread(target = refresh_admin).start()
     for addr in hosts:
-        threading.Thread(target = warband_listener, args = (addr)).start()
+        threading.Thread(target = warband_listener, args = (addr,)).start()
 
 except:
     print_(traceback.format_exc())
