@@ -1,9 +1,9 @@
 from header_directories import *
 
 directories = Directory_Manager(
-    data = [".", "Data"],
-    logs = [".data", "Logs"],
+    data = [".", "data"],
+    logs = [".data", "logs"],
     log = [".logs", "log_{strftime}.txt"],
-    rollbacks = [".data", "Rollbacks"],
+    rollbacks = [".data", "rollbacks"],
     rollback = [".rollbacks", "{filename}_{strftime}.txt"],
 )
