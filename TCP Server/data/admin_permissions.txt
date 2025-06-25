@@ -1,0 +1,2 @@
+Guid    % Spectate % Tools % Panel % Gold % Kick % Temp % Perm % Fade/Kill % Freeze % Teleport % adminItems % Heal Self % Godlike % Ship % Announce % Poll % allItems % Mute % Animal % joinFaction % Factions
+3214304 % 0        % 0     % 0     % 0    % 0    % 0    % 0    % 0         % 0      % 0        % 0          % 0         % 0       % 0    % 0        % 0    % 0        % 0    % 0      % 0           % 0
