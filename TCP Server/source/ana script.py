@@ -1753,7 +1753,7 @@ def warband_listener(port, ip_adress):
         threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
 
 try:
-    directories.rollback.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d"))
+    directories.rollback.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
     shutil.copyfile(directories.database, directories.rollback.format(filename = "database"))
     shutil.copyfile(directories.chests, directories.rollback.format(filename = "chests"))
     shutil.copyfile(directories.inventories, directories.format(filename = "inventories"))

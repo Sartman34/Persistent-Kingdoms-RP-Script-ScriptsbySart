@@ -28,7 +28,10 @@ class Directory():
 
     def format(self, **kwargs):
         self.kwargs.update(kwargs)
-        return self.string()
+        try:
+            return self.string()
+        except KeyError:
+            return
 
     def string(self):
         current_kwargs = self.kwargs.copy()
