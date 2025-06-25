@@ -1756,7 +1756,7 @@ try:
     directories.rollback.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
     shutil.copyfile(directories.database, directories.rollback.format(filename = "database"))
     shutil.copyfile(directories.chests, directories.rollback.format(filename = "chests"))
-    shutil.copyfile(directories.inventories, directories.format(filename = "inventories"))
+    shutil.copyfile(directories.inventories, directories.rollback.format(filename = "inventories"))
     
     file = open(directories.database, "r+")
     database = file.read().split("\n")
