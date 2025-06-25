@@ -14,7 +14,7 @@ import traceback
 
 from modules.module_items import warband_items
 from modules.module_troops import warband_troops
-from modules.directories import directories
+from modules.module_directories import directories
 
 def check_file(directory):
     try:
@@ -34,7 +34,7 @@ def print_(*string, sep = " ", end = "\n", flush = False):
         sys.stdout = old_stdout
 
 try:
-    file = open("Data\\basic_settings.txt", "r+")
+    file = open(directories.basic_settings, "r+")
     database = file.read().split("\n")
     file.close()
     print_("Loading basic settings...")
@@ -549,7 +549,7 @@ def import_custom_announcement():
     if not extensions["Custom Announcement"]:
         return
     command_perm.clear()
-    file = open("Data\\permissions.txt", "r+")
+    file = open(directories.permissions, "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -560,7 +560,7 @@ def import_door_keys():
     if not extensions["Door Keys"]:
         return
     doors.clear()
-    file = open("Data\\door_keys.txt", "r+")
+    file = open(directories.door_keys, "r+")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -574,7 +574,7 @@ def import_door_keys():
         doors[door] = keys
 def import_admin_permissions():
     admin_permissions.clear()
-    file = open("Data\\admin_permissions.txt", "r+")
+    file = open(directories.admin_permissions, "r+")
     database = file.read().split("\n")
     file.close()
     for line in database:
@@ -586,7 +586,7 @@ def import_whitelist():
     if not whitelist_enabled:
         return
     whitelist.clear()
-    file = open("Data\\whitelist.txt", "r+")
+    file = open(directories.whitelist, "r+")
     database = file.read().split("\n")
     file.close()
     for unique_id in database:
@@ -595,7 +595,7 @@ def import_mails():
     if not extensions["Letter"]:
         return
     mails.clear()
-    file = open("Data\\mails.txt", "r", encoding = "utf-8")
+    file = open(directories.mails, "r", encoding = "utf-8")
     database = file.read().split("\n")
     file.close()
     if not database[0]:
@@ -610,10 +610,10 @@ def import_mails():
 def import_names():
     global force_names, kick_unmatched_name, exclude_admins
     names.clear()
-    with open("Data\\names.txt", "r", encoding = "utf-8") as file:
+    with open(directories.names, "r", encoding = "utf-8") as file:
         data = file.read()
     if not data:
-        with open("Data\\names.txt", "w", encoding = "utf-8") as file:
+        with open(directories.names, "w", encoding = "utf-8") as file:
             file.write("Force Usernames : 0")
             file.write("Kick Unmatched : 0")
             file.write("Exclude Admins : 0")
@@ -637,7 +637,7 @@ def import_names():
 def import_inventories():
     if not extensions["Inventory"]:
         return
-    file = open("Data\\inventories.txt", "r+")
+    file = open(directories.inventories, "r+")
     database = file.read().split("\n")
     file.close()
     base_inventory.clear()
@@ -651,7 +651,7 @@ def import_inventories():
 def import_armies():
     if not extensions["Army"]:
         return
-    with open("Data\\armies.txt", "r+") as file:
+    with open(directories.armies, "r+") as file:
         database = file.read().split("\n")
     armies.clear()
     for line in database:
@@ -672,7 +672,7 @@ def import_armies():
             print("WARNING! troop: {} is not defined. Creating an empty one.".format(troop_name))
             armies[troop_name] = ["0" for i in range(8)]
 def import_chests():
-    file = open("Data\\chests.txt", "r+")
+    file = open(directories.chests, "r+")
     database = file.read().split("\n")
     file.close()
     chests.clear()
@@ -688,7 +688,7 @@ def import_play_times():
     global authentication_time
     if not extensions["Play Times"]:
         return
-    file = open("Data\\play_times.txt", "r+")
+    file = open(directories.play_times, "r+")
     database = file.read().split("\n")
     file.close()
     play_times.clear()
@@ -1475,13 +1475,13 @@ def main_request_handler(client, addr, port):
                     except:
                         print_(traceback.format_exc(), "\n", players[unique_id])
                     text += "{}%".format(unique_id) + "%".join(players[unique_id]) + "\n"
-                file = open("Data\\database.txt", "w")
+                file = open(directories.database, "w")
                 file.write(text[:-1])
                 file.close()
             except:
                 print_(traceback.format_exc())
             try:
-                file = open("Data\\banned_players.txt", "w")
+                file = open(directories.banned_players, "w")
                 text = ""
                 for unique_id in banned_players:
                     text += "{}%{}%{}%{}\n".format(
@@ -1496,7 +1496,7 @@ def main_request_handler(client, addr, port):
                 print_(traceback.format_exc())
             try:
                 if extensions["Letter"]:
-                    file = open("Data\\mails.txt", "w", encoding = 'utf8')
+                    file = open(directories.mails, "w", encoding = 'utf8')
                     text = ""
                     for code in mails:
                         mail = mails[code]
@@ -1509,7 +1509,7 @@ def main_request_handler(client, addr, port):
             except:
                 print_(traceback.format_exc())
             try:
-                file = open("Data\\names.txt", "w", encoding = 'utf8')
+                file = open(directories.names, "w", encoding = 'utf8')
                 text = "\
 Force Usernames : {}\n\
 Kick Unmatched : {}\n\
@@ -1528,7 +1528,7 @@ Exclude Admins : {}\n\
                 print_(traceback.format_exc())
             try:
                 if extensions["Door Keys"]:
-                    with open("Data\\door_keys.txt", "w", encoding = 'utf8') as file:
+                    with open(directories.door_keys, "w", encoding = 'utf8') as file:
                         text = ["%".join(key_checkers)]
                         for door, keys in doors.items():
                             text.append("%".join([door, *keys]))
@@ -1537,7 +1537,7 @@ Exclude Admins : {}\n\
                 print_(traceback.format_exc())
             try:
                 if extensions["Inventory"]:
-                    file = open("Data\\inventories.txt", "w", encoding = 'utf8')
+                    file = open(directories.inventories, "w", encoding = 'utf8')
                     text = ""
                     text += "Base Inventory%" + "%".join(base_inventory) + "\n"
                     for unique_id in inventories.keys():
@@ -1549,7 +1549,7 @@ Exclude Admins : {}\n\
                 print_(traceback.format_exc())
             try:
                 if extensions["Army"]:
-                    file = open("Data\\armies.txt", "w", encoding = 'utf8')
+                    file = open(directories.armies, "w", encoding = 'utf8')
                     text = ""
                     for troop, items in armies.items():
                         text += troop + "%"
@@ -1559,7 +1559,7 @@ Exclude Admins : {}\n\
             except:
                 print_(traceback.format_exc())
             try:
-                file = open("Data\\chests.txt", "w", encoding = 'utf8')
+                file = open(directories.chests, "w", encoding = 'utf8')
                 text = ""
                 for variation_id, items in chests.items():
                     if not items:
@@ -1572,7 +1572,7 @@ Exclude Admins : {}\n\
                 print_(traceback.format_exc())
             try:
                 if extensions["Play Times"]:
-                    file = open("Data\\play_times.txt", "w", encoding = 'utf8')
+                    file = open(directories.play_times, "w", encoding = 'utf8')
                     text = ""
                     text += "Authentication Time Minutes" + " : " + authentication_time + "\n"
                     for unique_id in play_times.keys():
@@ -1654,7 +1654,7 @@ Exclude Admins : {}\n\
                         addr
                         )
         elif action == "save_bans":
-            file = open("Data\\banned_ips.txt", "w")
+            file = open(directories.banned_ips, "w")
             text = "#".join(banned_ips)
             file.write(text)
             file.close()
@@ -1671,20 +1671,20 @@ Exclude Admins : {}\n\
                 file.close()
             except IOError:
                 client.send(b"message%Istenen log dosyasi bulunamadi")
-        elif action == "get_file":
-            sent_admin_pass = message[0]
-            requested_file = message[1]
-            if sent_admin_pass == admin_pass:
-                try:
-                    file = open("Data\\" + requested_file, 'rb')
-                    client.send(b"recv_file")
-                    l = file.read(1024)
-                    while (l):
-                       client.send(l)
-                       l = file.read(1024)
-                    file.close()
-                except IOError:
-                    client.send(b"message%Istenen dosya bulunamadi")
+##        elif action == "get_file":
+##            sent_admin_pass = message[0]
+##            requested_file = message[1]
+##            if sent_admin_pass == admin_pass:
+##                try:
+##                    file = open("Data\\" + requested_file, 'rb')
+##                    client.send(b"recv_file")
+##                    l = file.read(1024)
+##                    while (l):
+##                       client.send(l)
+##                       l = file.read(1024)
+##                    file.close()
+##                except IOError:
+##                    client.send(b"message%Istenen dosya bulunamadi")
             else:
                 client.send(b"message%Hatali sifre.")
                 log = "Hatali admin pass ile dosya istedi."
@@ -1696,28 +1696,28 @@ Exclude Admins : {}\n\
                 if admin_client:
                     admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
                 print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
-        elif action == "set_file":
-            sent_admin_pass = message[0]
-            sent_file = message[1]
-            if sent_admin_pass == admin_pass:
-                client.send(b"send_file")
-                with open("Data\\" + sent_file, 'wb') as file:
-                    while True:
-                        data = client.recv(1024)
-                        if not data:
-                            break
-                        file.write(data)
-            else:
-                client.send(b"message%Hatali sifre.")
-                log = "Hatali admin pass ile dosya gonderdi."
-                while True:
-                    code = get_random_string(5)
-                    if code not in bad_ips:
-                        bad_ips[code] = addr[0]
-                        break
-                if admin_client:
-                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
-                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
+##        elif action == "set_file":
+##            sent_admin_pass = message[0]
+##            sent_file = message[1]
+##            if sent_admin_pass == admin_pass:
+##                client.send(b"send_file")
+##                with open("Data\\" + sent_file, 'wb') as file:
+##                    while True:
+##                        data = client.recv(1024)
+##                        if not data:
+##                            break
+##                        file.write(data)
+##            else:
+##                client.send(b"message%Hatali sifre.")
+##                log = "Hatali admin pass ile dosya gonderdi."
+##                while True:
+##                    code = get_random_string(5)
+##                    if code not in bad_ips:
+##                        bad_ips[code] = addr[0]
+##                        break
+##                if admin_client:
+##                    admin_client.send("!! {} {} Ban kodu: {}".format(addr[0], log, code).encode())
+##                print_("!! {} {} Ban kodu: {}".format(addr[0], log, code))
         else:
             warning(client,
                     "Unknown Message. Use 'help' to see commands.",
@@ -1753,14 +1753,12 @@ def warband_listener(port, ip_adress):
         threading.Thread(target = main_request_handler, args = (client, addr, port)).start()
 
 try:
-    directories.rollback.format(filename = "database", strftime = datetime.datetime.now().strftime("%Y_%m_%d"))
-    shutil.copyfile("Data\\database.txt", directories.rollback)
-    directories.rollback.format(filename = "chests")
-    shutil.copyfile("Data\\chests.txt", directories.rollback)
-    directories.rollback.format(filename = "inventories")
-    shutil.copyfile("Data\\inventories.txt", directories.rollback)
+    directories.rollback.format(strftime = datetime.datetime.now().strftime("%Y_%m_%d"))
+    shutil.copyfile(directories.database, directories.rollback.format(filename = "database"))
+    shutil.copyfile(directories.chests, directories.rollback.format(filename = "chests"))
+    shutil.copyfile(directories.inventories, directories.format(filename = "inventories"))
     
-    file = open("Data\\database.txt", "r+")
+    file = open(directories.database, "r+")
     database = file.read().split("\n")
     file.close()
     for player in database:
@@ -1769,7 +1767,7 @@ try:
         player_data = player[1:]
         players[unique_id] = player_data
 
-    file = open("Data\\banned_players.txt", "r+")
+    file = open(directories.banned_players, "r+")
     database = file.read().split("\n")
     file.close()
     for player in database:
@@ -1780,7 +1778,7 @@ try:
         reason = parameters.pop(0)
         banned_players[unique_id] = (permanently, hours, reason)
 
-    file = open("Data\\banned_ips.txt", "r+")
+    file = open(directories.banned_ips, "r+")
     database = file.read().split("#")
     file.close()
     for ip in database:
