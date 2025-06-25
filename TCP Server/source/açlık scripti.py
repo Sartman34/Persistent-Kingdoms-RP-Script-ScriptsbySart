@@ -2,7 +2,7 @@ import socket
 import time
 
 ip_adress = "127.0.0.1"
-with open("Data\\hunger.txt", "r") as file:
+with open("data/hunger.txt", "r") as file:
     data = file.read().split("\n")
 is_enabled = int(data.pop(0).split(" : ")[1])
 interval = int(data.pop(0).split(" : ")[1])
