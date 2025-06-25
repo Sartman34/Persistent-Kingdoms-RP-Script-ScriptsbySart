@@ -703,7 +703,7 @@ def import_hosts():
         data = f.read().splitlines()
     for line in data:
         ip_address, port = line.strip().replace(" ", "").split(":")
-        hosts.append((ip_address, port))
+        hosts.append((ip_address, int(port)))
 
 def get_random_string(length):
     random_list = []
