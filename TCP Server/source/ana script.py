@@ -35,7 +35,7 @@ def print_(*string, sep = " ", end = "\n", flush = False):
 
 try:
     file = open(directories.basic_settings, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     print_("Loading basic settings...")
     server_name = database.pop(0).split(" : ")[1]
@@ -549,7 +549,7 @@ def import_custom_announcement():
         return
     command_perm.clear()
     file = open(directories.permissions, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     if not database[0]:
         return
@@ -560,7 +560,7 @@ def import_door_keys():
         return
     doors.clear()
     file = open(directories.door_keys, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     if not database[0]:
         return
@@ -574,7 +574,7 @@ def import_door_keys():
 def import_admin_permissions():
     admin_permissions.clear()
     file = open(directories.admin_permissions, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     for line in database:
         guid, *permissions = clear_spaces(line).split("%")
@@ -586,7 +586,7 @@ def import_whitelist():
         return
     whitelist.clear()
     file = open(directories.whitelist, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     for unique_id in database:
         whitelist.append(unique_id)
@@ -595,7 +595,7 @@ def import_mails():
         return
     mails.clear()
     file = open(directories.mails, "r", encoding = "utf-8")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     if not database[0]:
         return
@@ -617,7 +617,7 @@ def import_names():
             file.write("Kick Unmatched : 0")
             file.write("Exclude Admins : 0")
         return
-    force_names, kick_unmatched_name, exclude_admins, *lines = data.split("\n")
+    force_names, kick_unmatched_name, exclude_admins, *lines = data.splitlines()
     if force_names.split(" : ")[1] in ["True", "true", "+", "1"]:
         force_names = True
     else:
@@ -637,7 +637,7 @@ def import_inventories():
     if not extensions["Inventory"]:
         return
     file = open(directories.inventories, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     base_inventory.clear()
     base_inventory.extend(database[0].split("%")[1:])
@@ -651,7 +651,7 @@ def import_armies():
     if not extensions["Army"]:
         return
     with open(directories.armies, "r+") as file:
-        database = file.read().split("\n")
+        database = file.read().splitlines()
     armies.clear()
     for line in database:
         troop, *raw_equipments = line.split("%")
@@ -672,7 +672,7 @@ def import_armies():
             armies[troop_name] = ["0" for i in range(8)]
 def import_chests():
     file = open(directories.chests, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     chests.clear()
     if not database[0]:
@@ -688,7 +688,7 @@ def import_play_times():
     if not extensions["Play Times"]:
         return
     file = open(directories.play_times, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     play_times.clear()
     authentication_time = database[0].split(" : ")[1]
@@ -1765,7 +1765,7 @@ try:
     shutil.copyfile(directories.inventories, directories.rollback.format(filename = "inventories"))
     
     file = open(directories.database, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     for player in database:
         player = player.split("%")
@@ -1774,7 +1774,7 @@ try:
         players[unique_id] = player_data
 
     file = open(directories.banned_players, "r+")
-    database = file.read().split("\n")
+    database = file.read().splitlines()
     file.close()
     for player in database:
         parameters = player.split("%")
